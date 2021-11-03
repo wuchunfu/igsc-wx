@@ -72,6 +72,6 @@ App({
       wx.setStorageSync('play_mode', play_mode ? play_mode : 'xunhuan')
     } catch (e) {}
     // 加载字体
-    util.loadFont()
+    //util.loadFont()
   }
 });

@@ -2,7 +2,7 @@
     "client": "igsc/",
     "miniprogramRoot": "igsc/",
     "setting": {
-        "urlCheck": true,
+        "urlCheck": false,
         "es6": true,
         "enhance": false,
         "postcss": true,
@@ -40,7 +40,7 @@
     },
     "appid": "wx3f2ef9f26eebfb65",
     "projectname": "i%E5%8F%A4%E8%AF%97%E8%AF%8D",
-    "libVersion": "2.15.0",
+    "libVersion": "2.13.2",
     "compileType": "miniprogram",
     "simulatorType": "wechat",
     "simulatorPluginLibVersion": {},

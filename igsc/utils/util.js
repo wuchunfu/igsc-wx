@@ -108,25 +108,21 @@ var userLogin = function() {
 }
 
 var loadFont = function() {
-  wx.getNetworkType({
-    success: function(res) {
-      var networkType = res.networkType
-      if (networkType == 'wifi') {
-        try {
-          wx.loadFontFace({
-            global: true,
-            family: 'syst',
-            source: 'url("https://songci.nos-eastchina1.126.net/font/SourceHanSerifCN-Regular.otf")',
-            complete: function(res) {
-              console.log(res)
-            }
-          });
-        } catch (e) {
-          console.log(e)
-        }
+  try {
+    wx.loadFontFace({
+      global: true,
+      family: 'syst',
+      source: 'url("https://igsc-1251460212.cos.ap-beijing.myqcloud.com/SourceHanSerifCN-Regular.ttf")',
+      success: function(res) {
+        console.log('load font success')
+      },
+      fail: function(res) {
+        console.log('load font failed', res)
       }
-    }
-  })
+    });
+  } catch (e) {
+    console.log(e)
+  }
 }
 
 module.exports = {

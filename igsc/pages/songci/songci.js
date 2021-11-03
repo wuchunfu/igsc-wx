@@ -663,7 +663,6 @@ Page({
       wx.hideLoading();
     });
     this.backgroundAudioManager.onPlay(() => {
-       wx.hideLoading();
        if(!that.data['playing']){
         that.setData({
           playing: true
@@ -729,7 +728,6 @@ Page({
       if (that.data.songciItem) {
         clearInterval(id_)
         that.setCurrentPlaying();
-        wx.hideLoading();
       }
     }, 100)
   },
