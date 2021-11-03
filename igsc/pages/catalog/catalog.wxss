@@ -1,4 +1,4 @@
-@import "../wxSearchView/wxSearchView.wxss";
+@import "../search/search.wxss";
 
 .itemSongci {
   min-height: 2.6em;

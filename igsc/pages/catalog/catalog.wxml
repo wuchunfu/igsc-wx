@@ -1,6 +1,6 @@
 <view class='container catalog'>
   <view wx:if="{{showhead}}">
-    <include src="../wxSearchView/wxSearchView.wxml" />
+    <include src="../search/search.wxml" />
     <view style='margin-top:10px;' wx:if="{{historyplay&&historyplay.length>0}}">
       <view style='margin-left:5px;font-size:20rpx;'>最近播放</view>
       <view style='border-bottom:1px solid #eee;'>

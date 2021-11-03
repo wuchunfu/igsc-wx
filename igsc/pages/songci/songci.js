@@ -2,11 +2,11 @@ var config = require('../../config')
 var util = require('../../utils/util.js')
 Page({
   data: {
-    songciItem: null,
+    work_item: null,
     audioId: 0,
     duration: 0,
     audioUrl: '',
-    currentSongci: '',
+    current_work_item: '',
     poster: 'http://m.qpic.cn/psb?/V121Rqgy1YUsix/IviqfBJYA85bdpCyovu1Pi2.YVOCku1MlgYcy4FbGv0!/b/dDEBAAAAAAAA&bo=7wHzAQAAAAARByw!&rf=viewer_4',
     currentTab: 0,
     show_content: '',
@@ -16,7 +16,8 @@ Page({
     seek2: 0,
     slideValue: 0,
     time2close: 0,
-    closeplaytime: 0
+    closeplaytime: 0,
+    sliding: 0, // 1 正在滑动 2 刚刚有滑动
   },
   setTimed: function () {
     var that = this
@@ -143,10 +144,10 @@ Page({
         icon: 'none'
       })
       wx.setStorageSync('singleid', {
-        'id': that.data.songciItem.id,
+        'id': that.data.work_item.id,
         'url': that.data.audioUrl,
-        'title': that.data.songciItem.work_title,
-        'author': that.data.songciItem.work_author
+        'title': that.data.work_item.work_title,
+        'author': that.data.work_item.work_author
       })
     } else if (this.data.mode == 'one') {
       this.setData({
@@ -251,11 +252,11 @@ Page({
               work.content = work.content.replace(/\t/g, "\n　　")
             }
             that.setData({
-              songciItem: work,
+              work_item: work,
               audioId: work.audio_id,
               audioUrl: url +
                 work.audio_id + '.m4a',
-              currentSongci: work.work_title + '-' + work.work_author,
+              current_work_item: work.work_title + '-' + work.work_author,
               currentTab: target_id,
               show_content: show_content,
               duration_show: '',
@@ -301,7 +302,7 @@ Page({
     var mode = that.data.mode
     if (mode == 'xunhuan') {
       var index = music_ids.indexOf(
-        that.data.songciItem.id)
+        that.data.work_item.id)
       //循环播放
       if (key == 'next') {
         if (index == music_ids.length - 1) {
@@ -333,19 +334,19 @@ Page({
         }
       } catch (e) {
         wx.setStorageSync('singleid', {
-          'id': that.data.songciItem.id,
+          'id': that.data.work_item.id,
           'url': that.data.audioUrl,
-          'title': that.data.songciItem.work_title,
-          'author': that.data.songciItem.work_author
+          'title': that.data.work_item.work_title,
+          'author': that.data.work_item.work_author
         })
         that.backgroundAudioManager.src = that.data.audioUrl
-        that.backgroundAudioManager.title = that.data.songciItem.work_title
+        that.backgroundAudioManager.title = that.data.work_item.work_title
         that.backgroundAudioManager.epname = 'i古诗词'
-        that.backgroundAudioManager.singer = that.data.songciItem.work_author
+        that.backgroundAudioManager.singer = that.data.work_item.work_author
         that.backgroundAudioManager.coverImgUrl = that.data.poster
         that.backgroundAudioManager.play()
-        if (that.data.songciItem && that.data.songciItem.work_title) {
-          that.record_play(that.data.songciItem.id, that.data.songciItem.work_title + '-' + that.data.songciItem.work_author);
+        if (that.data.work_item && that.data.work_item.work_title) {
+          that.record_play(that.data.work_item.id, that.data.work_item.work_title + '-' + that.data.work_item.work_author);
         }
       }
     } else {
@@ -361,10 +362,10 @@ Page({
         that.get_by_id(play_id)
         var try_times = 0
         var playInt = setInterval(() => {
-          if (that.data.songciItem && that.data.songciItem.id == play_id) {
+          if (that.data.work_item && that.data.work_item.id == play_id) {
             that.playsound();
-            if (that.data.songciItem.work_title) {
-              that.record_play(play_id, that.data.songciItem.work_title + '-' + that.data.songciItem.work_author);
+            if (that.data.work_item.work_title) {
+              that.record_play(play_id, that.data.work_item.work_title + '-' + that.data.work_item.work_author);
             }
             clearInterval(playInt)
           }
@@ -397,7 +398,7 @@ Page({
       key: 'user_open_id',
       success: function (res) {
         var open_id = res.data;
-        var gsc_id = that.data.songciItem.id
+        var gsc_id = that.data.work_item.id
         wx.request({
           url: config.service.host + '/user/' + operate + '/' + open_id + '/' + gsc_id,
           success: function (res) {
@@ -449,17 +450,17 @@ Page({
               })
             }
             if (res.data.code == 0) {
-              var songciItem = that.data.songciItem
+              var work_item = that.data.work_item
               if (operate == 'like') {
-                songciItem.like = 1
+                work_item.like = 1
               } else {
-                songciItem.like = 0
+                work_item.like = 0
               }
               that.setData({
-                songciItem: songciItem
+                work_item: work_item
               })
               wx.removeStorage({
-                key: 'songci' + songciItem.id + util.formatTime(new Date())
+                key: 'songci' + work_item.id + util.formatTime(new Date())
               })
             }
           }
@@ -481,9 +482,9 @@ Page({
       currentTime = this.backgroundAudioManager.currentTime
     }
     this.setData({
-      seek2: currentTime,
-      slideValue: parseInt(currentTime / this.backgroundAudioManager.duration),
-      playing: false
+      seek2: currentTime - 1,
+      slideValue: parseInt(currentTime / this.backgroundAudioManager.duration * 100),
+      playing: false,
     });
   },
   playbackmusic: function (e) {
@@ -497,15 +498,15 @@ Page({
     } else {
       if (that.data.mode == 'one') {
         wx.setStorageSync('singleid', {
-          'id': that.data.songciItem.id,
+          'id': that.data.work_item.id,
           'url': that.data.audioUrl,
-          'title': that.data.songciItem.work_title,
-          'author': that.data.songciItem.work_author
+          'title': that.data.work_item.work_title,
+          'author': that.data.work_item.work_author
         })
       }
       that.playsound();
-      if (that.data.songciItem && that.data.songciItem.work_title) {
-        that.record_play(that.data.songciItem.id, that.data.songciItem.work_title + '-' + that.data.songciItem.work_author);
+      if (that.data.work_item && that.data.work_item.work_title) {
+        that.record_play(that.data.work_item.id, that.data.work_item.work_title + '-' + that.data.work_item.work_author);
       }
     }
   },
@@ -546,7 +547,7 @@ Page({
   },
   changeContent: function (e) {
     var target_id = e.target.dataset.item
-    var gsc = this.data.songciItem
+    var gsc = this.data.work_item
     var show_content = ''
     switch ('' + target_id) {
       case '0':
@@ -576,10 +577,10 @@ Page({
   onPullDownRefresh: function () {
     wx.showNavigationBarLoading();
     var that = this
-    if (parseInt(that.data.songciItem.id) > 8099) {
+    if (parseInt(that.data.work_item.id) > 8099) {
       var id_ = 0
     } else {
-      id_ = that.data.songciItem.id
+      id_ = that.data.work_item.id
     }
     var key = parseInt(id_) + 1
     that.get_by_id(key, true)
@@ -608,10 +609,10 @@ Page({
   playsound: function () {
     var that = this
     const backgroundAudioManager = this.backgroundAudioManager
-    if (this.data.songciItem) {
-      backgroundAudioManager.title = this.data.songciItem.work_title
+    if (this.data.work_item) {
+      backgroundAudioManager.title = this.data.work_item.work_title
       backgroundAudioManager.epname = 'i古诗词'
-      backgroundAudioManager.singer = this.data.songciItem.work_author
+      backgroundAudioManager.singer = this.data.work_item.work_author
       backgroundAudioManager.coverImgUrl = this.data.poster
       backgroundAudioManager.startTime = this.data.seek2
       backgroundAudioManager.src = this.data.audioUrl
@@ -679,7 +680,9 @@ Page({
       });
     });
     this.backgroundAudioManager.onStop(() => {
-      return false
+      that.setData({
+        playing: false
+      });
     });
     this.backgroundAudioManager.onError((e) => {
       that.setData({
@@ -699,7 +702,7 @@ Page({
       wx.hideLoading();
     });
     this.backgroundAudioManager.onPlay(() => {
-      if (!that.data['playing']) {
+      if (!that.data.playing) {
         that.setData({
           playing: true
         })
@@ -715,7 +718,9 @@ Page({
       that.do_operate_play('next', mode)
     });
     this.backgroundAudioManager.onTimeUpdate(() => {
-      that.musicStart()
+      if (that.data.sliding != 1) {
+        that.musicStart()
+      }
     });
     var music_ids = wx.getStorageSync('music_ids')
     if (!music_ids) {
@@ -723,7 +728,7 @@ Page({
       app.get_music_list()
     }
     var id_ = setInterval(() => {
-      if (that.data.songciItem) {
+      if (that.data.work_item) {
         clearInterval(id_)
         that.setCurrentPlaying();
         wx.hideLoading();
@@ -761,7 +766,7 @@ Page({
   onShow: function () {
     var that = this
     var id_ = setInterval(() => {
-      if (that.data.songciItem) {
+      if (that.data.work_item) {
         clearInterval(id_)
         that.setCurrentPlaying();
       }
@@ -780,10 +785,10 @@ Page({
   },
   longPress: function () {
     var that = this
-    if (parseInt(that.data.songciItem.id) <= 1) {
+    if (parseInt(that.data.work_item.id) <= 1) {
       var id_ = 8101
     } else {
-      id_ = that.data.songciItem.id
+      id_ = that.data.work_item.id
     }
     var key = parseInt(id_) - 1
     var pages = getCurrentPages()
@@ -801,8 +806,8 @@ Page({
 
   onShareAppMessage: function (res) {
     return {
-      title: this.data.currentSongci,
-      path: '/pages/songci/songci?id=' + this.data.songciItem.id,
+      title: this.data.work_item.content.substr(0, 23) + '...  [' + this.data.work_item.work_dynasty + '] ' + this.data.work_item.work_author + '《' + this.data.work_item.work_title + '》',
+      path: '/pages/songci/songci?id=' + this.data.work_item.id,
       imageUrl: '/static/share4.jpg',
       success: function (res) {
         util.showSuccess('分享成功')
@@ -818,8 +823,8 @@ Page({
       prefix = '【音频】'
     }
     return {
-      title: prefix + this.data.currentSongci,
-      query: 'id=' + this.data.songciItem.id,
+      title: prefix + this.data.work_item.content.substr(0, 28) + '...  [' + this.data.work_item.work_dynasty + '] ' + this.data.work_item.work_author + '《' + this.data.work_item.work_title + '》',
+      query: 'id=' + this.data.work_item.id,
       imageUrl: '/static/share.jpg',
       success: function (res) {
         util.showSuccess('分享成功')
@@ -875,6 +880,14 @@ Page({
     } catch (e) {}
     var current_time = this.backgroundAudioManager.currentTime
     var duration = this.backgroundAudioManager.duration
+    if (that.data.sliding == 2) {
+      var slide_value = that.data.slideValue
+      current_time = slide_value / 100.0 * duration
+      that.backgroundAudioManager.seek(that.data.seek2)
+    }
+    if (current_time <= 0) {
+      return
+    }
     this.setData({
       slideValue: parseInt(current_time / duration * 100)
     })
@@ -884,43 +897,46 @@ Page({
       duration: this.backgroundAudioManager.duration,
       current_time: this.backgroundAudioManager.currentTime,
       duration_show: duration_show,
-      current_time_show: current_time_show
+      current_time_show: current_time_show,
+      sliding: 0,
     })
   },
   sliderChanging: function (e) {
     var that = this
-    that.backgroundAudioManager.pause()
-    var v = e.detail.value
-    var duration = that.backgroundAudioManager.duration ? that.backgroundAudioManager.duration : 0
-    if (duration <= 0) {
-      wx.showToast({
-        title: '出错啦～',
+    if (that.data['duration'] <= 0) {
+      that.setData({
+        slideValue: 0
       })
       return
     }
+    var v = e.detail.value
+    var duration = that.data.duration
     var seek2 = v / 100 * duration
     var current_time_show = (parseInt(seek2 / 60) < 10 ? '0' + parseInt(seek2 / 60) : parseInt(seek2 / 60)) + ':' + ((parseInt(seek2 % 60) > 9) ? parseInt(seek2 % 60) : '0' + parseInt(seek2 % 60))
     that.setData({
-      current_time_show: current_time_show
+      sliding: 1,
+      seek2: seek2 >= duration ? 0 : seek2,
+      current_time_show: current_time_show,
+      slideValue: v
     });
   },
   slider2change: function (e) {
     var that = this
-    var v = e.detail.value
-    var duration = that.backgroundAudioManager.duration ? that.backgroundAudioManager.duration : 0
-    if (duration <= 0) {
-      wx.showToast({
-        title: '出错啦～',
+    if (that.data.duration <= 0) {
+      that.setData({
+        slideValue: 0
       })
       return
     }
+    var v = e.detail.value
+    var duration = that.data.duration
     var seek2 = v / 100 * duration
     var current_time_show = (parseInt(seek2 / 60) < 10 ? '0' + parseInt(seek2 / 60) : parseInt(seek2 / 60)) + ':' + ((parseInt(seek2 % 60) > 9) ? parseInt(seek2 % 60) : '0' + parseInt(seek2 % 60))
     that.setData({
       seek2: seek2 >= duration ? 0 : seek2,
       current_time_show: current_time_show,
       slideValue: v,
+      sliding: 2,
     });
-    that.playsound();
   }
 });

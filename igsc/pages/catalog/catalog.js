@@ -1,6 +1,6 @@
 var config = require('../../config')
 var util = require('../../utils/util.js')
-var WxSearch = require('../wxSearchView/wxSearchView.js');
+var WxSearch = require('../search/search.js');
 Page({
   data: {
     gscitems: [],
