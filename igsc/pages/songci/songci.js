@@ -18,11 +18,11 @@ Page({
     time2close: 0,
     closeplaytime: 0
   },
-  setTimed: function() {
+  setTimed: function () {
     var that = this
     wx.showActionSheet({
       itemList: ['2小时', '1小时', '30分钟', '10分钟', '播放完这首', '不设置'],
-      success: function(res) {
+      success: function (res) {
         var index = res.tapIndex
         var seconds = 0
         switch (index) {
@@ -119,10 +119,10 @@ Page({
           }
         }
       },
-      fail: function(res) {}
+      fail: function (res) {}
     })
   },
-  change_mode: function() {
+  change_mode: function () {
     //xunhuan->one->shuffle->xunhuan
     var that = this
     var mode = "xunhuan"
@@ -171,7 +171,7 @@ Page({
       wx.setStorageSync('play_mode', mode)
     } catch (e) {}
   },
-  get_by_id: function(key, pull = false) {
+  get_by_id: function (key, pull = false) {
     if (!pull) {
       wx.showLoading({
         title: '加载中...'
@@ -180,7 +180,7 @@ Page({
     var that = this
     wx.getStorage({
       key: 'songci' + key + util.formatTime(new Date()),
-      success: function(res) {
+      success: function (res) {
         var d = res.data;
         that.setData(d);
         that.get_play_mode();
@@ -197,7 +197,7 @@ Page({
           }
         }
       },
-      fail: function() {
+      fail: function () {
         var open_id = ''
         try {
           open_id = wx.getStorageSync('user_open_id')
@@ -287,7 +287,7 @@ Page({
       }
     });
   },
-  do_operate_play: function(key, mode = "xunhuan") {
+  do_operate_play: function (key, mode = "xunhuan") {
     var that = this
     var music_ids = wx.getStorageSync('music_ids')
     if (!music_ids) {
@@ -385,22 +385,22 @@ Page({
       }
     }
   },
-  operate_play: function(e) {
+  operate_play: function (e) {
     var key = e.target.dataset.key
     this.do_operate_play(key, this.data.mode)
   },
-  operate_like: function(e) {
+  operate_like: function (e) {
     var like = e.target.dataset.like
     var operate = like == 1 ? 'dislike' : 'like'
     var that = this
     wx.getStorage({
       key: 'user_open_id',
-      success: function(res) {
+      success: function (res) {
         var open_id = res.data;
         var gsc_id = that.data.songciItem.id
         wx.request({
           url: config.service.host + '/user/' + operate + '/' + open_id + '/' + gsc_id,
-          success: function(res) {
+          success: function (res) {
             if (!res || res.data.code != 0) {
               wx.showToast({
                 title: '网络异常~~',
@@ -412,6 +412,42 @@ Page({
               title: res.data.data,
               icon: 'none'
             });
+            if (operate == 'like') {
+              wx.getStorage({
+                key: 'not_show_like_toast',
+                success: function (res) {
+                  var toast_num = parseInt(res.data)
+                  if (toast_num < 3) {
+                    wx.showToast({
+                      title: '收藏成功，可在首页下拉查看~',
+                      duration: 3000,
+                      icon: 'none',
+                      success: function (res) {
+                        wx.setStorage({
+                          key: 'not_show_like_toast',
+                          data: toast_num + 1,
+                        });
+                      }
+                    })
+                  }
+                },
+                fail: function (res) {
+                  wx.hideToast()
+                  wx.showModal({
+                    title: '收藏成功',
+                    content: '可在首页下拉进入收藏页面查看~',
+                    showCancel: false,
+                    confirmText: '知道了',
+                    success: function (res) {
+                      wx.setStorage({
+                        key: 'not_show_like_toast',
+                        data: 1,
+                      });
+                    }
+                  })
+                }
+              })
+            }
             if (res.data.code == 0) {
               var songciItem = that.data.songciItem
               if (operate == 'like') {
@@ -429,7 +465,7 @@ Page({
           }
         })
       },
-      fail: function() {
+      fail: function () {
         wx.showToast({
           title: '请稍后再试',
           icon: 'none'
@@ -438,7 +474,7 @@ Page({
       }
     })
   },
-  pauseplaybackmusic: function() {
+  pauseplaybackmusic: function () {
     this.backgroundAudioManager.stop()
     var currentTime = 1
     if (this.backgroundAudioManager.currentTime && this.backgroundAudioManager.currentTime > 1) {
@@ -450,7 +486,7 @@ Page({
       playing: false
     });
   },
-  playbackmusic: function(e) {
+  playbackmusic: function (e) {
     var that = this
     var mode = wx.getStorageSync('play_mode')
     if (mode == 'hc') {
@@ -473,7 +509,7 @@ Page({
       }
     }
   },
-  record_play: function(id_, title) {
+  record_play: function (id_, title) {
     var that = this
     var historyplay = wx.getStorageSync('historyplay')
     if (!historyplay) {
@@ -492,7 +528,7 @@ Page({
     }
     wx.setStorageSync('historyplay', historyplay)
   },
-  search_: function(e) {
+  search_: function (e) {
     var id_ = e.target.dataset.id_
     var q = e.target.dataset.q
     var pages = getCurrentPages()
@@ -508,7 +544,7 @@ Page({
       });
     }
   },
-  changeContent: function(e) {
+  changeContent: function (e) {
     var target_id = e.target.dataset.item
     var gsc = this.data.songciItem
     var show_content = ''
@@ -537,7 +573,7 @@ Page({
       show_content: show_content
     })
   },
-  onPullDownRefresh: function() {
+  onPullDownRefresh: function () {
     wx.showNavigationBarLoading();
     var that = this
     if (parseInt(that.data.songciItem.id) > 8099) {
@@ -560,7 +596,7 @@ Page({
   /**
    * 生命周期函数--监听页面加载
    */
-  onLoad: function(options) {
+  onLoad: function (options) {
     var that = this
     if (options.hasOwnProperty('id')) {
       var id_ = options.id
@@ -569,7 +605,7 @@ Page({
     }
     that.get_by_id(id_)
   },
-  playsound: function() {
+  playsound: function () {
     var that = this
     const backgroundAudioManager = this.backgroundAudioManager
     if (this.data.songciItem) {
@@ -595,7 +631,7 @@ Page({
       })
     }
   },
-  get_play_mode: function() {
+  get_play_mode: function () {
     var that = this
     try {
       var mode = wx.getStorageSync('play_mode')
@@ -610,7 +646,7 @@ Page({
     })
     return mode
   },
-  reset_playmode: function() {
+  reset_playmode: function () {
     var that = this
     try {
       var old_play_mode = wx.getStorageSync('old_play_mode')
@@ -626,16 +662,16 @@ Page({
   /**
    * 生命周期函数--监听页面初次渲染完成
    */
-  onReady: function(e) {
+  onReady: function (e) {
     var that = this
     that.backgroundAudioManager = wx.getBackgroundAudioManager();
     this.backgroundAudioManager.onEnded(() => {
-        var mode = that.get_play_mode()
-        if (mode != 'hc') {
-          that.do_operate_play('next', mode)
-        } else {
-          that.reset_playmode()
-        }
+      var mode = that.get_play_mode()
+      if (mode != 'hc') {
+        that.do_operate_play('next', mode)
+      } else {
+        that.reset_playmode()
+      }
     });
     this.backgroundAudioManager.onPause(() => {
       that.setData({
@@ -663,11 +699,11 @@ Page({
       wx.hideLoading();
     });
     this.backgroundAudioManager.onPlay(() => {
-       if(!that.data['playing']){
+      if (!that.data['playing']) {
         that.setData({
           playing: true
         })
-       }
+      }
     });
     this.backgroundAudioManager.onPrev(() => {
       var mode = that.get_play_mode()
@@ -694,7 +730,7 @@ Page({
       }
     }, 100)
   },
-  setCurrentPlaying: function() {
+  setCurrentPlaying: function () {
     var that = this
     // 如果正在播放
     if (that.backgroundAudioManager && !that.backgroundAudioManager.paused) {
@@ -722,7 +758,7 @@ Page({
   /**
    * 生命周期函数--监听页面显示
    */
-  onShow: function() {
+  onShow: function () {
     var that = this
     var id_ = setInterval(() => {
       if (that.data.songciItem) {
@@ -734,15 +770,15 @@ Page({
   /**
    * 生命周期函数--监听页面隐藏
    */
-  onHide: function() {},
+  onHide: function () {},
 
   /**
    * 生命周期函数--监听页面卸载
    */
-  onUnload: function() {
+  onUnload: function () {
 
   },
-  longPress: function() {
+  longPress: function () {
     var that = this
     if (parseInt(that.data.songciItem.id) <= 1) {
       var id_ = 8101
@@ -763,20 +799,20 @@ Page({
     }
   },
 
-  onShareAppMessage: function(res) {
+  onShareAppMessage: function (res) {
     return {
       title: this.data.currentSongci,
       path: '/pages/songci/songci?id=' + this.data.songciItem.id,
       imageUrl: '/static/share4.jpg',
-      success: function(res) {
+      success: function (res) {
         util.showSuccess('分享成功')
       },
-      fail: function(res) {
+      fail: function (res) {
         util.showSuccess('取消分享')
       }
     }
   },
-  onShareTimeline: function() {
+  onShareTimeline: function () {
     var prefix = ''
     if (this.data.audioId > 0) {
       prefix = '【音频】'
@@ -785,20 +821,20 @@ Page({
       title: prefix + this.data.currentSongci,
       query: 'id=' + this.data.songciItem.id,
       imageUrl: '/static/share.jpg',
-      success: function(res) {
+      success: function (res) {
         util.showSuccess('分享成功')
       },
-      fail: function(res) {
+      fail: function (res) {
         util.showSuccess('取消分享')
       }
     }
   },
-  longPressBack: function() {
+  longPressBack: function () {
     wx.redirectTo({
       url: '/pages/catalog/catalog',
     })
   },
-  musicStart: function() {
+  musicStart: function () {
     var that = this
     try {
       var time2close = wx.getStorageSync('time2close')
@@ -851,7 +887,7 @@ Page({
       current_time_show: current_time_show
     })
   },
-  sliderChanging: function(e) {
+  sliderChanging: function (e) {
     var that = this
     that.backgroundAudioManager.pause()
     var v = e.detail.value
@@ -868,7 +904,7 @@ Page({
       current_time_show: current_time_show
     });
   },
-  slider2change: function(e) {
+  slider2change: function (e) {
     var that = this
     var v = e.detail.value
     var duration = that.backgroundAudioManager.duration ? that.backgroundAudioManager.duration : 0
