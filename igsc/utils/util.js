@@ -6,15 +6,15 @@ const formatTime = date => {
   return [year, month, day].map(formatNumber).join('-')
 }
 
-var timetrans = function(date) {
-  var date = new Date(date * 1000);
-  var Y = date.getFullYear() + '-';
-  var M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-';
-  var D = (date.getDate() < 10 ? '0' + (date.getDate()) : date.getDate()) + ' ';
-  var h = (date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) + ':';
-  var m = (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()) + ':';
-  var s = (date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds());
-  return Y + M + D + h + m + s;
+var timetrans = function (date) {
+  var date = new Date(date * 1000)
+  var Y = date.getFullYear() + '-'
+  var M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-'
+  var D = (date.getDate() < 10 ? '0' + (date.getDate()) : date.getDate()) + ' '
+  var h = (date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) + ':'
+  var m = (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()) + ':'
+  var s = (date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds())
+  return Y + M + D + h + m + s
 }
 
 const formatNumber = n => {
@@ -38,7 +38,7 @@ var showSuccess = text => wx.showToast({
 
 // 显示失败提示
 var showModel = (content) => {
-  wx.hideToast();
+  wx.hideToast()
 
   wx.showModal({
     content: content,
@@ -55,11 +55,11 @@ var pageConfirm = (url) => {
     content: '小程序最多能打开十层页面，是否要继续？',
     cancelText: '不要',
     confirmText: '继续',
-    success: function(res) {
+    success: function (res) {
       if (res.confirm) {
         wx.redirectTo({
           url: url
-        });
+        })
       } else {
         wx.showToast({
           title: '您可以到其他地方看看:)',
@@ -68,18 +68,18 @@ var pageConfirm = (url) => {
         })
       }
     }
-  });
+  })
 }
 
-var userLogin = function() {
+var userLogin = function () {
   wx.login({
-    success: function(loginCode) {
+    success: function (loginCode) {
       wx.request({
         url: config.service.host + '/user/auth/' + loginCode.code,
         header: {
           'content-type': 'application/json'
         },
-        success: function(res) {
+        success: function (res) {
           if (res.statusCode == 200) {
             if (res.data.code == 0) {
               var open_id = res.data.data.openid
@@ -101,25 +101,25 @@ var userLogin = function() {
         }
       })
     },
-    fail: function(e) {
+    fail: function (e) {
       console.log(e)
     }
-  });
+  })
 }
 
-var loadFont = function() {
+var loadFont = function () {
   try {
     wx.loadFontFace({
       global: true,
       family: 'syst',
       source: 'url("https://igsc-1251460212.cos.ap-beijing.myqcloud.com/SourceHanSerifCN-Regular.ttf")',
-      success: function(res) {
+      success: function (res) {
         console.log('load font success')
       },
-      fail: function(res) {
+      fail: function (res) {
         console.log('load font failed', res)
       }
-    });
+    })
   } catch (e) {
     console.log(e)
   }

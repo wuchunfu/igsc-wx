@@ -1,4 +1,4 @@
-.operate_music {
+.operate_audio {
   height: 42rpx;
   width: 42rpx;
   padding-right: 18rpx;
@@ -13,10 +13,10 @@
 .tab-item {
   display: inline-block;
   width: 64rpx;
-  margin-right: 45rpx;
+  margin-right: 30rpx;
   font-family: 'myfont';
   height: 32rpx;
-  line-height: 36rpx;
+  line-height: 30rpx;
   font-size: 30rpx;
   font-weight: 700;
 }
@@ -38,15 +38,9 @@
 }
 
 .title {
-  font-size: 40rpx;
+  font-size: 35rpx;
   text-align: center;
   margin-top: 0.1em;
-}
-
-.title :hover {
-  /* background-color: #F6F6F6; */
-  border-radius: 8rpx;
-  font-weight: bolder;
 }
 
 .author {
@@ -55,8 +49,7 @@
   margin-top: 15rpx;
 }
 
-.author:hover {
-  border-radius: 8rpx;
+.author:hover,.title:hover,.translation:hover, .content:hover,.foreward:hover{
   font-weight: bolder;
 }
 

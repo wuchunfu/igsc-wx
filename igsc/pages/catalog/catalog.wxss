@@ -1,6 +1,6 @@
 @import "../search/search.wxss";
 
-.itemSongci {
+.item_work {
   min-height: 2.6em;
   border-bottom-width: 0.80rpx;
   border-bottom-style: dotted;

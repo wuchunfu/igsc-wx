@@ -3,21 +3,25 @@ var util = require('../../utils/util.js')
 Page({
   data: {
     work_item: null,
-    audioId: 0,
+    audio_id: 0,
     duration: 0,
-    audioUrl: '',
+    audio_url: '',
     current_work_item: '',
     poster: 'http://m.qpic.cn/psb?/V121Rqgy1YUsix/IviqfBJYA85bdpCyovu1Pi2.YVOCku1MlgYcy4FbGv0!/b/dDEBAAAAAAAA&bo=7wHzAQAAAAARByw!&rf=viewer_4',
-    currentTab: 0,
+    current_tab: 0,
     show_content: '',
     playing: false,
     duration_show: '',
     current_time_show: '',
-    seek2: 0,
-    slideValue: 0,
+    seek2: {
+      seek: 0,
+      audio_id: 0
+    },
+    slide_value: 0,
     time2close: 0,
-    closeplaytime: 0,
+    close_play_time: 0,
     sliding: 0, // 1 正在滑动 2 刚刚有滑动
+    playing_audio_id: 0, // 正在播放的id
   },
   setTimed: function () {
     var that = this
@@ -57,7 +61,7 @@ Page({
         }
         if (seconds == -1) {
           wx.removeStorageSync('time2close')
-          wx.removeStorageSync('closeplaytime')
+          wx.removeStorageSync('close_play_time')
           if (that.data.time2close && that.data.time2close != 0) {
             if (setTimedInt > 0) {
               clearInterval(setTimedInt)
@@ -70,7 +74,7 @@ Page({
           }
           that.setData({
             time2close: 0,
-            closeplaytime: 0
+            close_play_time: 0,
           })
         } else {
           var time2close = (new Date).getTime() / 1000 + seconds
@@ -84,10 +88,10 @@ Page({
               wx.setStorageSync('setTimedInt', 0)
             }
             wx.setStorageSync('time2close', time2close)
-            wx.setStorageSync('closeplaytime', parseInt(seconds / 60))
+            wx.setStorageSync('close_play_time', parseInt(seconds / 60))
             that.setData({
               time2close: time2close,
-              closeplaytime: parseInt(seconds / 60)
+              close_play_time: parseInt(seconds / 60),
             })
             var timedId = setInterval(() => {
               try {
@@ -96,17 +100,17 @@ Page({
                 time2closeS = 0
               }
               if (!time2closeS || time2closeS == 0 || (new Date()).getTime() >= time2close * 1000) {
-                that.pauseplaybackmusic()
+                that.pauseplaybackaudio()
                 that.setData({
                   time2close: 0,
-                  closeplaytime: 0
+                  close_play_time: 0,
                 })
                 wx.showToast({
                   title: '定时已到~~',
                   icon: 'none'
                 })
                 wx.removeStorageSync('time2close')
-                wx.removeStorageSync('closeplaytime')
+                wx.removeStorageSync('close_play_time')
                 clearInterval(timedId)
                 wx.setStorageSync('setTimedInt', 0)
               }
@@ -136,7 +140,7 @@ Page({
     }
     if (this.data.mode == 'xunhuan') {
       this.setData({
-        mode: "one"
+        mode: "one",
       })
       mode = "one"
       wx.showToast({
@@ -145,13 +149,13 @@ Page({
       })
       wx.setStorageSync('singleid', {
         'id': that.data.work_item.id,
-        'url': that.data.audioUrl,
+        'url': that.data.audio_url,
         'title': that.data.work_item.work_title,
         'author': that.data.work_item.work_author
       })
     } else if (this.data.mode == 'one') {
       this.setData({
-        mode: "shuffle"
+        mode: "shuffle",
       })
       wx.showToast({
         title: '随机播放',
@@ -160,7 +164,7 @@ Page({
       mode = "shuffle"
     } else if (this.data.mode == 'shuffle') {
       this.setData({
-        mode: "xunhuan"
+        mode: "xunhuan",
       })
       wx.showToast({
         title: "循环播放",
@@ -176,25 +180,25 @@ Page({
     if (!pull) {
       wx.showLoading({
         title: '加载中...'
-      });
+      })
     }
     var that = this
     wx.getStorage({
       key: 'songci' + key + util.formatTime(new Date()),
       success: function (res) {
-        var d = res.data;
-        that.setData(d);
-        that.get_play_mode();
+        var d = res.data
+        that.setData(d)
+        that.get_play_mode()
         var time2close = wx.getStorageSync('time2close')
         that.setData({
-          time2close: time2close && time2close > 0 ? time2close : 0
-        });
+          time2close: time2close && time2close > 0 ? time2close : 0,
+        })
         if (time2close && time2close > 0) {
           var last_micro_seconds = time2close - (new Date()).getTime() / 1000
           if (last_micro_seconds) {
             that.setData({
-              closeplaytime: parseInt(last_micro_seconds / 60.0 + 0.5)
-            });
+              close_play_time: parseInt(last_micro_seconds / 60.0 + 0.5),
+            })
           }
         }
       },
@@ -242,9 +246,9 @@ Page({
             show_content = show_content.replace(/\n/g, "\n　　")
             show_content = show_content.replace(/\t/g, "\n　　")
             if (work.id % 4 != 0) {
-              var url = config.neteaseAudioUrl
+              var url = config.neteaseaudio_url
             } else {
-              var url = config.songciAudioUrl
+              var url = config.qaudio_url
             }
             if (work.layout == 'indent') {
               work.content = work.content.replace(/　　/g, "\n")
@@ -253,68 +257,70 @@ Page({
             }
             that.setData({
               work_item: work,
-              audioId: work.audio_id,
-              audioUrl: url +
-                work.audio_id + '.m4a',
+              audio_id: work.audio_id,
+              audio_url: url + work.audio_id + '.m4a',
               current_work_item: work.work_title + '-' + work.work_author,
-              currentTab: target_id,
+              current_tab: target_id,
               show_content: show_content,
               duration_show: '',
               current_time_show: '',
-              seek2: 0,
-              slideValue: 0
-            });
+              seek2: {
+                seek: 0,
+                audio_id: work.audio_id,
+              },
+              slide_value: 0,
+            })
             if (work.like == 1) {
               wx.setStorage({
                 key: 'songci' + key + util.formatTime(new Date()),
                 data: that.data,
               })
             }
-            that.get_play_mode();
+            that.get_play_mode()
             var time2close = wx.getStorageSync('time2close')
             that.setData({
-              time2close: time2close && time2close > 0 ? time2close : 0
-            });
+              time2close: time2close && time2close > 0 ? time2close : 0,
+            })
             if (time2close && time2close > 0) {
               var last_micro_seconds = time2close - (new Date()).getTime() / 1000
               if (last_micro_seconds) {
                 that.setData({
-                  closeplaytime: parseInt(last_micro_seconds / 60.0 + 0.5)
-                });
+                  close_play_time: parseInt(last_micro_seconds / 60.0 + 0.5),
+                })
               }
             }
           }
-        });
+        })
       }
-    });
+    })
   },
   do_operate_play: function (key, mode = "xunhuan") {
     var that = this
-    var music_ids = wx.getStorageSync('music_ids')
-    if (!music_ids) {
+    var audio_ids = wx.getStorageSync('audio_ids')
+    if (!audio_ids) {
       wx.showToast({
         title: '播放失败~~',
-        icon: 'none'
+        icon: 'none',
       })
       return
     }
     var play_id = 1
     var mode = that.data.mode
     if (mode == 'xunhuan') {
-      var index = music_ids.indexOf(
+      var index = audio_ids.indexOf(
         that.data.work_item.id)
       //循环播放
       if (key == 'next') {
-        if (index == music_ids.length - 1) {
-          play_id = music_ids[0]
+        if (index == audio_ids.length - 1) {
+          play_id = audio_ids[0]
         } else {
-          play_id = music_ids[index + 1]
+          play_id = audio_ids[index + 1]
         }
       } else {
         if (index == 0) {
-          play_id = music_ids[music_ids.length - 1]
+          play_id = audio_ids[audio_ids.length - 1]
         } else {
-          play_id = music_ids[index - 1]
+          play_id = audio_ids[index - 1]
         }
       }
     } else if (that.data.mode == 'one') {
@@ -325,37 +331,39 @@ Page({
         that.backgroundAudioManager.title = play_id_url.title
         that.backgroundAudioManager.singer = play_id_url.author
         that.backgroundAudioManager.coverImgUrl = that.data.poster
-        that.backgroundAudioManager.epname = 'i古诗词'
+        that.backgroundAudioManager.epname = 'i古诗词 '
         that.backgroundAudioManager.startTime = 0
+        that.backgroundAudioManager._audio_id = that.data.work_item.audio_id
         that.backgroundAudioManager.seek(0)
         that.backgroundAudioManager.play()
         if (play_id_url.title) {
-          that.record_play(play_id_url.id, play_id_url.title + '-' + play_id_url.author);
+          that.record_play(play_id_url.id, play_id_url.title + '-' + play_id_url.author)
         }
       } catch (e) {
         wx.setStorageSync('singleid', {
           'id': that.data.work_item.id,
-          'url': that.data.audioUrl,
+          'url': that.data.audio_url,
           'title': that.data.work_item.work_title,
           'author': that.data.work_item.work_author
         })
-        that.backgroundAudioManager.src = that.data.audioUrl
+        that.backgroundAudioManager.src = that.data.audio_url
         that.backgroundAudioManager.title = that.data.work_item.work_title
-        that.backgroundAudioManager.epname = 'i古诗词'
+        that.backgroundAudioManager.epname = 'i古诗词 '
         that.backgroundAudioManager.singer = that.data.work_item.work_author
         that.backgroundAudioManager.coverImgUrl = that.data.poster
+        that.backgroundAudioManager._audio_id = that.data.work_item.audio_id
         that.backgroundAudioManager.play()
         if (that.data.work_item && that.data.work_item.work_title) {
-          that.record_play(that.data.work_item.id, that.data.work_item.work_title + '-' + that.data.work_item.work_author);
+          that.record_play(that.data.work_item.id, that.data.work_item.work_title + '-' + that.data.work_item.work_author)
         }
       }
     } else {
       //随机播放
-      var play_id = parseInt(music_ids.length * Math.random())
-      if (play_id >= music_ids.length) {
-        play_id = music_ids.length - 1
+      var play_id = parseInt(audio_ids.length * Math.random())
+      if (play_id >= audio_ids.length) {
+        play_id = audio_ids.length - 1
       }
-      play_id = music_ids[play_id]
+      play_id = audio_ids[play_id]
     }
     if (mode != 'one') {
       try {
@@ -363,9 +371,9 @@ Page({
         var try_times = 0
         var playInt = setInterval(() => {
           if (that.data.work_item && that.data.work_item.id == play_id) {
-            that.playsound();
+            that.playsound()
             if (that.data.work_item.work_title) {
-              that.record_play(play_id, that.data.work_item.work_title + '-' + that.data.work_item.work_author);
+              that.record_play(play_id, that.data.work_item.work_title + '-' + that.data.work_item.work_author)
             }
             clearInterval(playInt)
           }
@@ -374,7 +382,7 @@ Page({
             wx.showToast({
               title: '播放失败:(',
               icon: 'none'
-            });
+            })
             clearInterval(playInt)
           }
         }, 600)
@@ -390,6 +398,21 @@ Page({
     var key = e.target.dataset.key
     this.do_operate_play(key, this.data.mode)
   },
+  do_copy: function (e) {
+    var s = []
+    s.push(this.data.work_item.work_title)
+    s.push(this.data.work_item.work_dynasty + '·' + this.data.work_item.work_author)
+    if (this.data.work_item.foreword) {
+      s.push(this.data.work_item.foreword + '(序)')
+    }
+    s.push(this.data.work_item.content.replace(/　　/g, ''))
+    if (this.data.work_item.audio_id > 0) {
+      s.push('\n' + config.neteaseaudio_url + this.data.work_item.audio_id + '.m4a')
+    }
+    wx.setClipboardData({
+      data: s.join('\n'),
+    })
+  },
   operate_like: function (e) {
     var like = e.target.dataset.like
     var operate = like == 1 ? 'dislike' : 'like'
@@ -397,7 +420,7 @@ Page({
     wx.getStorage({
       key: 'user_open_id',
       success: function (res) {
-        var open_id = res.data;
+        var open_id = res.data
         var gsc_id = that.data.work_item.id
         wx.request({
           url: config.service.host + '/user/' + operate + '/' + open_id + '/' + gsc_id,
@@ -406,13 +429,13 @@ Page({
               wx.showToast({
                 title: '网络异常~~',
                 icon: 'none'
-              });
+              })
               return
             }
             wx.showToast({
               title: res.data.data,
               icon: 'none'
-            });
+            })
             if (operate == 'like') {
               wx.getStorage({
                 key: 'not_show_like_toast',
@@ -427,7 +450,7 @@ Page({
                         wx.setStorage({
                           key: 'not_show_like_toast',
                           data: toast_num + 1,
-                        });
+                        })
                       }
                     })
                   }
@@ -443,7 +466,7 @@ Page({
                       wx.setStorage({
                         key: 'not_show_like_toast',
                         data: 1,
-                      });
+                      })
                     }
                   })
                 }
@@ -457,10 +480,10 @@ Page({
                 work_item.like = 0
               }
               that.setData({
-                work_item: work_item
+                work_item: work_item,
               })
               wx.removeStorage({
-                key: 'songci' + work_item.id + util.formatTime(new Date())
+                key: 'songci' + work_item.id + util.formatTime(new Date()),
               })
             }
           }
@@ -470,43 +493,46 @@ Page({
         wx.showToast({
           title: '请稍后再试',
           icon: 'none'
-        });
+        })
         util.userLogin()
       }
     })
   },
-  pauseplaybackmusic: function () {
+  pauseplaybackaudio: function () {
     this.backgroundAudioManager.stop()
     var currentTime = 1
     if (this.backgroundAudioManager.currentTime && this.backgroundAudioManager.currentTime > 1) {
       currentTime = this.backgroundAudioManager.currentTime
     }
     this.setData({
-      seek2: currentTime - 1,
-      slideValue: parseInt(currentTime / this.backgroundAudioManager.duration * 100),
+      seek2: {
+        seek: currentTime,
+        audio_id: this.backgroundAudioManager._audio_id,
+      },
+      slide_value: parseInt(currentTime / this.backgroundAudioManager.duration * 100),
       playing: false,
-    });
+    })
   },
-  playbackmusic: function (e) {
+  playbackaudio: function (e) {
     var that = this
     var mode = wx.getStorageSync('play_mode')
     if (mode == 'hc') {
-      that.reset_playmode();
+      that.reset_playmode()
     }
     if (that.data.playing) {
-      that.pauseplaybackmusic()
+      that.pauseplaybackaudio()
     } else {
       if (that.data.mode == 'one') {
         wx.setStorageSync('singleid', {
           'id': that.data.work_item.id,
-          'url': that.data.audioUrl,
+          'url': that.data.audio_url,
           'title': that.data.work_item.work_title,
           'author': that.data.work_item.work_author
         })
       }
-      that.playsound();
+      that.playsound()
       if (that.data.work_item && that.data.work_item.work_title) {
-        that.record_play(that.data.work_item.id, that.data.work_item.work_title + '-' + that.data.work_item.work_author);
+        that.record_play(that.data.work_item.id, that.data.work_item.work_title + '-' + that.data.work_item.work_author)
       }
     }
   },
@@ -542,7 +568,7 @@ Page({
     } else {
       wx.navigateTo({
         url: url
-      });
+      })
     }
   },
   changeContent: function (e) {
@@ -570,12 +596,12 @@ Page({
     show_content = show_content.replace(/\n/g, "\n　　")
     show_content = show_content.replace(/\t/g, "\n　　")
     this.setData({
-      currentTab: target_id,
-      show_content: show_content
+      current_tab: target_id,
+      show_content: show_content,
     })
   },
   onPullDownRefresh: function () {
-    wx.showNavigationBarLoading();
+    wx.showNavigationBarLoading()
     var that = this
     if (parseInt(that.data.work_item.id) > 8099) {
       var id_ = 0
@@ -590,9 +616,12 @@ Page({
     }, 600)
     that.setData({
       playing: false,
-      seek2: 0,
-      slideValue: 0,
-    });
+      seek2: {
+        seek: 0,
+        audio_id: 0,
+      },
+      slide_value: 0,
+    })
   },
   /**
    * 生命周期函数--监听页面加载
@@ -607,24 +636,20 @@ Page({
     that.get_by_id(id_)
   },
   playsound: function () {
-    var that = this
     const backgroundAudioManager = this.backgroundAudioManager
     if (this.data.work_item) {
       backgroundAudioManager.title = this.data.work_item.work_title
-      backgroundAudioManager.epname = 'i古诗词'
+      backgroundAudioManager.epname = 'i古诗词 '
       backgroundAudioManager.singer = this.data.work_item.work_author
       backgroundAudioManager.coverImgUrl = this.data.poster
-      backgroundAudioManager.startTime = this.data.seek2
-      backgroundAudioManager.src = this.data.audioUrl
-      if (this.data.seek2 > 0) {
-        backgroundAudioManager.seek(this.data.seek2)
+      if (this.data.seek2.seek > 0 && this.data.seek2.audio_id == this.data.work_item.audio_id) {
+        backgroundAudioManager.startTime = this.data.seek2.seek
       } else {
-        backgroundAudioManager.play()
+        backgroundAudioManager.startTime = 0
       }
-
-      this.setData({
-        playing: true
-      });
+      backgroundAudioManager.src = this.data.audio_url
+      backgroundAudioManager._audio_id = this.data.work_item.audio_id
+      backgroundAudioManager.play()
     } else {
       wx.showToast({
         title: '播放失败，请稍后重试~~',
@@ -643,7 +668,7 @@ Page({
       mode = 'xunhuan'
     }
     that.setData({
-      mode: mode
+      mode: mode,
     })
     return mode
   },
@@ -655,9 +680,9 @@ Page({
       old_play_mode = 'xunhuan'
     }
     old_play_mode = old_play_mode == 'hc' ? 'xunhuan' : old_play_mode
-    wx.setStorageSync('play_mode', old_play_mode);
+    wx.setStorageSync('play_mode', old_play_mode)
     that.setData({
-      mode: old_play_mode
+      mode: old_play_mode,
     })
   },
   /**
@@ -665,7 +690,7 @@ Page({
    */
   onReady: function (e) {
     var that = this
-    that.backgroundAudioManager = wx.getBackgroundAudioManager();
+    that.backgroundAudioManager = wx.getBackgroundAudioManager()
     this.backgroundAudioManager.onEnded(() => {
       var mode = that.get_play_mode()
       if (mode != 'hc') {
@@ -673,92 +698,81 @@ Page({
       } else {
         that.reset_playmode()
       }
-    });
+    })
     this.backgroundAudioManager.onPause(() => {
       that.setData({
-        playing: false
-      });
-    });
+        playing: false,
+      })
+    })
     this.backgroundAudioManager.onStop(() => {
       that.setData({
-        playing: false
-      });
-    });
+        playing: false,
+      })
+    })
     this.backgroundAudioManager.onError((e) => {
       that.setData({
-        playing: false
+        playing: false,
       })
       wx.showToast({
         title: '播放失败:(',
-        icon: 'none'
-      });
-    });
+        icon: 'none',
+      })
+    })
     this.backgroundAudioManager.onWaiting(() => {
       wx.showLoading({
         title: '音频加载中...',
-      });
-    });
+      })
+    })
     this.backgroundAudioManager.onCanplay(() => {
-      wx.hideLoading();
-    });
+      wx.hideLoading()
+    })
     this.backgroundAudioManager.onPlay(() => {
-      if (!that.data.playing) {
-        that.setData({
-          playing: true
-        })
-      }
-    });
+      this.setData({
+        playing: true,
+        playing_audio_id: this.backgroundAudioManager._audio_id,
+      })
+    })
     this.backgroundAudioManager.onPrev(() => {
       var mode = that.get_play_mode()
       that.do_operate_play('up', mode)
-    });
+    })
 
     this.backgroundAudioManager.onNext(() => {
       var mode = that.get_play_mode()
       that.do_operate_play('next', mode)
-    });
+    })
     this.backgroundAudioManager.onTimeUpdate(() => {
       if (that.data.sliding != 1) {
-        that.musicStart()
+        that.audio_start()
       }
-    });
-    var music_ids = wx.getStorageSync('music_ids')
-    if (!music_ids) {
+    })
+    var audio_ids = wx.getStorageSync('audio_ids')
+    if (!audio_ids) {
       var app = getApp()
-      app.get_music_list()
+      app.get_audio_list()
     }
     var id_ = setInterval(() => {
       if (that.data.work_item) {
+        that.setCurrentPlaying()
         clearInterval(id_)
-        that.setCurrentPlaying();
-        wx.hideLoading();
+        wx.hideLoading()
       }
-    }, 100)
+    }, 200)
   },
   setCurrentPlaying: function () {
-    var that = this
-    // 如果正在播放
-    if (that.backgroundAudioManager && !that.backgroundAudioManager.paused) {
-      var audioUrl = that.backgroundAudioManager.src
-      if (audioUrl) {
-        var re = /[0-9]+\.m4a/g
-        var results = audioUrl.match(re)
-        if (results && results.length > 0) {
-          results = results[0].slice(0, -4)
-          if (that.data.audioId == results) {
-            setTimeout(() => {
-              that.setData({
-                playing: true
-              });
-            }, 200)
-            return
-          }
-        }
+    if (this.backgroundAudioManager && this.backgroundAudioManager.paused) {
+      if (this.backgroundAudioManager.src) {
+        this.setData({
+          playing: true,
+          playing_audio_id: this.backgroundAudioManager._audio_id,
+        })
+        return
       }
     }
-    that.setData({
-      playing: false
-    });
+    this.setData({
+      playing: false,
+      playing_audio_id: 0,
+    })
   },
   /**
    * 生命周期函数--监听页面显示
@@ -767,10 +781,10 @@ Page({
     var that = this
     var id_ = setInterval(() => {
       if (that.data.work_item) {
+        that.setCurrentPlaying()
         clearInterval(id_)
-        that.setCurrentPlaying();
       }
-    }, 100)
+    }, 200)
   },
   /**
    * 生命周期函数--监听页面隐藏
@@ -800,13 +814,13 @@ Page({
     } else {
       wx.redirectTo({
         url: url
-      });
+      })
     }
   },
 
   onShareAppMessage: function (res) {
     return {
-      title: this.data.work_item.content.substr(0, 23) + '...  [' + this.data.work_item.work_dynasty + '] ' + this.data.work_item.work_author + '《' + this.data.work_item.work_title + '》',
+      title: '《' + this.data.work_item.work_title + '》' + this.data.work_item.work_author + '   ' + this.data.work_item.content.substr(0, 24),
       path: '/pages/songci/songci?id=' + this.data.work_item.id,
       imageUrl: '/static/share4.jpg',
       success: function (res) {
@@ -819,11 +833,11 @@ Page({
   },
   onShareTimeline: function () {
     var prefix = ''
-    if (this.data.audioId > 0) {
+    if (this.data.audio_id > 0) {
       prefix = '【音频】'
     }
     return {
-      title: prefix + this.data.work_item.content.substr(0, 28) + '...  [' + this.data.work_item.work_dynasty + '] ' + this.data.work_item.work_author + '《' + this.data.work_item.work_title + '》',
+      title: prefix + '《' + this.data.work_item.work_title + '》' + this.data.work_item.work_dynasty + '·' + this.data.work_item.work_author + '   ' + this.data.work_item.content.substr(0, 28),
       query: 'id=' + this.data.work_item.id,
       imageUrl: '/static/share.jpg',
       success: function (res) {
@@ -839,15 +853,15 @@ Page({
       url: '/pages/catalog/catalog',
     })
   },
-  musicStart: function () {
+  audio_start: function () {
     var that = this
     try {
       var time2close = wx.getStorageSync('time2close')
       if (time2close && time2close > 0 && (new Date()).getTime() > time2close * 1000) {
-        that.pauseplaybackmusic()
+        that.pauseplaybackaudio()
         that.setData({
           time2close: 0,
-          closeplaytime: 0
+          close_play_time: 0,
         })
         try {
           var setTimedInt = wx.getStorageSync('setTimedInt')
@@ -858,11 +872,11 @@ Page({
           setTimedInt = 0
         }
         wx.removeStorageSync('time2close')
-        wx.removeStorageSync('closeplaytime')
+        wx.removeStorageSync('close_play_time')
         if (setTimedInt > 0) {
           wx.showToast({
             title: '定时已到~~',
-            icon: 'none'
+            icon: 'none',
           })
           clearInterval(setTimedInt)
           wx.setStorageSync('setTimedInt', 0)
@@ -873,27 +887,28 @@ Page({
         var last_micro_seconds = time2close - (new Date()).getTime() / 1000
         if (last_micro_seconds) {
           that.setData({
-            closeplaytime: parseInt(last_micro_seconds / 60.0 + 0.5)
-          });
+            close_play_time: parseInt(last_micro_seconds / 60.0 + 0.5),
+          })
         }
       }
     } catch (e) {}
     var current_time = this.backgroundAudioManager.currentTime
     var duration = this.backgroundAudioManager.duration
-    if (that.data.sliding == 2) {
-      var slide_value = that.data.slideValue
+    if (that.data.sliding == 2 && that.data.seek2.audio_id == this.backgroundAudioManager._audio_id) {
+      that.setData({
+        sliding: 0,
+      })
+      var slide_value = that.data.slide_value
       current_time = slide_value / 100.0 * duration
-      that.backgroundAudioManager.seek(that.data.seek2)
+      that.backgroundAudioManager.seek(that.data.seek2.seek)
     }
     if (current_time <= 0) {
       return
     }
-    this.setData({
-      slideValue: parseInt(current_time / duration * 100)
-    })
     var current_time_show = (parseInt(current_time / 60) < 10 ? '0' + parseInt(current_time / 60) : parseInt(current_time / 60)) + ':' + ((parseInt(current_time % 60) > 9) ? parseInt(current_time % 60) : '0' + parseInt(current_time % 60))
     var duration_show = (parseInt(duration / 60) < 10 ? '0' + parseInt(duration / 60) : parseInt(duration / 60)) + ':' + ((parseInt(duration % 60) > 9) ? parseInt(duration % 60) : '0' + parseInt(duration % 60))
     that.setData({
+      slide_value: parseInt(current_time / duration * 100),
       duration: this.backgroundAudioManager.duration,
       current_time: this.backgroundAudioManager.currentTime,
       duration_show: duration_show,
@@ -905,7 +920,7 @@ Page({
     var that = this
     if (that.data['duration'] <= 0) {
       that.setData({
-        slideValue: 0
+        slide_value: 0,
       })
       return
     }
@@ -915,16 +930,19 @@ Page({
     var current_time_show = (parseInt(seek2 / 60) < 10 ? '0' + parseInt(seek2 / 60) : parseInt(seek2 / 60)) + ':' + ((parseInt(seek2 % 60) > 9) ? parseInt(seek2 % 60) : '0' + parseInt(seek2 % 60))
     that.setData({
       sliding: 1,
-      seek2: seek2 >= duration ? 0 : seek2,
+      seek2: {
+        seek: seek2 >= duration ? 0 : seek2,
+        audio_id: that.backgroundAudioManager._audio_id,
+      },
       current_time_show: current_time_show,
-      slideValue: v
-    });
+      slide_value: v,
+    })
   },
   slider2change: function (e) {
     var that = this
     if (that.data.duration <= 0) {
       that.setData({
-        slideValue: 0
+        slide_value: 0
       })
       return
     }
@@ -933,10 +951,13 @@ Page({
     var seek2 = v / 100 * duration
     var current_time_show = (parseInt(seek2 / 60) < 10 ? '0' + parseInt(seek2 / 60) : parseInt(seek2 / 60)) + ':' + ((parseInt(seek2 % 60) > 9) ? parseInt(seek2 % 60) : '0' + parseInt(seek2 % 60))
     that.setData({
-      seek2: seek2 >= duration ? 0 : seek2,
+      seek2: {
+        seek: seek2 >= duration ? 0 : seek2,
+        audio_id: that.backgroundAudioManager._audio_id,
+      },
       current_time_show: current_time_show,
-      slideValue: v,
+      slide_value: v,
       sliding: 2,
-    });
+    })
   }
-});
+})

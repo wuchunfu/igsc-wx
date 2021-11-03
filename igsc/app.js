@@ -1,42 +1,42 @@
 var config = require('config')
 var util = require('utils/util')
 App({
-  get_music_list: function() {
+  get_audio_list: function () {
     var value = "音频"
     var key = 'search_音频' + util.formatTime(new Date())
     wx.getStorage({
       key: key,
-      success: function(res) {
+      success: function (res) {
         if (res && res.data) {
           var data = res.data
-          var music_ids = []
+          var audio_ids = []
           for (var index = 0; index < data.length; index++) {
-            music_ids.push(data[index].id)
+            audio_ids.push(data[index].id)
           }
-          wx.setStorageSync('music_ids', music_ids)
+          wx.setStorageSync('audio_ids', audio_ids)
         }
       },
-      fail: function() {
+      fail: function () {
         wx.request({
           url: config.songciUrl + 'query/' + value + "/main/abcd",
           success(result) {
             if (!result || result.data.code != 0) {
               return
             }
-            var music_ids = []
+            var audio_ids = []
             var data = result.data.data.data
             for (var index = 0; index < data.length; index++) {
-              music_ids.push(data[index].id)
+              audio_ids.push(data[index].id)
             }
-            wx.setStorageSync('music_ids', music_ids)
+            wx.setStorageSync('audio_ids', audio_ids)
             wx.setStorage({
               key: key,
-              data: data
-            });
+              data: data,
+            })
           }
-        });
+        })
       }
-    });
+    })
   },
   onLaunch() {
     try {
@@ -53,7 +53,7 @@ App({
       var historyplay = wx.getStorageSync('historyplay')
       var today_clear = wx.getStorageSync('clear_1' + today)
       if (!today_clear || today_clear != 1) {
-        wx.clearStorage();
+        wx.clearStorage()
       }
       wx.setStorage({
         key: 'clear_1' + today,
@@ -61,12 +61,12 @@ App({
       })
       wx.setStorage({
         key: 'historyplay',
-        data: historyplay
+        data: historyplay,
       })
       if (open_id) {
         wx.setStorage({
           key: 'user_open_id',
-          data: open_id
+          data: open_id,
         })
       }
       wx.setStorageSync('play_mode', play_mode ? play_mode : 'xunhuan')
@@ -74,4 +74,4 @@ App({
     // 加载字体
     //util.loadFont()
   }
-});
+})
