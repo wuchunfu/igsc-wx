@@ -1,5 +1,7 @@
 var config = require('../../config')
+var wechat_si = requirePlugin("WechatSI")
 var util = require('../../utils/util.js')
+
 Page({
   data: {
     work_item: null,
@@ -22,6 +24,7 @@ Page({
     close_play_time: 0,
     sliding: 0, // 1 正在滑动 2 刚刚有滑动
     playing_audio_id: 0, // 正在播放的id
+    speeching: false,
   },
   setTimed: function () {
     var that = this
@@ -44,8 +47,8 @@ Page({
             seconds = 600
             break
           case 4:
-            var currentTime = that.backgroundAudioManager.currentTime
-            seconds = that.backgroundAudioManager.duration - (currentTime ? currentTime : 0) + 0.5
+            var currentTime = that.background_audio_manager.currentTime
+            seconds = that.background_audio_manager.duration - (currentTime ? currentTime : 0) + 0.5
             break
           case 5:
             seconds = -1
@@ -327,15 +330,16 @@ Page({
       //单曲循环
       try {
         var play_id_url = wx.getStorageSync('singleid')
-        that.backgroundAudioManager.src = play_id_url.url
-        that.backgroundAudioManager.title = play_id_url.title
-        that.backgroundAudioManager.singer = play_id_url.author
-        that.backgroundAudioManager.coverImgUrl = that.data.poster
-        that.backgroundAudioManager.epname = 'i古诗词 '
-        that.backgroundAudioManager.startTime = 0
-        that.backgroundAudioManager._audio_id = that.data.work_item.audio_id
-        that.backgroundAudioManager.seek(0)
-        that.backgroundAudioManager.play()
+        that.background_audio_manager.src = play_id_url.url
+        that.background_audio_manager.title = play_id_url.title
+        that.background_audio_manager.singer = play_id_url.author
+        that.background_audio_manager.coverImgUrl = that.data.poster
+        that.background_audio_manager.epname = 'i古诗词 '
+        that.background_audio_manager.startTime = 0
+        that.background_audio_manager._audio_id = that.data.work_item.audio_id
+        that.background_audio_manager.seek(0)
+        that.inner_audio_context.pause()
+        that.background_audio_manager.play()
         if (play_id_url.title) {
           that.record_play(play_id_url.id, play_id_url.title + '-' + play_id_url.author)
         }
@@ -346,13 +350,14 @@ Page({
           'title': that.data.work_item.work_title,
           'author': that.data.work_item.work_author
         })
-        that.backgroundAudioManager.src = that.data.audio_url
-        that.backgroundAudioManager.title = that.data.work_item.work_title
-        that.backgroundAudioManager.epname = 'i古诗词 '
-        that.backgroundAudioManager.singer = that.data.work_item.work_author
-        that.backgroundAudioManager.coverImgUrl = that.data.poster
-        that.backgroundAudioManager._audio_id = that.data.work_item.audio_id
-        that.backgroundAudioManager.play()
+        that.background_audio_manager.src = that.data.audio_url
+        that.background_audio_manager.title = that.data.work_item.work_title
+        that.background_audio_manager.epname = 'i古诗词 '
+        that.background_audio_manager.singer = that.data.work_item.work_author
+        that.background_audio_manager.coverImgUrl = that.data.poster
+        that.background_audio_manager._audio_id = that.data.work_item.audio_id
+        that.inner_audio_context.pause()
+        that.background_audio_manager.play()
         if (that.data.work_item && that.data.work_item.work_title) {
           that.record_play(that.data.work_item.id, that.data.work_item.work_title + '-' + that.data.work_item.work_author)
         }
@@ -395,8 +400,64 @@ Page({
     }
   },
   operate_play: function (e) {
-    var key = e.target.dataset.key
-    this.do_operate_play(key, this.data.mode)
+    this.do_operate_play(e.target.dataset.key, this.data.mode)
+  },
+  do_speak: function (work_item) {
+    var that = this
+    var data = wx.getStorageSync('speak_audio' + work_item.id)
+    if (data) {
+      if (data.expired_time > (new Date().getTime() / 1000 + 60)) {
+        that.inner_audio_context.stop()
+        that.inner_audio_context.src = data.url
+        that.inner_audio_context.play()
+        return
+      }
+    }
+    var s = []
+    s.push(work_item.work_title)
+    s.push(work_item.work_dynasty + '·' + work_item.work_author)
+    if (work_item.foreword) {
+      s.push(work_item.foreword)
+    }
+    s.push(work_item.content)
+    var s = s.join('\n')
+    wx.showLoading({
+      title: '正在加载音频...',
+    })
+    wechat_si.textToSpeech({
+      lang: "zh_CN",
+      tts: true,
+      content: s.substr(0, 340),
+      success: function (res) {
+        wx.hideLoading()
+        that.inner_audio_context.stop()
+        that.inner_audio_context.src = res.filename
+        that.inner_audio_context.play()
+        wx.setStorage({
+          key: 'speak_audio' + work_item.id,
+          data: {
+            expired_time: res.expired_time,
+            url: res.filename,
+          }
+        })
+      },
+      fail: function (res) {
+        wx.hideLoading()
+        wx.showToast({
+          title: '播放出错:(',
+          icon: 'none',
+        })
+      }
+    })
+  },
+  speak: function (e) {
+    var speeching = e.target.dataset.speeching
+    if (speeching) {
+      this.inner_audio_context.pause()
+    } else {
+      this.background_audio_manager.pause()
+      this.do_speak(this.data.work_item)
+    }
   },
   do_copy: function (e) {
     var s = []
@@ -506,17 +567,17 @@ Page({
     })
   },
   pauseplaybackaudio: function () {
-    this.backgroundAudioManager.stop()
+    this.background_audio_manager.stop()
     var currentTime = 1
-    if (this.backgroundAudioManager.currentTime && this.backgroundAudioManager.currentTime > 1) {
-      currentTime = this.backgroundAudioManager.currentTime
+    if (this.background_audio_manager.currentTime && this.background_audio_manager.currentTime > 1) {
+      currentTime = this.background_audio_manager.currentTime
     }
     this.setData({
       seek2: {
         seek: currentTime,
-        audio_id: this.backgroundAudioManager._audio_id,
+        audio_id: this.background_audio_manager._audio_id,
       },
-      slide_value: parseInt(currentTime / this.backgroundAudioManager.duration * 100),
+      slide_value: parseInt(currentTime / this.background_audio_manager.duration * 100),
       playing: false,
     })
   },
@@ -630,9 +691,6 @@ Page({
       slide_value: 0,
     })
   },
-  /**
-   * 生命周期函数--监听页面加载
-   */
   onLoad: function (options) {
     var that = this
     if (options.hasOwnProperty('id')) {
@@ -643,20 +701,20 @@ Page({
     that.get_by_id(id_)
   },
   playsound: function () {
-    const backgroundAudioManager = this.backgroundAudioManager
     if (this.data.work_item) {
-      backgroundAudioManager.title = this.data.work_item.work_title
-      backgroundAudioManager.epname = 'i古诗词 '
-      backgroundAudioManager.singer = this.data.work_item.work_author
-      backgroundAudioManager.coverImgUrl = this.data.poster
+      this.background_audio_manager.title = this.data.work_item.work_title
+      this.background_audio_manager.epname = 'i古诗词 '
+      this.background_audio_manager.singer = this.data.work_item.work_author
+      this.background_audio_manager.coverImgUrl = this.data.poster
       if (this.data.seek2.seek > 0 && this.data.seek2.audio_id == this.data.work_item.audio_id) {
-        backgroundAudioManager.startTime = this.data.seek2.seek
+        this.background_audio_manager.startTime = this.data.seek2.seek
       } else {
-        backgroundAudioManager.startTime = 0
+        this.background_audio_manager.startTime = 0
       }
-      backgroundAudioManager.src = this.data.audio_url
-      backgroundAudioManager._audio_id = this.data.work_item.audio_id
-      backgroundAudioManager.play()
+      this.background_audio_manager.src = this.data.audio_url
+      this.background_audio_manager._audio_id = this.data.work_item.audio_id
+      this.inner_audio_context.pause()
+      this.background_audio_manager.play()
     } else {
       wx.showToast({
         title: '播放失败，请稍后重试~~',
@@ -692,13 +750,12 @@ Page({
       mode: old_play_mode,
     })
   },
-  /**
-   * 生命周期函数--监听页面初次渲染完成
-   */
   onReady: function (e) {
     var that = this
-    that.backgroundAudioManager = wx.getBackgroundAudioManager()
-    this.backgroundAudioManager.onEnded(() => {
+    that.background_audio_manager = wx.getBackgroundAudioManager()
+    that.inner_audio_context = wx.createInnerAudioContext()
+    that.inner_audio_context.loop = true
+    this.background_audio_manager.onEnded(() => {
       var mode = that.get_play_mode()
       if (mode != 'hc') {
         that.do_operate_play('next', mode)
@@ -706,17 +763,17 @@ Page({
         that.reset_playmode()
       }
     })
-    this.backgroundAudioManager.onPause(() => {
+    this.background_audio_manager.onPause(() => {
       that.setData({
         playing: false,
       })
     })
-    this.backgroundAudioManager.onStop(() => {
+    this.background_audio_manager.onStop(() => {
       that.setData({
         playing: false,
       })
     })
-    this.backgroundAudioManager.onError((e) => {
+    this.background_audio_manager.onError((e) => {
       that.setData({
         playing: false,
       })
@@ -725,33 +782,64 @@ Page({
         icon: 'none',
       })
     })
-    this.backgroundAudioManager.onWaiting(() => {
+    this.background_audio_manager.onWaiting(() => {
       wx.showLoading({
         title: '音频加载中...',
       })
     })
-    this.backgroundAudioManager.onCanplay(() => {
+    this.background_audio_manager.onCanplay(() => {
       wx.hideLoading()
     })
-    this.backgroundAudioManager.onPlay(() => {
+    this.background_audio_manager.onPlay(() => {
+      this.inner_audio_context.pause()
       this.setData({
         playing: true,
-        playing_audio_id: this.backgroundAudioManager._audio_id,
+        playing_audio_id: this.background_audio_manager._audio_id,
       })
     })
-    this.backgroundAudioManager.onPrev(() => {
+    this.background_audio_manager.onPrev(() => {
       var mode = that.get_play_mode()
       that.do_operate_play('up', mode)
     })
-
-    this.backgroundAudioManager.onNext(() => {
+    this.background_audio_manager.onNext(() => {
       var mode = that.get_play_mode()
       that.do_operate_play('next', mode)
     })
-    this.backgroundAudioManager.onTimeUpdate(() => {
+    this.background_audio_manager.onTimeUpdate(() => {
       if (that.data.sliding != 1) {
         that.audio_start()
       }
+    })
+    this.inner_audio_context.onPlay(() => {
+      this.background_audio_manager.pause()
+      that.setData({
+        speeching: true,
+      })
+    })
+    this.inner_audio_context.onPause(() => {
+      that.setData({
+        speeching: false,
+      })
+    })
+    this.inner_audio_context.onStop(() => {
+      that.setData({
+        speeching: false,
+      })
+    })
+    this.inner_audio_context.onEnded(() => {
+      that.setData({
+        speeching: false,
+      })
+    })
+    this.inner_audio_context.onTimeUpdate(() => {
+      that.setData({
+        speeching: true,
+      })
+    })
+    this.inner_audio_context.onError(() => {
+      that.setData({
+        speeching: false,
+      })
     })
     var audio_ids = wx.getStorageSync('audio_ids')
     if (!audio_ids) {
@@ -767,11 +855,11 @@ Page({
     }, 200)
   },
   setCurrentPlaying: function () {
-    if (this.backgroundAudioManager && !this.backgroundAudioManager.paused) {
-      if (this.backgroundAudioManager.src) {
+    if (this.background_audio_manager && !this.background_audio_manager.paused) {
+      if (this.background_audio_manager.src) {
         this.setData({
           playing: true,
-          playing_audio_id: this.backgroundAudioManager._audio_id,
+          playing_audio_id: this.background_audio_manager._audio_id,
         })
         return
       }
@@ -781,9 +869,6 @@ Page({
       playing_audio_id: 0,
     })
   },
-  /**
-   * 生命周期函数--监听页面显示
-   */
   onShow: function () {
     var that = this
     var id_ = setInterval(() => {
@@ -793,16 +878,11 @@ Page({
       }
     }, 200)
   },
-  /**
-   * 生命周期函数--监听页面隐藏
-   */
-  onHide: function () {},
-
-  /**
-   * 生命周期函数--监听页面卸载
-   */
+  onHide: function () {
+    this.inner_audio_context.stop()
+  },
   onUnload: function () {
-
+    this.inner_audio_context.stop()
   },
   longPress: function () {
     var that = this
@@ -898,15 +978,15 @@ Page({
         }
       }
     } catch (e) {}
-    var current_time = this.backgroundAudioManager.currentTime
-    var duration = this.backgroundAudioManager.duration
-    if (that.data.sliding == 2 && that.data.seek2.audio_id == this.backgroundAudioManager._audio_id) {
+    var current_time = this.background_audio_manager.currentTime
+    var duration = this.background_audio_manager.duration
+    if (that.data.sliding == 2 && that.data.seek2.audio_id == this.background_audio_manager._audio_id) {
       that.setData({
         sliding: 0,
       })
       var slide_value = that.data.slide_value
       current_time = slide_value / 100.0 * duration
-      that.backgroundAudioManager.seek(that.data.seek2.seek)
+      that.background_audio_manager.seek(that.data.seek2.seek)
     }
     if (current_time <= 0) {
       return
@@ -920,7 +1000,7 @@ Page({
       duration_show: duration_show,
       current_time_show: current_time_show,
       sliding: 0,
-      playing_audio_id: this.backgroundAudioManager._audio_id,
+      playing_audio_id: this.background_audio_manager._audio_id,
     })
   },
   sliderChanging: function (e) {
@@ -939,7 +1019,7 @@ Page({
       sliding: 1,
       seek2: {
         seek: seek2 >= duration ? 0 : seek2,
-        audio_id: that.backgroundAudioManager._audio_id,
+        audio_id: that.background_audio_manager._audio_id,
       },
       current_time_show: current_time_show,
       slide_value: v,
@@ -960,7 +1040,7 @@ Page({
     that.setData({
       seek2: {
         seek: seek2 >= duration ? 0 : seek2,
-        audio_id: that.backgroundAudioManager._audio_id,
+        audio_id: that.background_audio_manager._audio_id,
       },
       current_time_show: current_time_show,
       slide_value: v,

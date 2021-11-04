@@ -13,7 +13,7 @@
 .tab-item {
   display: inline-block;
   width: 64rpx;
-  margin-right: 30rpx;
+  margin-right: 20rpx;
   font-family: 'myfont';
   height: 32rpx;
   line-height: 30rpx;

@@ -17,10 +17,10 @@ Page({
       that = current_page
     }
     // 如果正在播放
-    if (that.backgroundAudioManager && !that.backgroundAudioManager.paused) {
-      if (that.backgroundAudioManager.src) {
+    if (that.background_audio_manager && !that.background_audio_manager.paused) {
+      if (that.background_audio_manager.src) {
         that.setData({
-          current_paly_id: that.backgroundAudioManager._audio_id,
+          current_paly_id: that.background_audio_manager._audio_id,
         })
         return true
       }
@@ -131,7 +131,7 @@ Page({
           showhead: true,
         })
       }
-      that.mySearchFunction(options.q)
+      that.my_search_function(options.q)
       WxSearch.search(options.q)
     } else {
       wx.getStorage({
@@ -174,7 +174,7 @@ Page({
   wxSearchConfirm: WxSearch.wxSearchConfirm, // 搜索函数
   wxSearchClear: WxSearch.wxSearchClear, // 清空函数
   // 4 搜索回调函数  
-  mySearchFunction: function (value) {
+  my_search_function: function (value) {
     wx.showLoading({
       title: '加载中...'
     })
@@ -283,7 +283,7 @@ Page({
     }, 200)
   },
   // 5 返回回调函数
-  myGobackFunction: function () {
+  my_goback_function: function () {
     wx.reLaunch({
       url: '../songci/songci?id=1'
     })
@@ -299,13 +299,9 @@ Page({
     if (this != current_page) {
       that = current_page
     }
-    that.backgroundAudioManager = wx.getBackgroundAudioManager()
+    that.background_audio_manager = wx.getBackgroundAudioManager()
     that.getcurrent_paly_id()
   },
-
-  /**
-   * 生命周期函数--监听页面显示
-   */
   onShow: function () {
     var that = this
     var pages = getCurrentPages()
@@ -316,8 +312,8 @@ Page({
     WxSearch.init(
       that, ['杜甫', '白居易', '苏轼', '姜夔', '浣溪沙', '满庭芳', '青玉案', '蝶恋花', '与陈伯之书', '滕王阁序', '谏逐客书', '洛神赋'], // 热点搜索推荐
       ['宋祁', '朱淑真', "吴文英", "晏几道", '秦观', '贺铸', '王安石', '李之仪', '周邦彦', '姜夔', '晏殊', '张先', '范仲淹', '晁补之', '赵佶', '宋徽宗', '张元干', '岳飞', '史达祖', '刘克庄', '蒋捷', '钱惟演', '张炎', '张孝祥', '张镃', '张抡', '青玉案', '元宵', '中秋', '蝶恋花', '满庭芳', '卜算子', '菩萨蛮', '忆江南', '浣溪沙', '诉衷情', '清平乐', '雨霖铃', '定风波', '八声甘州', '青门引', '念奴娇', '水调歌头', '洞仙歌', '渔家傲', '横塘路', '瑞龙吟', '六丑', '欧阳修', '声声慢', '永遇乐', '贺新郎', '水龙吟', '程垓', '齐天乐', '苏轼', '辛弃疾', '白居易', '李白', '杜甫', '李清照'], // 搜索匹配，[]表示不使用
-      that.mySearchFunction, // 提供一个搜索回调函数
-      that.myGobackFunction //提供一个返回回调函数
+      that.my_search_function,
+      that.my_goback_function
     )
     var temData = that.data.wxSearchData
     if (that.search_V && temData) {

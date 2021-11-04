@@ -2,7 +2,6 @@
   <view class="weui-search-bar">
     <view class="weui-search-bar__form">
       <view class="weui-search-bar__box">
-        <!-- <icon class="weui-icon-search_in-box" type="search" size="20rpx"></icon> -->
         <input type="text" class="weui-search-bar__input" placeholder="请输入查询内容" placeholder-class="placeholder" value="{{wxSearchData.value}}" bindinput="wxSearchInput" bindconfirm="wxSearchConfirm" />
         <view class="weui-icon-clear" wx:if="{{wxSearchData.value && wxSearchData.value.length > 0}}">
           <icon type="clear" bindtap="wxSearchClear" size="30rpx"></icon>
@@ -16,7 +15,6 @@
 
   <view class="wxSearch">
     <view class="wxSearchInner">
-      <!-- 搜索提示部分 -->
       <view class="wxSearchMindKey">
         <view class="wxSearchMindKeyList">
           <block wx:for="{{wxSearchData.tipKeys}}" wx:key="*this">
@@ -36,7 +34,6 @@
           </block>
         </view>
       </view>
-
       <view class="wxSearchKey" style="display:{{wxSearchData.value.length>0 ? 'none':'block'}}">
         <text wx:if="{{wxSearchData.hotKeys[0]}}" class="wxSearchTitle">搜索热点</text>
         <view class="wxSearchKeyList">
