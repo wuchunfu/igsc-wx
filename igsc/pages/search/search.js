@@ -66,7 +66,7 @@ function wxSearchClear() {
 
   var temData = __that.data.wxSearchData
 
-  temData.value = ""
+  temData.value = ''
   temData.tipKeys = []
   if (__that.search_V) {
     __that.search_V = ''
@@ -153,7 +153,7 @@ function wxSearchAddHisKey(inputValue) {
       value.unshift(inputValue)
     }
     wx.setStorage({
-      key: "wxSearchHisKeys",
+      key: 'wxSearchHisKeys',
       data: value,
       success: function () {
         getHisKeys(__that)
@@ -163,7 +163,7 @@ function wxSearchAddHisKey(inputValue) {
     value = []
     value.push(inputValue)
     wx.setStorage({
-      key: "wxSearchHisKeys",
+      key: 'wxSearchHisKeys',
       data: value,
       success: function () {
         getHisKeys(__that)

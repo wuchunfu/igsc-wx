@@ -2,7 +2,7 @@ var config = require('config')
 var util = require('utils/util')
 App({
   get_audio_list: function () {
-    var value = "音频"
+    var value = '音频'
     var key = 'search_音频' + util.formatTime(new Date())
     wx.getStorage({
       key: key,
@@ -18,7 +18,7 @@ App({
       },
       fail: function () {
         wx.request({
-          url: config.songciUrl + 'query/' + value + "/main/abcd",
+          url: config.songciUrl + 'query/' + value + '/main/abcd',
           success(result) {
             if (!result || result.data.code != 0) {
               return

@@ -80,11 +80,11 @@ Page({
         var datas = result.data.data.data
         var dd = []
         for (var data of datas) {
-          var splits = data.content.split("。")
+          var splits = data.content.split('。')
           var fuhao = '。'
           if (splits.length > 0) {
             if (splits[0].indexOf('？') >= 0) {
-              fuhao = "？"
+              fuhao = '？'
             }
             data.short_content = splits[0].split('？')[0]
           } else {
@@ -97,7 +97,7 @@ Page({
           gscitems: dd,
         })
         wx.setStorage({
-          key: "songciItems" + util.formatTime(new Date()),
+          key: 'songciItems' + util.formatTime(new Date()),
           data: dd
         })
         wx.hideLoading()
@@ -235,11 +235,11 @@ Page({
             var datas = result.data.data.data
             var dd = []
             for (var data of datas) {
-              var splits = data.content.split("。")
+              var splits = data.content.split('。')
               var fuhao = '。'
               if (splits.length > 0) {
                 if (splits[0].indexOf('？') >= 0) {
-                  fuhao = "？"
+                  fuhao = '？'
                 }
                 data.short_content = splits[0].split('？')[0]
               } else {
@@ -311,7 +311,7 @@ Page({
     }
     WxSearch.init(
       that, ['杜甫', '白居易', '苏轼', '姜夔', '浣溪沙', '满庭芳', '青玉案', '蝶恋花', '与陈伯之书', '滕王阁序', '谏逐客书', '洛神赋'], // 热点搜索推荐
-      ['宋祁', '朱淑真', "吴文英", "晏几道", '秦观', '贺铸', '王安石', '李之仪', '周邦彦', '姜夔', '晏殊', '张先', '范仲淹', '晁补之', '赵佶', '宋徽宗', '张元干', '岳飞', '史达祖', '刘克庄', '蒋捷', '钱惟演', '张炎', '张孝祥', '张镃', '张抡', '青玉案', '元宵', '中秋', '蝶恋花', '满庭芳', '卜算子', '菩萨蛮', '忆江南', '浣溪沙', '诉衷情', '清平乐', '雨霖铃', '定风波', '八声甘州', '青门引', '念奴娇', '水调歌头', '洞仙歌', '渔家傲', '横塘路', '瑞龙吟', '六丑', '欧阳修', '声声慢', '永遇乐', '贺新郎', '水龙吟', '程垓', '齐天乐', '苏轼', '辛弃疾', '白居易', '李白', '杜甫', '李清照'], // 搜索匹配，[]表示不使用
+      ['宋祁', '朱淑真', '吴文英', '晏几道', '秦观', '贺铸', '王安石', '李之仪', '周邦彦', '姜夔', '晏殊', '张先', '范仲淹', '晁补之', '赵佶', '宋徽宗', '张元干', '岳飞', '史达祖', '刘克庄', '蒋捷', '钱惟演', '张炎', '张孝祥', '张镃', '张抡', '青玉案', '元宵', '中秋', '蝶恋花', '满庭芳', '卜算子', '菩萨蛮', '忆江南', '浣溪沙', '诉衷情', '清平乐', '雨霖铃', '定风波', '八声甘州', '青门引', '念奴娇', '水调歌头', '洞仙歌', '渔家傲', '横塘路', '瑞龙吟', '六丑', '欧阳修', '声声慢', '永遇乐', '贺新郎', '水龙吟', '程垓', '齐天乐', '苏轼', '辛弃疾', '白居易', '李白', '杜甫', '李清照'],
       that.my_search_function,
       that.my_goback_function
     )
@@ -430,11 +430,11 @@ Page({
           var datas = result.data.data.data
           var dd = []
           for (var data of datas) {
-            var splits = data.content.split("。")
+            var splits = data.content.split('。')
             var fuhao = '。'
             if (splits.length > 0) {
               if (splits[0].indexOf('？') >= 0) {
-                fuhao = "？"
+                fuhao = '？'
               }
               data.short_content = splits[0].split('？')[0]
             } else {

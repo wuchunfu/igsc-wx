@@ -1,5 +1,5 @@
 var config = require('../../config')
-var wechat_si = requirePlugin("WechatSI")
+var wechat_si = requirePlugin('WechatSI')
 var util = require('../../utils/util.js')
 
 Page({
@@ -133,7 +133,7 @@ Page({
   change_mode: function () {
     //xunhuan->one->shuffle->xunhuan
     var that = this
-    var mode = "xunhuan"
+    var mode = 'xunhuan'
     if (this.data.mode == 'hc') {
       wx.showToast({
         title: '请等待语音播放完毕...',
@@ -143,9 +143,9 @@ Page({
     }
     if (this.data.mode == 'xunhuan') {
       this.setData({
-        mode: "one",
+        mode: 'one',
       })
-      mode = "one"
+      mode = 'one'
       wx.showToast({
         title: '单曲循环',
         icon: 'none'
@@ -158,22 +158,22 @@ Page({
       })
     } else if (this.data.mode == 'one') {
       this.setData({
-        mode: "shuffle",
+        mode: 'shuffle',
       })
       wx.showToast({
         title: '随机播放',
         icon: 'none'
       })
-      mode = "shuffle"
+      mode = 'shuffle'
     } else if (this.data.mode == 'shuffle') {
       this.setData({
-        mode: "xunhuan",
+        mode: 'xunhuan',
       })
       wx.showToast({
-        title: "循环播放",
+        title: '循环播放',
         icon: 'none'
       })
-      mode = "xunhuan"
+      mode = 'xunhuan'
     }
     try {
       wx.setStorageSync('play_mode', mode)
@@ -213,8 +213,8 @@ Page({
         if (!open_id) {
           util.userLogin()
         }
-        if (open_id == "") {
-          open_id = "adcd"
+        if (open_id == '') {
+          open_id = 'adcd'
         }
         wx.request({
           url: config.songciUrl + 'index/' + key + '/' + open_id,
@@ -245,18 +245,18 @@ Page({
               target_id = 4
               show_content = work.master_comment
             }
-            show_content = show_content.replace(/　　/g, "\n")
-            show_content = show_content.replace(/\n/g, "\n　　")
-            show_content = show_content.replace(/\t/g, "\n　　")
+            show_content = show_content.replace(/　　/g, '\n')
+            show_content = show_content.replace(/\n/g, '\n　　')
+            show_content = show_content.replace(/\t/g, '\n　　')
             if (work.id % 4 != 0) {
               var url = config.neteaseaudio_url
             } else {
               var url = config.qaudio_url
             }
             if (work.layout == 'indent') {
-              work.content = work.content.replace(/　　/g, "\n")
-              work.content = work.content.replace(/\n/g, "\n　　")
-              work.content = work.content.replace(/\t/g, "\n　　")
+              work.content = work.content.replace(/　　/g, '\n')
+              work.content = work.content.replace(/\n/g, '\n　　')
+              work.content = work.content.replace(/\t/g, '\n　　')
             }
             that.setData({
               work_item: work,
@@ -297,7 +297,7 @@ Page({
       }
     })
   },
-  do_operate_play: function (key, mode = "xunhuan") {
+  do_operate_play: function (key, mode = 'xunhuan') {
     var that = this
     var audio_ids = wx.getStorageSync('audio_ids')
     if (!audio_ids) {
@@ -425,7 +425,7 @@ Page({
       title: '正在加载音频...',
     })
     wechat_si.textToSpeech({
-      lang: "zh_CN",
+      lang: 'zh_CN',
       tts: true,
       content: s.substr(0, 340),
       success: function (res) {
@@ -660,9 +660,9 @@ Page({
         show_content = gsc.master_comment
         break
     }
-    show_content = show_content.replace(/\　　/g, "\n")
-    show_content = show_content.replace(/\n/g, "\n　　")
-    show_content = show_content.replace(/\t/g, "\n　　")
+    show_content = show_content.replace(/\　　/g, '\n')
+    show_content = show_content.replace(/\n/g, '\n　　')
+    show_content = show_content.replace(/\t/g, '\n　　')
     this.setData({
       current_tab: target_id,
       show_content: show_content,
