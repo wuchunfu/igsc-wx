@@ -422,6 +422,13 @@ Page({
       success: function (res) {
         var open_id = res.data
         var gsc_id = that.data.work_item.id
+        if (open_id.length == 0 || gsc_id == 0) {
+          wx.showToast({
+            title: '操作失败，请稍后再试',
+            icon: 'none'
+          })
+          return
+        }
         wx.request({
           url: config.service.host + '/user/' + operate + '/' + open_id + '/' + gsc_id,
           success: function (res) {
@@ -760,7 +767,7 @@ Page({
     }, 200)
   },
   setCurrentPlaying: function () {
-    if (this.backgroundAudioManager && this.backgroundAudioManager.paused) {
+    if (this.backgroundAudioManager && !this.backgroundAudioManager.paused) {
       if (this.backgroundAudioManager.src) {
         this.setData({
           playing: true,
@@ -817,7 +824,6 @@ Page({
       })
     }
   },
-
   onShareAppMessage: function (res) {
     return {
       title: '《' + this.data.work_item.work_title + '》' + this.data.work_item.work_author + '   ' + this.data.work_item.content.substr(0, 24),
@@ -909,11 +915,12 @@ Page({
     var duration_show = (parseInt(duration / 60) < 10 ? '0' + parseInt(duration / 60) : parseInt(duration / 60)) + ':' + ((parseInt(duration % 60) > 9) ? parseInt(duration % 60) : '0' + parseInt(duration % 60))
     that.setData({
       slide_value: parseInt(current_time / duration * 100),
-      duration: this.backgroundAudioManager.duration,
-      current_time: this.backgroundAudioManager.currentTime,
+      duration: duration,
+      current_time: current_time,
       duration_show: duration_show,
       current_time_show: current_time_show,
       sliding: 0,
+      playing_audio_id: this.backgroundAudioManager._audio_id,
     })
   },
   sliderChanging: function (e) {
