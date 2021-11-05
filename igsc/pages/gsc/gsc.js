@@ -25,6 +25,7 @@ Page({
     sliding: 0, // 1 正在滑动 2 刚刚有滑动
     playing_audio_id: 0, // 正在播放的id
     speeching: false,
+    speeching_urls: [],
   },
   setTimed: function () {
     var that = this
@@ -187,7 +188,7 @@ Page({
     }
     var that = this
     wx.getStorage({
-      key: 'songci' + key + util.formatTime(new Date()),
+      key: 'gsc' + key + util.formatTime(new Date()),
       success: function (res) {
         var d = res.data
         that.setData(d)
@@ -217,7 +218,7 @@ Page({
           open_id = 'adcd'
         }
         wx.request({
-          url: config.songciUrl + 'index/' + key + '/' + open_id,
+          url: config.gscUrl + 'index/' + key + '/' + open_id,
           success(result) {
             if (!result || result.data.code != 0) {
               wx.showToast({
@@ -275,7 +276,7 @@ Page({
             })
             if (work.like == 1) {
               wx.setStorage({
-                key: 'songci' + key + util.formatTime(new Date()),
+                key: 'gsc' + key + util.formatTime(new Date()),
                 data: that.data,
               })
             }
@@ -402,13 +403,55 @@ Page({
   operate_play: function (e) {
     this.do_operate_play(e.target.dataset.key, this.data.mode)
   },
+  _do_speak: function (s, start, urls, work_id) {
+    var that = this
+    wechat_si.textToSpeech({
+      lang: 'zh_CN',
+      tts: true,
+      content: s.substring(start, 330 + start),
+      success: function (res) {
+        urls.push(res.filename)
+        if ((start + 330) >= s.length) {
+          wx.hideLoading()
+          that.setData({
+            speeching_urls: urls,
+          })
+          that.inner_audio_context.stop()
+          that.inner_audio_context.src = urls[0]
+          that.inner_audio_context._start_index = 0
+          that.inner_audio_context.play()
+          wx.setStorage({
+            key: 'speak_audio:' + work_id,
+            data: {
+              expired_time: res.expired_time,
+              urls: urls,
+            }
+          })
+        } else {
+          that._do_speak(s, start + 330, urls, work_id)
+        }
+      },
+      fail: function (res) {
+        wx.hideLoading()
+        that.inner_audio_context.pause()
+        wx.showToast({
+          title: '播放出错:(',
+          icon: 'none',
+        })
+      }
+    })
+  },
   do_speak: function (work_item) {
     var that = this
-    var data = wx.getStorageSync('speak_audio' + work_item.id)
+    var data = wx.getStorageSync('speak_audio:' + work_item.id)
     if (data) {
       if (data.expired_time > (new Date().getTime() / 1000 + 60)) {
         that.inner_audio_context.stop()
-        that.inner_audio_context.src = data.url
+        that.setData({
+          speeching_urls: data.urls,
+        })
+        that.inner_audio_context.src = data.urls[0]
+        that.inner_audio_context._start_index = 0
         that.inner_audio_context.play()
         return
       }
@@ -422,40 +465,16 @@ Page({
     s.push(work_item.content)
     var s = s.join('\n')
     wx.showLoading({
-      title: '正在加载音频...',
+      title: '音频加载中...',
     })
-    wechat_si.textToSpeech({
-      lang: 'zh_CN',
-      tts: true,
-      content: s.substr(0, 340),
-      success: function (res) {
-        wx.hideLoading()
-        that.inner_audio_context.stop()
-        that.inner_audio_context.src = res.filename
-        that.inner_audio_context.play()
-        wx.setStorage({
-          key: 'speak_audio' + work_item.id,
-          data: {
-            expired_time: res.expired_time,
-            url: res.filename,
-          }
-        })
-      },
-      fail: function (res) {
-        wx.hideLoading()
-        wx.showToast({
-          title: '播放出错:(',
-          icon: 'none',
-        })
-      }
-    })
+    return that._do_speak(s, 0, [], work_item.id)
   },
   speak: function (e) {
     var speeching = e.target.dataset.speeching
     if (speeching) {
       this.inner_audio_context.pause()
     } else {
-      this.background_audio_manager.pause()
+      this.pauseplaybackaudio()
       this.do_speak(this.data.work_item)
     }
   },
@@ -551,7 +570,7 @@ Page({
                 work_item: work_item,
               })
               wx.removeStorage({
-                key: 'songci' + work_item.id + util.formatTime(new Date()),
+                key: 'gsc' + work_item.id + util.formatTime(new Date()),
               })
             }
           }
@@ -754,7 +773,7 @@ Page({
     var that = this
     that.background_audio_manager = wx.getBackgroundAudioManager()
     that.inner_audio_context = wx.createInnerAudioContext()
-    that.inner_audio_context.loop = true
+    that.inner_audio_context.loop = false
     this.background_audio_manager.onEnded(() => {
       var mode = that.get_play_mode()
       if (mode != 'hc') {
@@ -811,7 +830,7 @@ Page({
       }
     })
     this.inner_audio_context.onPlay(() => {
-      this.background_audio_manager.pause()
+      this.pauseplaybackaudio()
       that.setData({
         speeching: true,
       })
@@ -827,9 +846,16 @@ Page({
       })
     })
     this.inner_audio_context.onEnded(() => {
-      that.setData({
-        speeching: false,
-      })
+      console.log(this.inner_audio_context._start_index, this.data.speeching_urls)
+      if (this.inner_audio_context._start_index == this.data.speeching_urls.length - 1) {
+        var url = this.data.speeching_urls[0]
+        this.inner_audio_context._start_index = 0
+      } else {
+        var url = this.data.speeching_urls[this.inner_audio_context._start_index + 1]
+        this.inner_audio_context._start_index += 1
+      }
+      this.inner_audio_context.src = url
+      this.inner_audio_context.play()
     })
     this.inner_audio_context.onTimeUpdate(() => {
       that.setData({
@@ -893,7 +919,7 @@ Page({
     }
     var key = parseInt(id_) - 1
     var pages = getCurrentPages()
-    var url = '/pages/songci/songci?id=' + key
+    var url = '/pages/gsc/gsc?id=' + key
     if (pages.length == config.maxLayer) {
       wx.redirectTo({
         url: url,
@@ -907,7 +933,7 @@ Page({
   onShareAppMessage: function (res) {
     return {
       title: '《' + this.data.work_item.work_title + '》' + this.data.work_item.work_author + '   ' + this.data.work_item.content.substr(0, 24),
-      path: '/pages/songci/songci?id=' + this.data.work_item.id,
+      path: '/pages/gsc/gsc?id=' + this.data.work_item.id,
       imageUrl: '/static/share4.jpg',
       success: function (res) {
         util.showSuccess('分享成功')

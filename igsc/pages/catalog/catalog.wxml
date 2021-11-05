@@ -14,7 +14,7 @@
   <view wx:for="{{gscitems}}">
     <view class='item_work' wx:if="{{showhead}}">
       <view class='myclick' data-id_='{{item.id}}'>
-        <view class='songci' bindtap='go2detail' data-id_='{{item.id}}' style='position:relative;'>
+        <view class='gsc' bindtap='go2detail' data-id_='{{item.id}}' style='position:relative;'>
           <text class='title' data-id_='{{item.id}}' style="{{current_paly_id==item.id?'font-style:italic;color:#BB7E7E;font-weight:700;':''}}">{{item.work_title}}
           </text>
           <view wx:if="{{item.audio_id>0}}" style='position:absolute;top:2rpx;right:15rpx;'>
@@ -28,12 +28,12 @@
       </view>
     </view>
     <view class="item_work myclick" wx:if="{{!showhead}}" bindtap='go2detail' data-id_='{{item.id}}'>
-      <view class='title songci myclick' data-id_='{{item.id}}' animation="{{current_paly_id==item.id?animationData:''}}" data-id_='{{item.id}}'>
+      <view class='title gsc myclick' data-id_='{{item.id}}' animation="{{current_paly_id==item.id?animationData:''}}" data-id_='{{item.id}}'>
         <text style="{{current_paly_id==item.id?'font-style:italic;color:#BB7E7E;font-weight:700;':''}}" data-id_='{{item.id}}'>{{index+1}}.{{item.work_title}} - {{item.work_author}}</text>
       </view>
     </view>
   </view>
-  <navigator wx:if="{{current_paly_id > 0}}" url='/pages/songci/songci?id={{current_paly_id}}'>
+  <navigator wx:if="{{current_paly_id > 0}}" url='/pages/gsc/gsc?id={{current_paly_id}}'>
     <image class='playingicon' src='../../static/quan.png' style='width:80rpx;height:80rpx;position:fixed;bottom:100rpx;right:5px;z-index:999;'>
     </image>
   </navigator>

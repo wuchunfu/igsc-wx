@@ -1,7 +1,7 @@
 {
   "pages": [
     "pages/catalog/catalog",
-    "pages/songci/songci"
+    "pages/gsc/gsc"
   ],
   "window": {
     "backgroundColor": "#FCF9F4",

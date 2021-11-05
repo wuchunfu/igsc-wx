@@ -33,7 +33,7 @@ Page({
   go2detail: function (e) {
     var id_ = e.target.dataset.id_
     var pages = getCurrentPages()
-    var url = '/pages/songci/songci?id=' + id_
+    var url = '/pages/gsc/gsc?id=' + id_
     if (pages.length == config.maxLayer) {
       //util.pageConfirm(url)
       wx.redirectTo({
@@ -47,7 +47,7 @@ Page({
   },
   getData: function (that) {
     wx.getStorage({
-      key: 'songciItems' + util.formatTime(new Date()),
+      key: 'gscItems' + util.formatTime(new Date()),
       success: function (res) {
         var items = res.data
         if (!items || items.length == 0) {
@@ -68,7 +68,7 @@ Page({
       title: '加载中...',
     })
     wx.request({
-      url: config.songciUrl + 'index/all/abc',
+      url: config.gscUrl + 'index/all/abc',
       success(result) {
         if (!result || result.data.code != 0) {
           wx.showToast({
@@ -97,7 +97,7 @@ Page({
           gscitems: dd,
         })
         wx.setStorage({
-          key: 'songciItems' + util.formatTime(new Date()),
+          key: 'gscItems' + util.formatTime(new Date()),
           data: dd
         })
         wx.hideLoading()
@@ -135,7 +135,7 @@ Page({
       WxSearch.search(options.q)
     } else {
       wx.getStorage({
-        key: 'songciItems' + util.formatTime(new Date()),
+        key: 'gscItems' + util.formatTime(new Date()),
         success: function (res) {
           if (!res) {
             wx.showToast({
@@ -223,7 +223,7 @@ Page({
           }
         }
         wx.request({
-          url: config.songciUrl + 'query/' + value + '/' + page + '/' + open_id,
+          url: config.gscUrl + 'query/' + value + '/' + page + '/' + open_id,
           success(result) {
             if (!result || result.data.code != 0) {
               wx.showToast({
@@ -285,7 +285,7 @@ Page({
   // 5 返回回调函数
   my_goback_function: function () {
     wx.reLaunch({
-      url: '../songci/songci?id=1'
+      url: '../gsc/gsc?id=1'
     })
   },
 
@@ -416,7 +416,7 @@ Page({
         return
       }
       wx.request({
-        url: config.songciUrl + 'mylike/' + open_id,
+        url: config.gscUrl + 'mylike/' + open_id,
         success(result) {
           if (!result || result.data.code != 0) {
             wx.showToast({

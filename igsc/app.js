@@ -18,7 +18,7 @@ App({
       },
       fail: function () {
         wx.request({
-          url: config.songciUrl + 'query/' + value + '/main/abcd',
+          url: config.gscUrl + 'query/' + value + '/main/abcd',
           success(result) {
             if (!result || result.data.code != 0) {
               return
