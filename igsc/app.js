@@ -73,5 +73,10 @@ App({
     } catch (e) {}
     // 加载字体
     //util.loadFont()
+    wx.getSystemInfo({
+      success: function (res) {
+        wx.setStorageSync('platform', 'pc')
+      }
+    })
   }
 })

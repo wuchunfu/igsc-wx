@@ -35,7 +35,6 @@ Page({
     var pages = getCurrentPages()
     var url = '/pages/gsc/gsc?id=' + id_
     if (pages.length == config.maxLayer) {
-      //util.pageConfirm(url)
       wx.redirectTo({
         url: url,
       })

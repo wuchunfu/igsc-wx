@@ -26,6 +26,11 @@ Page({
     playing_audio_id: 0, // 正在播放的id
     speeching: false,
     speeching_urls: [],
+    seek3: {
+      seek: 0,
+      work_id: 0,
+      index: 0,
+    },
   },
   setTimed: function () {
     var that = this
@@ -416,9 +421,21 @@ Page({
           that.setData({
             speeching_urls: urls,
           })
-          that.inner_audio_context.stop()
-          that.inner_audio_context.src = urls[0]
-          that.inner_audio_context._start_index = 0
+          //that.inner_audio_context.stop()
+          if (that.data.seek3.work_id == work_id) {
+            that.inner_audio_context.src = urls[that.data.seek3.index]
+            that.inner_audio_context._start_index = that.data.seek3.index
+            // 安卓trick
+            if (wx.getStorageSync('platform') == 'android') {
+              that.inner_audio_context.play()
+              that.inner_audio_context.pause()
+            }
+            that.inner_audio_context.seek(that.data.seek3.seek)
+          } else {
+            that.inner_audio_context.src = urls[0]
+            that.inner_audio_context._start_index = 0
+          }
+          that.inner_audio_context._work_id = work_id
           that.inner_audio_context.play()
           wx.setStorage({
             key: 'speak_audio:' + work_id,
@@ -442,17 +459,28 @@ Page({
     })
   },
   do_speak: function (work_item) {
-    var that = this
     var data = wx.getStorageSync('speak_audio:' + work_item.id)
     if (data) {
       if (data.expired_time > (new Date().getTime() / 1000 + 60)) {
-        that.inner_audio_context.stop()
-        that.setData({
+        //this.inner_audio_context.stop()
+        this.setData({
           speeching_urls: data.urls,
         })
-        that.inner_audio_context.src = data.urls[0]
-        that.inner_audio_context._start_index = 0
-        that.inner_audio_context.play()
+        if (this.data.seek3.work_id == work_item.id) {
+          this.inner_audio_context.src = data.urls[this.data.seek3.index]
+          this.inner_audio_context._start_index = this.data.seek3.index
+          // 安卓跳转失败, it's just a trick
+          if (wx.getStorageSync('platform') == 'android') {
+            this.inner_audio_context.play()
+            this.inner_audio_context.pause()
+          }
+          this.inner_audio_context.seek(this.data.seek3.seek)
+        } else {
+          this.inner_audio_context.src = data.urls[0]
+          this.inner_audio_context._start_index = 0
+        }
+        this.inner_audio_context._work_id = work_item.id
+        this.inner_audio_context.play()
         return
       }
     }
@@ -467,7 +495,7 @@ Page({
     wx.showLoading({
       title: '音频加载中...',
     })
-    return that._do_speak(s, 0, [], work_item.id)
+    return this._do_speak(s, 0, [], work_item.id)
   },
   speak: function (e) {
     var speeching = e.target.dataset.speeching
@@ -838,6 +866,11 @@ Page({
     this.inner_audio_context.onPause(() => {
       that.setData({
         speeching: false,
+        seek3: {
+          work_id: this.inner_audio_context._work_id,
+          index: this.inner_audio_context._start_index,
+          seek: this.inner_audio_context.currentTime,
+        }
       })
     })
     this.inner_audio_context.onStop(() => {
@@ -846,7 +879,6 @@ Page({
       })
     })
     this.inner_audio_context.onEnded(() => {
-      console.log(this.inner_audio_context._start_index, this.data.speeching_urls)
       if (this.inner_audio_context._start_index == this.data.speeching_urls.length - 1) {
         var url = this.data.speeching_urls[0]
         this.inner_audio_context._start_index = 0
