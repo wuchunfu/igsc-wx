@@ -163,7 +163,8 @@ Page({
         'id': that.data.work_item.id,
         'url': that.data.audio_url,
         'title': that.data.work_item.work_title,
-        'author': that.data.work_item.work_author
+        'author': that.data.work_item.work_author,
+        'audio_id': that.data.work_item.audio_id,
       })
     } else if (this.data.mode == 'one') {
       this.setData({
@@ -345,7 +346,7 @@ Page({
         background_audio_manager.coverImgUrl = that.data.poster
         background_audio_manager.epname = ' i古诗词 '
         background_audio_manager.startTime = 0
-        background_audio_manager._audio_id = that.data.work_item.audio_id
+        background_audio_manager._audio_id = play_id_url.audio_id
         background_audio_manager.seek(0)
         inner_audio_context.pause()
         background_audio_manager.play()
@@ -357,7 +358,8 @@ Page({
           'id': that.data.work_item.id,
           'url': that.data.audio_url,
           'title': that.data.work_item.work_title,
-          'author': that.data.work_item.work_author
+          'author': that.data.work_item.work_author,
+          'audio_id': that.data.work_item.audio_id,
         })
         background_audio_manager.src = that.data.audio_url
         background_audio_manager.title = that.data.work_item.work_title
@@ -649,7 +651,8 @@ Page({
           'id': that.data.work_item.id,
           'url': that.data.audio_url,
           'title': that.data.work_item.work_title,
-          'author': that.data.work_item.work_author
+          'author': that.data.work_item.work_author,
+          'audio_id': that.data.work_item.audio_id,
         })
       }
       that.playsound()

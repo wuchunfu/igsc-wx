@@ -389,6 +389,44 @@ Page({
       clearInterval(currentInterval)
     }
   },
+  getLikeList:function(open_id){
+    var that = this
+    wx.request({
+      url: config.gscUrl + 'mylike/' + open_id,
+      success(result) {
+        if (!result || result.data.code != 0) {
+          wx.showToast({
+            title: '网络异常~~',
+            icon: 'none'
+          })
+          wx.hideNavigationBarLoading()
+          wx.stopPullDownRefresh()
+          return
+        }
+        var datas = result.data.data.data
+        var dd = []
+        for (var data of datas) {
+          var splits = data.content.split('。')
+          var fuhao = '。'
+          if (splits.length > 0) {
+            if (splits[0].indexOf('？') >= 0) {
+              fuhao = '？'
+            }
+            data.short_content = splits[0].split('？')[0]
+          } else {
+            data.short_content = data.content
+          }
+          data.short_content += fuhao
+          dd.push(data)
+        }
+        that.setData({
+          gscitems: dd,
+        })
+        that.storage_result(dd)
+        wx.hideLoading()
+      }
+    })
+  },
   onPullDownRefresh: function () {
     var that = this
     var pages = getCurrentPages()
@@ -414,41 +452,7 @@ Page({
         wx.stopPullDownRefresh()
         return
       }
-      wx.request({
-        url: config.gscUrl + 'mylike/' + open_id,
-        success(result) {
-          if (!result || result.data.code != 0) {
-            wx.showToast({
-              title: '网络异常~~',
-              icon: 'none'
-            })
-            wx.hideNavigationBarLoading()
-            wx.stopPullDownRefresh()
-            return
-          }
-          var datas = result.data.data.data
-          var dd = []
-          for (var data of datas) {
-            var splits = data.content.split('。')
-            var fuhao = '。'
-            if (splits.length > 0) {
-              if (splits[0].indexOf('？') >= 0) {
-                fuhao = '？'
-              }
-              data.short_content = splits[0].split('？')[0]
-            } else {
-              data.short_content = data.content
-            }
-            data.short_content += fuhao
-            dd.push(data)
-          }
-          that.setData({
-            gscitems: dd,
-          })
-          that.storage_result(dd)
-          wx.hideLoading()
-        }
-      })
+      that.getLikeList(open_id)
       wx.setNavigationBarTitle({
         title: '我的收藏'
       })

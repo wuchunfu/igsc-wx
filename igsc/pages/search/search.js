@@ -77,6 +77,11 @@ function wxSearchClear() {
   })
   if (__that.data.page != 'like') {
     __that.getData(__that)
+  }else{
+    var open_id = wx.getStorageSync('user_open_id')
+    if(open_id){
+      __that.getLikeList(open_id)
+    }
   }
 }
 
