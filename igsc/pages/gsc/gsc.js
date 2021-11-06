@@ -625,7 +625,7 @@ Page({
     })
   },
   pauseplaybackaudio: function () {
-    background_audio_manager.stop()
+    background_audio_manager.pause()
     var currentTime = 1
     if (background_audio_manager.currentTime && background_audio_manager.currentTime > 1) {
       currentTime = background_audio_manager.currentTime
@@ -1083,7 +1083,6 @@ Page({
       current_time_show: current_time_show,
       sliding: 0,
       playing_audio_id: background_audio_manager._audio_id,
-      playing: true,
     })
   },
   sliderChanging: function (e) {
