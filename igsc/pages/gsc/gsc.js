@@ -1,7 +1,8 @@
 var config = require('../../config')
 var wechat_si = requirePlugin('WechatSI')
 var util = require('../../utils/util.js')
-
+const background_audio_manager = wx.getBackgroundAudioManager()
+const inner_audio_context = wx.createInnerAudioContext()
 Page({
   data: {
     work_item: null,
@@ -55,8 +56,8 @@ Page({
             seconds = 600
             break
           case 4:
-            var currentTime = that.background_audio_manager.currentTime
-            seconds = that.background_audio_manager.duration - (currentTime ? currentTime : 0) + 0.5
+            var currentTime = background_audio_manager.currentTime
+            seconds = background_audio_manager.duration - (currentTime ? currentTime : 0) + 0.5
             break
           case 5:
             seconds = -1
@@ -338,16 +339,16 @@ Page({
       //单曲循环
       try {
         var play_id_url = wx.getStorageSync('singleid')
-        that.background_audio_manager.src = play_id_url.url
-        that.background_audio_manager.title = play_id_url.title
-        that.background_audio_manager.singer = play_id_url.author
-        that.background_audio_manager.coverImgUrl = that.data.poster
-        that.background_audio_manager.epname = ' i古诗词 '
-        that.background_audio_manager.startTime = 0
-        that.background_audio_manager._audio_id = that.data.work_item.audio_id
-        that.background_audio_manager.seek(0)
-        that.inner_audio_context.pause()
-        that.background_audio_manager.play()
+        background_audio_manager.src = play_id_url.url
+        background_audio_manager.title = play_id_url.title
+        background_audio_manager.singer = play_id_url.author
+        background_audio_manager.coverImgUrl = that.data.poster
+        background_audio_manager.epname = ' i古诗词 '
+        background_audio_manager.startTime = 0
+        background_audio_manager._audio_id = that.data.work_item.audio_id
+        background_audio_manager.seek(0)
+        inner_audio_context.pause()
+        background_audio_manager.play()
         if (play_id_url.title) {
           that.record_play(play_id_url.id, play_id_url.title + '-' + play_id_url.author)
         }
@@ -358,14 +359,14 @@ Page({
           'title': that.data.work_item.work_title,
           'author': that.data.work_item.work_author
         })
-        that.background_audio_manager.src = that.data.audio_url
-        that.background_audio_manager.title = that.data.work_item.work_title
-        that.background_audio_manager.epname = ' i古诗词 '
-        that.background_audio_manager.singer = that.data.work_item.work_author
-        that.background_audio_manager.coverImgUrl = that.data.poster
-        that.background_audio_manager._audio_id = that.data.work_item.audio_id
-        that.inner_audio_context.pause()
-        that.background_audio_manager.play()
+        background_audio_manager.src = that.data.audio_url
+        background_audio_manager.title = that.data.work_item.work_title
+        background_audio_manager.epname = ' i古诗词 '
+        background_audio_manager.singer = that.data.work_item.work_author
+        background_audio_manager.coverImgUrl = that.data.poster
+        background_audio_manager._audio_id = that.data.work_item.audio_id
+        inner_audio_context.pause()
+        background_audio_manager.play()
         if (that.data.work_item && that.data.work_item.work_title) {
           that.record_play(that.data.work_item.id, that.data.work_item.work_title + '-' + that.data.work_item.work_author)
         }
@@ -424,23 +425,23 @@ Page({
             speeching_urls: urls,
             speeching_id: work_id,
           })
-          //that.inner_audio_context.stop()
+          //inner_audio_context.stop()
           if (that.data.seek3.work_id == work_id) {
-            that.inner_audio_context.src = urls[that.data.seek3.index]
-            that.inner_audio_context._start_index = that.data.seek3.index
+            inner_audio_context.src = urls[that.data.seek3.index]
+            inner_audio_context._start_index = that.data.seek3.index
             // 安卓trick
             if (wx.getStorageSync('platform') == 'android') {
-              that.inner_audio_context.play()
-              that.inner_audio_context.pause()
+              inner_audio_context.play()
+              inner_audio_context.pause()
             }
-            that.inner_audio_context.seek(that.data.seek3.seek)
+            inner_audio_context.seek(that.data.seek3.seek)
           } else {
-            that.inner_audio_context.src = urls[0]
-            that.inner_audio_context._start_index = 0
+            inner_audio_context.src = urls[0]
+            inner_audio_context._start_index = 0
           }
-          that.inner_audio_context._work_id = work_id
-          that.inner_audio_context.playbackRate = 0.8
-          that.inner_audio_context.play()
+          inner_audio_context._work_id = work_id
+          inner_audio_context.playbackRate = 0.8
+          inner_audio_context.play()
           wx.setStorage({
             key: 'speak_audio:' + work_id,
             data: {
@@ -454,7 +455,7 @@ Page({
       },
       fail: function (res) {
         wx.hideLoading()
-        that.inner_audio_context.pause()
+        inner_audio_context.pause()
         wx.showToast({
           title: '播放出错:(',
           icon: 'none',
@@ -466,27 +467,27 @@ Page({
     var data = wx.getStorageSync('speak_audio:' + work_item.id)
     if (data) {
       if (data.expired_time > (new Date().getTime() / 1000 + 60)) {
-        //this.inner_audio_context.stop()
+        //inner_audio_context.stop()
         this.setData({
           speeching_urls: data.urls,
           speeching_id: work_item.id,
         })
         if (this.data.seek3.work_id == work_item.id) {
-          this.inner_audio_context.src = data.urls[this.data.seek3.index]
-          this.inner_audio_context._start_index = this.data.seek3.index
+          inner_audio_context.src = data.urls[this.data.seek3.index]
+          inner_audio_context._start_index = this.data.seek3.index
           // 安卓跳转失败, it's just a trick
           if (wx.getStorageSync('platform') == 'android') {
-            this.inner_audio_context.play()
-            this.inner_audio_context.pause()
+            inner_audio_context.play()
+            inner_audio_context.pause()
           }
-          this.inner_audio_context.seek(this.data.seek3.seek)
+          inner_audio_context.seek(this.data.seek3.seek)
         } else {
-          this.inner_audio_context.src = data.urls[0]
-          this.inner_audio_context._start_index = 0
+          inner_audio_context.src = data.urls[0]
+          inner_audio_context._start_index = 0
         }
-        this.inner_audio_context._work_id = work_item.id
-        this.inner_audio_context.playbackRate = 0.8
-        this.inner_audio_context.play()
+        inner_audio_context._work_id = work_item.id
+        inner_audio_context.playbackRate = 0.8
+        inner_audio_context.play()
         return
       }
     }
@@ -506,7 +507,7 @@ Page({
   speak: function (e) {
     var speeching = e.target.dataset.speeching
     if (speeching) {
-      this.inner_audio_context.pause()
+      inner_audio_context.pause()
     } else {
       this.pauseplaybackaudio()
       this.do_speak(this.data.work_item)
@@ -620,17 +621,17 @@ Page({
     })
   },
   pauseplaybackaudio: function () {
-    this.background_audio_manager.stop()
+    background_audio_manager.stop()
     var currentTime = 1
-    if (this.background_audio_manager.currentTime && this.background_audio_manager.currentTime > 1) {
-      currentTime = this.background_audio_manager.currentTime
+    if (background_audio_manager.currentTime && background_audio_manager.currentTime > 1) {
+      currentTime = background_audio_manager.currentTime
     }
     this.setData({
       seek2: {
         seek: currentTime,
-        audio_id: this.background_audio_manager._audio_id,
+        audio_id: background_audio_manager._audio_id,
       },
-      slide_value: parseInt(currentTime / this.background_audio_manager.duration * 100),
+      slide_value: parseInt(currentTime / background_audio_manager.duration * 100),
       playing: false,
     })
   },
@@ -745,7 +746,7 @@ Page({
       wx.hideNavigationBarLoading()
       wx.stopPullDownRefresh()
     }, 600)
-    this.inner_audio_context.stop()
+    inner_audio_context.stop()
   },
   onReachBottom: function () {
     return
@@ -770,19 +771,19 @@ Page({
   },
   playsound: function () {
     if (this.data.work_item) {
-      this.background_audio_manager.title = this.data.work_item.work_title
-      this.background_audio_manager.epname = ' i古诗词 '
-      this.background_audio_manager.singer = this.data.work_item.work_author
-      this.background_audio_manager.coverImgUrl = this.data.poster
+      background_audio_manager.title = this.data.work_item.work_title
+      background_audio_manager.epname = ' i古诗词 '
+      background_audio_manager.singer = this.data.work_item.work_author
+      background_audio_manager.coverImgUrl = this.data.poster
       if (this.data.seek2.seek > 0 && this.data.seek2.audio_id == this.data.work_item.audio_id) {
-        this.background_audio_manager.startTime = this.data.seek2.seek
+        background_audio_manager.startTime = this.data.seek2.seek
       } else {
-        this.background_audio_manager.startTime = 0
+        background_audio_manager.startTime = 0
       }
-      this.background_audio_manager.src = this.data.audio_url
-      this.background_audio_manager._audio_id = this.data.work_item.audio_id
-      this.inner_audio_context.pause()
-      this.background_audio_manager.play()
+      background_audio_manager.src = this.data.audio_url
+      background_audio_manager._audio_id = this.data.work_item.audio_id
+      inner_audio_context.pause()
+      background_audio_manager.play()
     } else {
       wx.showToast({
         title: '播放失败，请稍后重试~~',
@@ -820,11 +821,9 @@ Page({
   },
   onReady: function (e) {
     var that = this
-    that.background_audio_manager = wx.getBackgroundAudioManager()
-    that.inner_audio_context = wx.createInnerAudioContext()
-    that.inner_audio_context.loop = false
-    that.inner_audio_context.playbackRate = 0.8
-    this.background_audio_manager.onEnded(() => {
+    inner_audio_context.loop = false
+    inner_audio_context.playbackRate = 0.8
+    background_audio_manager.onEnded(() => {
       var mode = that.get_play_mode()
       if (mode != 'hc') {
         that.do_operate_play('next', mode)
@@ -832,17 +831,17 @@ Page({
         that.reset_playmode()
       }
     })
-    this.background_audio_manager.onPause(() => {
+    background_audio_manager.onPause(() => {
       that.setData({
         playing: false,
       })
     })
-    this.background_audio_manager.onStop(() => {
+    background_audio_manager.onStop(() => {
       that.setData({
         playing: false,
       })
     })
-    this.background_audio_manager.onError((e) => {
+    background_audio_manager.onError((e) => {
       that.setData({
         playing: false,
       })
@@ -851,73 +850,73 @@ Page({
         icon: 'none',
       })
     })
-    this.background_audio_manager.onWaiting(() => {
+    background_audio_manager.onWaiting(() => {
       wx.showLoading({
         title: '音频加载中...',
       })
     })
-    this.background_audio_manager.onCanplay(() => {
+    background_audio_manager.onCanplay(() => {
       wx.hideLoading()
     })
-    this.background_audio_manager.onPlay(() => {
-      this.inner_audio_context.pause()
+    background_audio_manager.onPlay(() => {
+      inner_audio_context.pause()
       this.setData({
         playing: true,
-        playing_audio_id: this.background_audio_manager._audio_id,
+        playing_audio_id: background_audio_manager._audio_id,
       })
     })
-    this.background_audio_manager.onPrev(() => {
+    background_audio_manager.onPrev(() => {
       var mode = that.get_play_mode()
       that.do_operate_play('up', mode)
     })
-    this.background_audio_manager.onNext(() => {
+    background_audio_manager.onNext(() => {
       var mode = that.get_play_mode()
       that.do_operate_play('next', mode)
     })
-    this.background_audio_manager.onTimeUpdate(() => {
+    background_audio_manager.onTimeUpdate(() => {
       if (that.data.sliding != 1) {
         that.audio_start()
       }
     })
-    this.inner_audio_context.onPlay(() => {
+    inner_audio_context.onPlay(() => {
       this.pauseplaybackaudio()
       that.setData({
         speeching: true,
       })
     })
-    this.inner_audio_context.onPause(() => {
+    inner_audio_context.onPause(() => {
       that.setData({
         speeching: false,
         seek3: {
-          work_id: this.inner_audio_context._work_id,
-          index: this.inner_audio_context._start_index,
-          seek: this.inner_audio_context.currentTime,
+          work_id: inner_audio_context._work_id,
+          index: inner_audio_context._start_index,
+          seek: inner_audio_context.currentTime,
         }
       })
     })
-    this.inner_audio_context.onStop(() => {
+    inner_audio_context.onStop(() => {
       that.setData({
         speeching: false,
       })
     })
-    this.inner_audio_context.onEnded(() => {
-      if (this.inner_audio_context._start_index == this.data.speeching_urls.length - 1) {
+    inner_audio_context.onEnded(() => {
+      if (inner_audio_context._start_index == this.data.speeching_urls.length - 1) {
         var url = this.data.speeching_urls[0]
-        this.inner_audio_context._start_index = 0
+        inner_audio_context._start_index = 0
       } else {
-        var url = this.data.speeching_urls[this.inner_audio_context._start_index + 1]
-        this.inner_audio_context._start_index += 1
+        var url = this.data.speeching_urls[inner_audio_context._start_index + 1]
+        inner_audio_context._start_index += 1
       }
-      this.inner_audio_context.src = url
-      this.inner_audio_context.playbackRate = 0.8
-      this.inner_audio_context.play()
+      inner_audio_context.src = url
+      inner_audio_context.playbackRate = 0.8
+      inner_audio_context.play()
     })
-    this.inner_audio_context.onTimeUpdate(() => {
+    inner_audio_context.onTimeUpdate(() => {
       that.setData({
         speeching: true,
       })
     })
-    this.inner_audio_context.onError(() => {
+    inner_audio_context.onError(() => {
       that.setData({
         speeching: false,
       })
@@ -936,11 +935,11 @@ Page({
     }, 200)
   },
   setCurrentPlaying: function () {
-    if (this.background_audio_manager && !this.background_audio_manager.paused) {
-      if (this.background_audio_manager.src) {
+    if (background_audio_manager && !background_audio_manager.paused) {
+      if (background_audio_manager.src) {
         this.setData({
           playing: true,
-          playing_audio_id: this.background_audio_manager._audio_id,
+          playing_audio_id: background_audio_manager._audio_id,
         })
         return
       }
@@ -960,10 +959,10 @@ Page({
     }, 200)
   },
   onHide: function () {
-    this.inner_audio_context.stop()
+    inner_audio_context.stop()
   },
   onUnload: function () {
-    this.inner_audio_context.stop()
+    inner_audio_context.stop()
   },
   longPress: function () {
     var that = this
@@ -1059,18 +1058,15 @@ Page({
         }
       }
     } catch (e) {}
-    var current_time = this.background_audio_manager.currentTime
-    var duration = this.background_audio_manager.duration
-    if (that.data.sliding == 2 && that.data.seek2.audio_id == this.background_audio_manager._audio_id) {
+    var current_time = background_audio_manager.currentTime
+    var duration = background_audio_manager.duration
+    if (that.data.sliding == 2 && that.data.seek2.audio_id == background_audio_manager._audio_id) {
       that.setData({
         sliding: 0,
       })
       var slide_value = that.data.slide_value
       current_time = slide_value / 100.0 * duration
-      that.background_audio_manager.seek(that.data.seek2.seek)
-    }
-    if (current_time <= 0) {
-      return
+      background_audio_manager.seek(that.data.seek2.seek)
     }
     var current_time_show = (parseInt(current_time / 60) < 10 ? '0' + parseInt(current_time / 60) : parseInt(current_time / 60)) + ':' + ((parseInt(current_time % 60) > 9) ? parseInt(current_time % 60) : '0' + parseInt(current_time % 60))
     var duration_show = (parseInt(duration / 60) < 10 ? '0' + parseInt(duration / 60) : parseInt(duration / 60)) + ':' + ((parseInt(duration % 60) > 9) ? parseInt(duration % 60) : '0' + parseInt(duration % 60))
@@ -1081,7 +1077,7 @@ Page({
       duration_show: duration_show,
       current_time_show: current_time_show,
       sliding: 0,
-      playing_audio_id: this.background_audio_manager._audio_id,
+      playing_audio_id: background_audio_manager._audio_id,
     })
   },
   sliderChanging: function (e) {
@@ -1100,7 +1096,7 @@ Page({
       sliding: 1,
       seek2: {
         seek: seek2 >= duration ? 0 : seek2,
-        audio_id: that.background_audio_manager._audio_id,
+        audio_id: background_audio_manager._audio_id,
       },
       current_time_show: current_time_show,
       slide_value: v,
@@ -1121,7 +1117,7 @@ Page({
     that.setData({
       seek2: {
         seek: seek2 >= duration ? 0 : seek2,
-        audio_id: that.background_audio_manager._audio_id,
+        audio_id: background_audio_manager._audio_id,
       },
       current_time_show: current_time_show,
       slide_value: v,

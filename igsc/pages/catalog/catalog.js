@@ -1,6 +1,7 @@
 var config = require('../../config')
 var util = require('../../utils/util.js')
 var WxSearch = require('../search/search.js')
+const background_audio_manager = wx.getBackgroundAudioManager()
 Page({
   data: {
     gscitems: [],
@@ -17,10 +18,10 @@ Page({
       that = current_page
     }
     // 如果正在播放
-    if (that.background_audio_manager && !that.background_audio_manager.paused) {
-      if (that.background_audio_manager.src) {
+    if (background_audio_manager && !background_audio_manager.paused) {
+      if (background_audio_manager.src) {
         that.setData({
-          current_paly_id: that.background_audio_manager._audio_id,
+          current_paly_id: background_audio_manager._audio_id,
         })
         return true
       }
@@ -309,7 +310,6 @@ Page({
     if (this != current_page) {
       that = current_page
     }
-    that.background_audio_manager = wx.getBackgroundAudioManager()
     that.getcurrent_paly_id()
   },
   onShow: function () {
