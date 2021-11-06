@@ -1078,6 +1078,7 @@ Page({
       current_time_show: current_time_show,
       sliding: 0,
       playing_audio_id: background_audio_manager._audio_id,
+      playing: true,
     })
   },
   sliderChanging: function (e) {
