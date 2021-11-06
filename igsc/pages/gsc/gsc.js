@@ -423,7 +423,7 @@ Page({
             speeching_urls: urls,
             speeching_id: work_id,
           })
-          that.inner_audio_context.stop()
+          //that.inner_audio_context.stop()
           if (that.data.seek3.work_id == work_id) {
             that.inner_audio_context.src = urls[that.data.seek3.index]
             that.inner_audio_context._start_index = that.data.seek3.index
@@ -465,7 +465,7 @@ Page({
     var data = wx.getStorageSync('speak_audio:' + work_item.id)
     if (data) {
       if (data.expired_time > (new Date().getTime() / 1000 + 60)) {
-        this.inner_audio_context.stop()
+        //this.inner_audio_context.stop()
         this.setData({
           speeching_urls: data.urls,
           speeching_id: work_item.id,
@@ -722,32 +722,29 @@ Page({
   },
   onPullDownRefresh: function () {
     wx.showNavigationBarLoading()
-    var that = this
-    if (parseInt(that.data.work_item.id) > 8099) {
-      var id_ = 0
-    } else {
-      id_ = that.data.work_item.id
+    var key = this.data.work_item.id + 1
+    if (key > 8100) {
+      key = 1
     }
-    var key = parseInt(id_) + 1
-    that.get_by_id(key, true)
+    this.get_by_id(key, true)
     setTimeout(() => {
       wx.hideNavigationBarLoading()
       wx.stopPullDownRefresh()
     }, 600)
-    that.inner_audio_context.stop()
-    that.setData({
-      playing: false,
-      seek2: {
-        seek: 0,
-        audio_id: 0,
-      },
-      slide_value: 0,
-      seek3:{
-        seek: 0,
-        work_id: 0,
-        index: 0,
-      }
-    })
+    this.inner_audio_context.stop()
+  },
+  onReachBottom: function () {
+    return
+    wx.showNavigationBarLoading()
+    var key = this.data.work_item.id - 1
+    if (key <= 0 || key > 8099) {
+      key = 1
+    }
+    this.get_by_id(key, true)
+    setTimeout(() => {
+      wx.hideNavigationBarLoading()
+    }, 600)
+    this.inner_audio_context.stop()
   },
   onLoad: function (options) {
     var that = this
