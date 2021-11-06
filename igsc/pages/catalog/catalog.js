@@ -55,6 +55,7 @@ Page({
           that.setData({
             gscitems: items,
           })
+          that.storage_result(items)
         }
       },
       fail: function () {
@@ -63,6 +64,7 @@ Page({
     })
   },
   getAllData: function (context) {
+    var that = this
     wx.showLoading({
       title: '加载中...',
     })
@@ -95,6 +97,7 @@ Page({
         context.setData({
           gscitems: dd,
         })
+        that.storage_result(dd)
         wx.setStorage({
           key: 'gscItems' + util.formatTime(new Date()),
           data: dd
@@ -110,9 +113,20 @@ Page({
       }
     })
   },
-  /**
-   * 生命周期函数--监听页面加载
-   */
+  storage_result: function(items){
+    var search_result_ids = []
+    var audio_ids = []
+    for (var d of items) {
+      search_result_ids.push(d.id)
+      if(d.audio_id > 0){
+        audio_ids.push(d.audio_id)
+      }
+    }
+    wx.setStorageSync('search_result_ids', search_result_ids)
+    if(audio_ids.length > 0){
+      wx.setStorageSync('audio_ids', audio_ids)
+    }
+  },
   onLoad: function (options) {
     var that = this
     var pages = getCurrentPages()
@@ -153,6 +167,7 @@ Page({
             that.setData({
               gscitems: items,
             })
+            that.storage_result(items)
             wx.hideLoading()
           }
         },
@@ -167,12 +182,11 @@ Page({
     }, 500)
     wx.setStorageSync('currentInterval', currentInterval)
   },
-  wxSearchInput: WxSearch.wxSearchInput, // 输入变化时的操作
-  wxSearchKeyTap: WxSearch.wxSearchKeyTap, // 点击提示或者关键字、历史记录时的操作
-  wxSearchDeleteAll: WxSearch.wxSearchDeleteAll, // 删除所有的历史记录
-  wxSearchConfirm: WxSearch.wxSearchConfirm, // 搜索函数
-  wxSearchClear: WxSearch.wxSearchClear, // 清空函数
-  // 4 搜索回调函数  
+  wxSearchInput: WxSearch.wxSearchInput,
+  wxSearchKeyTap: WxSearch.wxSearchKeyTap,
+  wxSearchDeleteAll: WxSearch.wxSearchDeleteAll,
+  wxSearchConfirm: WxSearch.wxSearchConfirm,
+  wxSearchClear: WxSearch.wxSearchClear,
   my_search_function: function (value) {
     wx.showLoading({
       title: '加载中...'
@@ -201,6 +215,7 @@ Page({
         that.setData({
           gscitems: data,
         })
+        that.storage_result(data)
         if (data.length == 0) {
           util.showSuccess('没有相关内容')
         } else {
@@ -254,6 +269,7 @@ Page({
               key: key,
               data: dd,
             })
+            that.storage_result(dd)
             if (dd.length == 0) {
               util.showSuccess('没有相关内容')
             } else {
@@ -281,16 +297,11 @@ Page({
       }
     }, 200)
   },
-  // 5 返回回调函数
   my_goback_function: function () {
     wx.reLaunch({
       url: '../gsc/gsc?id=1&from=main'
     })
   },
-
-  /**
-   * 生命周期函数--监听页面初次渲染完成
-   */
   onReady: function () {
     var that = this
     var pages = getCurrentPages()
@@ -358,9 +369,6 @@ Page({
     })
     that.getcurrent_paly_id()
   },
-  /**
-   * 生命周期函数--监听页面隐藏
-   */
   onHide: function () {
     var playingint = wx.getStorageSync('playingint')
     if (playingint) {
@@ -371,10 +379,6 @@ Page({
       clearInterval(currentInterval)
     }
   },
-
-  /**
-   * 生命周期函数--监听页面卸载
-   */
   onUnload: function () {
     var playingint = wx.getStorageSync('playingint')
     if (playingint) {
@@ -385,10 +389,6 @@ Page({
       clearInterval(currentInterval)
     }
   },
-
-  /**
-   * 页面相关事件处理函数--监听用户下拉动作
-   */
   onPullDownRefresh: function () {
     var that = this
     var pages = getCurrentPages()
@@ -428,9 +428,7 @@ Page({
           }
           var datas = result.data.data.data
           var dd = []
-          var like_ids = []
           for (var data of datas) {
-            like_ids.push(data.id)
             var splits = data.content.split('。')
             var fuhao = '。'
             if (splits.length > 0) {
@@ -447,8 +445,8 @@ Page({
           that.setData({
             gscitems: dd,
           })
+          that.storage_result(dd)
           wx.hideLoading()
-          wx.setStorageSync('like_ids', like_ids)
         }
       })
       wx.setNavigationBarTitle({
@@ -476,10 +474,6 @@ Page({
     wx.stopPullDownRefresh()
     WxSearch.wxSearchClear()
   },
-
-  /**
-   * 页面上拉触底事件的处理函数
-   */
   onReachBottom: function () {
     return
   },
@@ -496,9 +490,6 @@ Page({
       }
     }
   },
-  /**
-   * 用户点击右上角分享
-   */
   onShareAppMessage: function (res) {
     var that = this
     var pages = getCurrentPages()
@@ -508,7 +499,7 @@ Page({
     }
     var q = that.data.wxSearchData.value
     return {
-      title: 'i古诗词-' + (q ? q : '我们都爱古诗词'),
+      title: 'i古诗词 ' + (q ? q : '我们都爱古诗词'),
       path: '/pages/catalog/catalog' + (q ? ('?q=' + q) : ''),
       imageUrl: '/static/share4.jpg',
       success: function (res) {

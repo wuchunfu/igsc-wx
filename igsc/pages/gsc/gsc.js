@@ -342,7 +342,7 @@ Page({
         that.background_audio_manager.title = play_id_url.title
         that.background_audio_manager.singer = play_id_url.author
         that.background_audio_manager.coverImgUrl = that.data.poster
-        that.background_audio_manager.epname = 'i古诗词 '
+        that.background_audio_manager.epname = ' i古诗词 '
         that.background_audio_manager.startTime = 0
         that.background_audio_manager._audio_id = that.data.work_item.audio_id
         that.background_audio_manager.seek(0)
@@ -360,7 +360,7 @@ Page({
         })
         that.background_audio_manager.src = that.data.audio_url
         that.background_audio_manager.title = that.data.work_item.work_title
-        that.background_audio_manager.epname = 'i古诗词 '
+        that.background_audio_manager.epname = ' i古诗词 '
         that.background_audio_manager.singer = that.data.work_item.work_author
         that.background_audio_manager.coverImgUrl = that.data.poster
         that.background_audio_manager._audio_id = that.data.work_item.audio_id
@@ -682,7 +682,6 @@ Page({
     var pages = getCurrentPages()
     var url = '/pages/catalog/catalog?id=' + id_ + '&q=' + q
     if (pages.length == config.maxLayer) {
-      //util.pageConfirm(url)
       wx.redirectTo({
         url: url,
       })
@@ -724,17 +723,15 @@ Page({
   onPullDownRefresh: function () {
     wx.showNavigationBarLoading()
     var key = 0
-    if (this.data.from_page == 'like') {
-      var like_ids = wx.getStorageSync('like_ids')
-      if (like_ids) {
-        var index = like_ids.indexOf(this.data.work_item.id)
-        if (index != -1) {
-          index += 1
-          if (index >= like_ids.length) {
-            index = 0
-          }
-          key = like_ids[index]
+    var search_result_ids = wx.getStorageSync('search_result_ids')
+    if (search_result_ids) {
+      var index = search_result_ids.indexOf(this.data.work_item.id)
+      if (index != -1) {
+        index += 1
+        if (index >= search_result_ids.length) {
+          index = 0
         }
+        key = search_result_ids[index]
       }
     }
     if (key == 0) {
@@ -760,6 +757,11 @@ Page({
         this.setData({
           from_page: options.from,
         })
+        if (options.from == 'like') {
+          wx.setNavigationBarTitle({
+            title: '我的收藏'
+          })
+        }
       }
     } else {
       id_ = parseInt(Math.random() * 8100)
@@ -769,7 +771,7 @@ Page({
   playsound: function () {
     if (this.data.work_item) {
       this.background_audio_manager.title = this.data.work_item.work_title
-      this.background_audio_manager.epname = 'i古诗词 '
+      this.background_audio_manager.epname = ' i古诗词 '
       this.background_audio_manager.singer = this.data.work_item.work_author
       this.background_audio_manager.coverImgUrl = this.data.poster
       if (this.data.seek2.seek > 0 && this.data.seek2.audio_id == this.data.work_item.audio_id) {
