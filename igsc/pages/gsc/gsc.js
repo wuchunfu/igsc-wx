@@ -2,7 +2,9 @@ var config = require('../../config')
 var wechat_si = requirePlugin('WechatSI')
 var util = require('../../utils/util.js')
 const background_audio_manager = wx.getBackgroundAudioManager()
+background_audio_manager.referrerPolicy = 'origin'
 const inner_audio_context = wx.createInnerAudioContext()
+inner_audio_context.referrerPolicy = 'origin'
 Page({
   data: {
     work_item: null,

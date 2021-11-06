@@ -2,6 +2,7 @@ var config = require('../../config')
 var util = require('../../utils/util.js')
 var WxSearch = require('../search/search.js')
 const background_audio_manager = wx.getBackgroundAudioManager()
+background_audio_manager.referrerPolicy = 'origin'
 Page({
   data: {
     gscitems: [],
