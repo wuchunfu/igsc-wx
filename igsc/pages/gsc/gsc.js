@@ -25,6 +25,7 @@ Page({
     sliding: 0, // 1 正在滑动 2 刚刚有滑动
     playing_audio_id: 0, // 正在播放的id
     speeching: false,
+    speeching_id: 0,
     speeching_urls: [],
     seek3: {
       seek: 0,
@@ -420,8 +421,9 @@ Page({
           wx.hideLoading()
           that.setData({
             speeching_urls: urls,
+            speeching_id: work_id,
           })
-          //that.inner_audio_context.stop()
+          that.inner_audio_context.stop()
           if (that.data.seek3.work_id == work_id) {
             that.inner_audio_context.src = urls[that.data.seek3.index]
             that.inner_audio_context._start_index = that.data.seek3.index
@@ -436,6 +438,7 @@ Page({
             that.inner_audio_context._start_index = 0
           }
           that.inner_audio_context._work_id = work_id
+          that.inner_audio_context.playbackRate = 0.8
           that.inner_audio_context.play()
           wx.setStorage({
             key: 'speak_audio:' + work_id,
@@ -462,9 +465,10 @@ Page({
     var data = wx.getStorageSync('speak_audio:' + work_item.id)
     if (data) {
       if (data.expired_time > (new Date().getTime() / 1000 + 60)) {
-        //this.inner_audio_context.stop()
+        this.inner_audio_context.stop()
         this.setData({
           speeching_urls: data.urls,
+          speeching_id: work_item.id,
         })
         if (this.data.seek3.work_id == work_item.id) {
           this.inner_audio_context.src = data.urls[this.data.seek3.index]
@@ -480,6 +484,7 @@ Page({
           this.inner_audio_context._start_index = 0
         }
         this.inner_audio_context._work_id = work_item.id
+        this.inner_audio_context.playbackRate = 0.8
         this.inner_audio_context.play()
         return
       }
@@ -729,6 +734,7 @@ Page({
       wx.hideNavigationBarLoading()
       wx.stopPullDownRefresh()
     }, 600)
+    that.inner_audio_context.stop()
     that.setData({
       playing: false,
       seek2: {
@@ -736,6 +742,11 @@ Page({
         audio_id: 0,
       },
       slide_value: 0,
+      seek3:{
+        seek: 0,
+        work_id: 0,
+        index: 0,
+      }
     })
   },
   onLoad: function (options) {
@@ -802,6 +813,7 @@ Page({
     that.background_audio_manager = wx.getBackgroundAudioManager()
     that.inner_audio_context = wx.createInnerAudioContext()
     that.inner_audio_context.loop = false
+    that.inner_audio_context.playbackRate = 0.8
     this.background_audio_manager.onEnded(() => {
       var mode = that.get_play_mode()
       if (mode != 'hc') {
@@ -887,6 +899,7 @@ Page({
         this.inner_audio_context._start_index += 1
       }
       this.inner_audio_context.src = url
+      this.inner_audio_context.playbackRate = 0.8
       this.inner_audio_context.play()
     })
     this.inner_audio_context.onTimeUpdate(() => {
