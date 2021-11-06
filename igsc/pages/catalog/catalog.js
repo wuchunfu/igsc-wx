@@ -33,7 +33,7 @@ Page({
   go2detail: function (e) {
     var id_ = e.target.dataset.id_
     var pages = getCurrentPages()
-    var url = '/pages/gsc/gsc?id=' + id_
+    var url = '/pages/gsc/gsc?id=' + id_ + '&from=' + this.data.page
     if (pages.length == config.maxLayer) {
       wx.redirectTo({
         url: url,
@@ -284,7 +284,7 @@ Page({
   // 5 返回回调函数
   my_goback_function: function () {
     wx.reLaunch({
-      url: '../gsc/gsc?id=1'
+      url: '../gsc/gsc?id=1&from=main'
     })
   },
 
@@ -428,7 +428,9 @@ Page({
           }
           var datas = result.data.data.data
           var dd = []
+          var like_ids = []
           for (var data of datas) {
+            like_ids.push(data.id)
             var splits = data.content.split('。')
             var fuhao = '。'
             if (splits.length > 0) {
@@ -446,6 +448,7 @@ Page({
             gscitems: dd,
           })
           wx.hideLoading()
+          wx.setStorageSync('like_ids', like_ids)
         }
       })
       wx.setNavigationBarTitle({

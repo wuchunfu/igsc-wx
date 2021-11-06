@@ -32,6 +32,7 @@ Page({
       work_id: 0,
       index: 0,
     },
+    from_page: 'main',
   },
   setTimed: function () {
     var that = this
@@ -722,9 +723,25 @@ Page({
   },
   onPullDownRefresh: function () {
     wx.showNavigationBarLoading()
-    var key = this.data.work_item.id + 1
-    if (key > 8100) {
-      key = 1
+    var key = 0
+    if (this.data.from_page == 'like') {
+      var like_ids = wx.getStorageSync('like_ids')
+      if (like_ids) {
+        var index = like_ids.indexOf(this.data.work_item.id)
+        if (index != -1) {
+          index += 1
+          if (index >= like_ids.length) {
+            index = 0
+          }
+          key = like_ids[index]
+        }
+      }
+    }
+    if (key == 0) {
+      key = this.data.work_item.id + 1
+      if (key > 8100) {
+        key = 1
+      }
     }
     this.get_by_id(key, true)
     setTimeout(() => {
@@ -735,25 +752,19 @@ Page({
   },
   onReachBottom: function () {
     return
-    wx.showNavigationBarLoading()
-    var key = this.data.work_item.id - 1
-    if (key <= 0 || key > 8099) {
-      key = 1
-    }
-    this.get_by_id(key, true)
-    setTimeout(() => {
-      wx.hideNavigationBarLoading()
-    }, 600)
-    this.inner_audio_context.stop()
   },
   onLoad: function (options) {
-    var that = this
     if (options.hasOwnProperty('id')) {
       var id_ = options.id
+      if (options.hasOwnProperty('from')) {
+        this.setData({
+          from_page: options.from,
+        })
+      }
     } else {
       id_ = parseInt(Math.random() * 8100)
     }
-    that.get_by_id(id_)
+    this.get_by_id(id_)
   },
   playsound: function () {
     if (this.data.work_item) {
@@ -975,7 +986,7 @@ Page({
   onShareAppMessage: function (res) {
     return {
       title: '《' + this.data.work_item.work_title + '》' + this.data.work_item.work_author + '   ' + this.data.work_item.content.substr(0, 24),
-      path: '/pages/gsc/gsc?id=' + this.data.work_item.id,
+      path: '/pages/gsc/gsc?id=' + this.data.work_item.id + '&from=main',
       imageUrl: '/static/share4.jpg',
       success: function (res) {
         util.showSuccess('分享成功')
