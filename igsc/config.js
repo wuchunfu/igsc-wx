@@ -1,5 +1,5 @@
-var host = 'https://igsc.wx.haihui.site'
-//var host = 'http://49.234.18.99:8081'
+//var host = 'https://igsc.wx.haihui.site'
+var host = 'http://192.168.0.106:8080'
 var config = {
     service: {
         host,

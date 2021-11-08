@@ -74,6 +74,8 @@ function wxSearchClear() {
 
   __that.setData({
     wxSearchData: temData,
+    show_bottom_button: false,
+    page_num: 1,
   })
   if (__that.data.page != 'like') {
     __that.getData(__that)
@@ -115,6 +117,8 @@ function search(inputValue) {
     temData.value = inputValue
     __that.setData({
       wxSearchData: temData,
+      show_bottom_button: false,
+      page_num: 1,
     })
 
     __searchFunction(inputValue)
