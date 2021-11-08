@@ -200,7 +200,7 @@ Page({
   wxSearchConfirm: WxSearch.wxSearchConfirm,
   wxSearchClear: WxSearch.wxSearchClear,
   pageDown: function(){
-    if(this.data.page_num >= this.data.total_page || !this.search_V){
+    if(this.data.page_num >= this.data.total_page || (!this.search_V && this.data.page !='like')){
       return
     }
     this.setData({
@@ -209,7 +209,7 @@ Page({
     this.my_search_function(this.search_V)
   },
   pageUp: function(){
-    if(this.data.page_num <= 1 || !this.search_V){
+    if(this.data.page_num <= 1 || (!this.search_V && this.data.page !='like')){
       return
     }
     this.setData({
@@ -242,8 +242,13 @@ Page({
         })
       }
     }
+    if(!value && page == 'like'){
+      var url = config.gscUrl + 'mylike_by_page/' + open_id + '?page_num=' + that.data.page_num + '&page_size=' + that.data.page_size
+    }else{
+      var url = config.gscUrl + 'query_by_page/' + value + '/' + page + '/' + open_id + '?page_num=' + that.data.page_num + '&page_size=' + that.data.page_size
+    }
     wx.request({
-      url: config.gscUrl + 'query_by_page/' + value + '/' + page + '/' + open_id + '?page_num=' + that.data.page_num + '&page_size=' + that.data.page_size,
+      url: url,
       success(result) {
         if (!result || result.data.code != 0) {
           wx.showToast({
@@ -397,7 +402,7 @@ Page({
   getLikeList: function (open_id) {
     var that = this
     wx.request({
-      url: config.gscUrl + 'mylike/' + open_id,
+      url: config.gscUrl + 'mylike_by_page/' + open_id + '?page_num=' + that.data.page_num + '&page_size=' + that.data.page_size,
       success(result) {
         if (!result || result.data.code != 0) {
           wx.showToast({
@@ -429,7 +434,9 @@ Page({
         }
         that.setData({
           gscitems: dd,
-          total: dd.length,
+          total: result.data.data.total,
+          show_bottom_button: result.data.data.total >  that.data.page_size,
+          total_page: Math.ceil(result.data.data.total / that.data.page_size),
         })
         that.storage_result(dd)
         wx.hideLoading()
