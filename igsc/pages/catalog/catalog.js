@@ -15,6 +15,7 @@ Page({
     total: 0,
     total_page: 0,
     page_size: 20,
+    search_pattern: 'all',
   },
   getcurrent_paly_id: function () {
     var that = this
@@ -86,7 +87,7 @@ Page({
           return
         }
         var datas = result.data.data.data
-        if(!datas){
+        if (!datas) {
           datas = []
         }
         var dd = []
@@ -199,8 +200,8 @@ Page({
   wxSearchDeleteAll: WxSearch.wxSearchDeleteAll,
   wxSearchConfirm: WxSearch.wxSearchConfirm,
   wxSearchClear: WxSearch.wxSearchClear,
-  pageDown: function(){
-    if(this.data.page_num >= this.data.total_page || (!this.search_V && this.data.page !='like')){
+  pageDown: function () {
+    if (this.data.page_num >= this.data.total_page || (!this.search_V && this.data.page != 'like')) {
       return
     }
     this.setData({
@@ -208,14 +209,24 @@ Page({
     })
     this.my_search_function(this.search_V)
   },
-  pageUp: function(){
-    if(this.data.page_num <= 1 || (!this.search_V && this.data.page !='like')){
+  pageUp: function () {
+    if (this.data.page_num <= 1 || (!this.search_V && this.data.page != 'like')) {
       return
     }
     this.setData({
       page_num: this.data.page_num - 1,
     })
     this.my_search_function(this.search_V)
+  },
+  radio_change: function (e) {
+    this.setData({
+      search_pattern: e.detail.value,
+      show_bottom_button: false,
+      page_num: 1,
+    })
+    if(this.search_V){
+      this.my_search_function(this.search_V)
+    }
   },
   my_search_function: function (value) {
     wx.showLoading({
@@ -242,10 +253,10 @@ Page({
         })
       }
     }
-    if(!value && page == 'like'){
-      var url = config.gscUrl + 'mylike_by_page/' + open_id + '?page_num=' + that.data.page_num + '&page_size=' + that.data.page_size
-    }else{
-      var url = config.gscUrl + 'query_by_page/' + value + '/' + page + '/' + open_id + '?page_num=' + that.data.page_num + '&page_size=' + that.data.page_size
+    if (!value && page == 'like') {
+      var url = config.gscUrl + 'mylike_by_page/' + open_id + '?page_num=' + that.data.page_num + '&page_size=' + that.data.page_size + '&search_pattern=' + that.data.search_pattern
+    } else {
+      var url = config.gscUrl + 'query_by_page/' + value + '/' + page + '/' + open_id + '?page_num=' + that.data.page_num + '&page_size=' + that.data.page_size + '&search_pattern=' + that.data.search_pattern
     }
     wx.request({
       url: url,
@@ -258,7 +269,7 @@ Page({
           return
         }
         var datas = result.data.data.data
-        if(!datas){
+        if (!datas) {
           datas = []
         }
         var dd = []
@@ -279,7 +290,7 @@ Page({
         that.setData({
           gscitems: dd,
           total: result.data.data.total,
-          show_bottom_button: result.data.data.total >  that.data.page_size && value != '音频',
+          show_bottom_button: result.data.data.total > that.data.page_size && value != '音频',
           total_page: Math.ceil(result.data.data.total / that.data.page_size),
         })
         that.storage_result(dd)
@@ -402,7 +413,7 @@ Page({
   getLikeList: function (open_id) {
     var that = this
     wx.request({
-      url: config.gscUrl + 'mylike_by_page/' + open_id + '?page_num=' + that.data.page_num + '&page_size=' + that.data.page_size,
+      url: config.gscUrl + 'mylike_by_page/' + open_id + '?page_num=' + that.data.page_num + '&page_size=' + that.data.page_size + '&search_pattern=' + that.data.search_pattern,
       success(result) {
         if (!result || result.data.code != 0) {
           wx.showToast({
@@ -414,7 +425,7 @@ Page({
           return
         }
         var datas = result.data.data.data
-        if(!datas){
+        if (!datas) {
           datas = []
         }
         var dd = []
@@ -435,7 +446,7 @@ Page({
         that.setData({
           gscitems: dd,
           total: result.data.data.total,
-          show_bottom_button: result.data.data.total >  that.data.page_size,
+          show_bottom_button: result.data.data.total > that.data.page_size,
           total_page: Math.ceil(result.data.data.total / that.data.page_size),
         })
         that.storage_result(dd)

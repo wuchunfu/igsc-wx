@@ -167,6 +167,12 @@
 }
 
 .weui-search-bar__cancel-btn:hover {
-  color: #09bb07;
+  color: #bb7e7e;
   font-weight: 700;
+}
+
+.search_radio {
+  color: #bb7e7e;
+  margin-right: 10rpx;
+  transform:scale(0.8);
 }

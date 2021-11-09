@@ -76,6 +76,7 @@ function wxSearchClear() {
     wxSearchData: temData,
     show_bottom_button: false,
     page_num: 1,
+    search_pattern: 'all',
   })
   if (__that.data.page != 'like') {
     __that.getData(__that)
