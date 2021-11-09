@@ -141,6 +141,17 @@ Page({
       wx.setStorageSync('audio_ids', audio_ids)
     }
   },
+  interval_get_current_play:function(){
+    var that = this
+    var currentInterval = wx.getStorageSync('currentInterval')
+    if(currentInterval){
+      clearInterval(currentInterval)
+    }
+    currentInterval = setInterval(() => {
+      that.getcurrent_paly_id()
+    }, 1500)
+    wx.setStorageSync('currentInterval', currentInterval)
+  },
   onLoad: function (options) {
     var that = this
     var pages = getCurrentPages()
@@ -196,11 +207,7 @@ Page({
         }
       })
     }
-    clearInterval(wx.getStorageSync('currentInterval'))
-    var currentInterval = setInterval(() => {
-      that.getcurrent_paly_id()
-    }, 500)
-    wx.setStorageSync('currentInterval', currentInterval)
+    that.interval_get_current_play()
   },
   wxSearchInput: WxSearch.wxSearchInput,
   wxSearchKeyTap: WxSearch.wxSearchKeyTap,
@@ -340,7 +347,7 @@ Page({
     if (this != current_page) {
       that = current_page
     }
-    that.getcurrent_paly_id()
+    that.interval_get_current_play()
   },
   onShow: function () {
     var that = this
@@ -397,27 +404,25 @@ Page({
         })
       }
     })
-    that.getcurrent_paly_id()
+    that.interval_get_current_play()
+  },
+  purge_some_data:function(){
+    var playingint = wx.getStorageSync('playingint')
+    if (playingint) {
+      clearInterval(playingint)
+      wx.removeStorageSync('playingint')
+    }
+    var currentInterval = wx.getStorageSync('currentInterval')
+    if (currentInterval) {
+      clearInterval(currentInterval)
+      wx.removeStorageSync('currentInterval')
+    }
   },
   onHide: function () {
-    var playingint = wx.getStorageSync('playingint')
-    if (playingint) {
-      clearInterval(playingint)
-    }
-    var currentInterval = wx.getStorageSync('currentInterval')
-    if (currentInterval) {
-      clearInterval(currentInterval)
-    }
+    this.purge_some_data()
   },
   onUnload: function () {
-    var playingint = wx.getStorageSync('playingint')
-    if (playingint) {
-      clearInterval(playingint)
-    }
-    var currentInterval = wx.getStorageSync('currentInterval')
-    if (currentInterval) {
-      clearInterval(currentInterval)
-    }
+    this.purge_some_data()
   },
   getLikeList: function (open_id) {
     var that = this
