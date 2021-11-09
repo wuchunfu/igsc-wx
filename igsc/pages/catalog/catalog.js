@@ -79,7 +79,6 @@ Page({
     wx.request({
       url: config.gscUrl + 'short_index',
       enableHttp2: true,
-      enableCache:true,
       success(result) {
         if (!result || result.data.code != 0) {
           wx.showToast({
@@ -141,10 +140,10 @@ Page({
       wx.setStorageSync('audio_ids', audio_ids)
     }
   },
-  interval_get_current_play:function(){
+  interval_get_current_play: function () {
     var that = this
     var currentInterval = wx.getStorageSync('currentInterval')
-    if(currentInterval){
+    if (currentInterval) {
       clearInterval(currentInterval)
     }
     currentInterval = setInterval(() => {
@@ -169,7 +168,7 @@ Page({
           showhead: true,
         })
       }
-      if(options.hasOwnProperty('sp')){
+      if (options.hasOwnProperty('sp')) {
         that.setData({
           search_pattern: options.sp,
         })
@@ -238,7 +237,7 @@ Page({
       show_bottom_button: false,
       page_num: 1,
     })
-    if(this.search_V){
+    if (this.search_V) {
       this.my_search_function(this.search_V)
     }
   },
@@ -270,12 +269,15 @@ Page({
     if (!value && page == 'like') {
       var url = config.gscUrl + 'mylike_by_page/' + open_id + '?page_num=' + that.data.page_num + '&page_size=' + that.data.page_size + '&search_pattern=' + that.data.search_pattern
     } else {
-      var url = config.gscUrl + 'query_by_page/' + value + '/' + page + '/' + open_id + '?page_num=' + that.data.page_num + '&page_size=' + that.data.page_size + '&search_pattern=' + that.data.search_pattern
+      if (value && value == '音频') {
+        var url = config.gscUrl + 'query_by_page/' + value + '/' + page + '/' + open_id + '?page_num=' + that.data.page_num + '&page_size=' + that.data.page_size + '&search_pattern=' + that.data.search_pattern
+      } else {
+        var url = config.gscUrl + 'query_by_page_a/' + page + '/' + value + '/' + open_id + '?page_num=' + that.data.page_num + '&page_size=' + that.data.page_size + '&search_pattern=' + that.data.search_pattern
+      }
     }
     wx.request({
       url: url,
       enableHttp2: true,
-      enableCache:true,
       success(result) {
         if (!result || result.data.code != 0) {
           wx.showToast({
@@ -406,7 +408,7 @@ Page({
     })
     that.interval_get_current_play()
   },
-  purge_some_data:function(){
+  purge_some_data: function () {
     var playingint = wx.getStorageSync('playingint')
     if (playingint) {
       clearInterval(playingint)
@@ -429,7 +431,6 @@ Page({
     wx.request({
       url: config.gscUrl + 'mylike_by_page/' + open_id + '?page_num=' + that.data.page_num + '&page_size=' + that.data.page_size + '&search_pattern=' + that.data.search_pattern,
       enableHttp2: true,
-      enableCache:true,
       success(result) {
         if (!result || result.data.code != 0) {
           wx.showToast({
