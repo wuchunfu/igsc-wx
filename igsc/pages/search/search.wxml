@@ -26,6 +26,7 @@
           <radio  class="search_radio" value="all" checked="{{search_pattern=='all'}}" color="#bb7e7e"><text>全部</text></radio>
           <radio value="title"  class="search_radio"checked="{{search_pattern=='title'}}" color="#bb7e7e"><text>标题</text></radio>
           <radio value="author" class="search_radio" checked="{{search_pattern=='author'}}" color="#bb7e7e"><text>作者</text></radio>
+          <radio value="dynasty" class="search_radio" checked="{{search_pattern=='dynasty'}}" color="#bb7e7e"><text>朝代</text></radio>
           <radio value="content"  class="search_radio" checked="{{search_pattern=='content'}}" color="#bb7e7e"><text>内容</text></radio>
         </radio-group>
       </view>

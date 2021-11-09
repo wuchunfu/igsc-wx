@@ -1,8 +1,8 @@
 <view class='gsc container'>
-  <view class='title' data-q='{{work_item.work_title}}' data-id_='{{work_item.id}}' bindtap='search_'>
+  <view class='title' data-q='{{work_item.work_title}}' data-id_='{{work_item.id}}' bindtap='search_' data-search_pattern='title'>
     {{work_item.work_title}}
   </view>
-  <view wx:if="{{work_item.work_dynasty}}" class='myclick author' data-q='{{work_item.work_author}}' data-id_='{{work_item.id}}' bindtap='search_'>
+  <view wx:if="{{work_item.work_dynasty}}" class='myclick author' data-q='{{work_item.work_author}}' data-id_='{{work_item.id}}' data-search_pattern='author' bindtap='search_'>
     {{work_item.work_dynasty}} · {{work_item.work_author}}
   </view>
   <view wx:if="{{work_item.content.length>=300}}">

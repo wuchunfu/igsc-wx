@@ -11,7 +11,7 @@
     </view>
     <view style='margin-left:5px;margin-top:0.8em;;font-size:20rpx;'>搜索结果({{total}})<label wx:if="{{show_bottom_button}}" style="float: right;">  第{{page_num}}/{{total_page}}页</label></view>
   </view>
-  <view wx:for="{{gscitems}}">
+  <view wx:for="{{gscitems}}" wx:key="id">
     <view class='item_work' wx:if="{{showhead}}">
       <view class='myclick' data-id_='{{item.id}}'>
         <view class='gsc' bindtap='go2detail' data-id_='{{item.id}}' style='position:relative;'>

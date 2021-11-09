@@ -156,6 +156,11 @@ Page({
           showhead: true,
         })
       }
+      if(options.hasOwnProperty('sp')){
+        that.setData({
+          search_pattern: options.sp,
+        })
+      }
       that.my_search_function(options.q)
       WxSearch.search(options.q)
     } else {
@@ -510,7 +515,7 @@ Page({
   },
   onShareTimeline: function () {
     return {
-      title: '欢迎体验i古诗词',
+      title: '欢迎体验 i古诗词',
       query: 'from=timeline',
       imageUrl: '/static/share.jpg',
       success: function (res) {
@@ -531,7 +536,7 @@ Page({
     var q = that.data.wxSearchData.value
     return {
       title: 'i古诗词 ' + (q ? q : '我们都爱古诗词'),
-      path: '/pages/catalog/catalog' + (q ? ('?q=' + q) : ''),
+      path: '/pages/catalog/catalog' + (q ? ('?q=' + q + '&sp=' + that.data.search_pattern) : ''),
       imageUrl: '/static/share4.jpg',
       success: function (res) {
         util.showSuccess('分享成功')

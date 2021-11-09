@@ -685,8 +685,9 @@ Page({
   search_: function (e) {
     var id_ = e.target.dataset.id_
     var q = e.target.dataset.q
+    var search_pattern = e.target.dataset.search_pattern
     var pages = getCurrentPages()
-    var url = '/pages/catalog/catalog?id=' + id_ + '&q=' + q
+    var url = '/pages/catalog/catalog?id=' + id_ + '&q=' + q+ '&sp='+ search_pattern
     if (pages.length == config.maxLayer) {
       wx.redirectTo({
         url: url,
