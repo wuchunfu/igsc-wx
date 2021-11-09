@@ -78,6 +78,8 @@ Page({
     })
     wx.request({
       url: config.gscUrl + 'short_index',
+      enableHttp2: true,
+      enableCache:true,
       success(result) {
         if (!result || result.data.code != 0) {
           wx.showToast({
@@ -265,6 +267,8 @@ Page({
     }
     wx.request({
       url: url,
+      enableHttp2: true,
+      enableCache:true,
       success(result) {
         if (!result || result.data.code != 0) {
           wx.showToast({
@@ -419,6 +423,8 @@ Page({
     var that = this
     wx.request({
       url: config.gscUrl + 'mylike_by_page/' + open_id + '?page_num=' + that.data.page_num + '&page_size=' + that.data.page_size + '&search_pattern=' + that.data.search_pattern,
+      enableHttp2: true,
+      enableCache:true,
       success(result) {
         if (!result || result.data.code != 0) {
           wx.showToast({

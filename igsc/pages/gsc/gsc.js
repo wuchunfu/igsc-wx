@@ -230,6 +230,8 @@ Page({
         }
         wx.request({
           url: config.gscUrl + 'index/' + key + '/' + open_id,
+          enableHttp2: true,
+          enableCache:true,
           success(result) {
             if (!result || result.data.code != 0) {
               wx.showToast({
@@ -550,6 +552,8 @@ Page({
         }
         wx.request({
           url: config.service.host + '/user/' + operate + '/' + open_id + '/' + gsc_id,
+          enableHttp2: true,
+          enableCache:true,
           success: function (res) {
             if (!res || res.data.code != 0) {
               wx.showToast({
