@@ -211,28 +211,28 @@ Page({
       })
     }
   },
-  wxSearchInput: WxSearch.wxSearchInput,
-  wxSearchKeyTap: WxSearch.wxSearchKeyTap,
-  wxSearchDeleteAll: WxSearch.wxSearchDeleteAll,
-  wxSearchConfirm: WxSearch.wxSearchConfirm,
-  wxSearchClear: WxSearch.wxSearchClear,
+  wx_search_input: WxSearch.wx_search_input,
+  wx_search_key_tap: WxSearch.wx_search_key_tap,
+  wx_search_delete_all: WxSearch.wx_search_delete_all,
+  wx_search_confirm: WxSearch.wx_search_confirm,
+  wx_search_clear: WxSearch.wx_search_clear,
   page_down: function () {
-    if (this.data.page_num >= this.data.total_page || (!this.search_V && this.data.page != 'like')) {
+    if (this.data.page_num >= this.data.total_page || (!this.search_v && this.data.page != 'like')) {
       return
     }
     this.setData({
       page_num: this.data.page_num + 1,
     })
-    this.my_search_function(this.search_V)
+    this.my_search_function(this.search_v)
   },
   page_up: function () {
-    if (this.data.page_num <= 1 || (!this.search_V && this.data.page != 'like')) {
+    if (this.data.page_num <= 1 || (!this.search_v && this.data.page != 'like')) {
       return
     }
     this.setData({
       page_num: this.data.page_num - 1,
     })
-    this.my_search_function(this.search_V)
+    this.my_search_function(this.search_v)
   },
   radio_change: function (e) {
     this.setData({
@@ -240,8 +240,8 @@ Page({
       show_bottom_button: false,
       page_num: 1,
     })
-    if (this.search_V) {
-      this.my_search_function(this.search_V)
+    if (this.search_v) {
+      this.my_search_function(this.search_v)
     }
   },
   my_search_function: function (value) {
@@ -254,7 +254,7 @@ Page({
     if (that != current_page) {
       that = current_page
     }
-    that.search_V = value
+    that.search_v = value
     var page = that.data.page
     var open_id = 'abcd'
     if (page == 'like') {
@@ -357,9 +357,15 @@ Page({
     var query = wx.createSelectorQuery().in(this)
     query.select('#top_search').boundingClientRect()
     query.exec(res => {
-      that.setData({
-        scroll_height: screen_height - res[0].height - 25,
-      })
+      if (res.length > 0 && res[0]) {
+        that.setData({
+          scroll_height: screen_height - res[0].height - 25,
+        })
+      }else{
+        that.setData({
+          scroll_height: screen_height - 25,
+        })
+      }
     })
   },
   onReady: function () {
@@ -380,16 +386,16 @@ Page({
     }
     WxSearch.init(
       that, ['杜甫', '白居易', '苏轼', '姜夔', '浣溪沙', '满庭芳', '青玉案', '蝶恋花', '与陈伯之书', '滕王阁序', '谏逐客书', '洛神赋'], // 热点搜索推荐
-      ['宋祁', '朱淑真', '吴文英', '晏几道', '秦观', '贺铸', '王安石', '李之仪', '周邦彦', '姜夔', '晏殊', '张先', '范仲淹', '晁补之', '赵佶', '宋徽宗', '张元干', '岳飞', '史达祖', '刘克庄', '蒋捷', '钱惟演', '张炎', '张孝祥', '张镃', '张抡', '青玉案', '元宵', '中秋', '蝶恋花', '满庭芳', '卜算子', '菩萨蛮', '忆江南', '浣溪沙', '诉衷情', '清平乐', '雨霖铃', '定风波', '八声甘州', '青门引', '念奴娇', '水调歌头', '洞仙歌', '渔家傲', '横塘路', '瑞龙吟', '六丑', '欧阳修', '声声慢', '永遇乐', '贺新郎', '水龙吟', '程垓', '齐天乐', '苏轼', '辛弃疾', '白居易', '李白', '杜甫', '李清照'],
+      ['宋祁', '朱淑真', '吴文英', '晏几道', '秦观', '贺铸', '王安石', '李之仪', '周邦彦', '姜夔', '晏殊', '张先', '范仲淹', '晁补之', '赵佶', '宋徽宗', '张元干', '岳飞', '史达祖', '刘克庄', '蒋捷', '钱惟演', '张炎', '张孝祥', '张镃', '张抡', '青玉案', '元宵', '中秋', '蝶恋花', '满庭芳', '卜算子', '菩萨蛮', '忆江南', '浣溪沙', '诉衷情', '清平乐', '雨霖铃', '定风波', '八声甘州', '青门引', '念奴娇', '水调歌头', '洞仙歌', '渔家傲', '横塘路', '瑞龙吟', '六丑', '欧阳修', '声声慢', '永遇乐', '贺新郎', '水龙吟', '程垓', '齐天乐', '苏轼', '辛弃疾', '白居易', '李白', '杜甫', '李清照', '杜审言'],
       that.my_search_function,
       that.my_goback_function
     )
-    var temData = that.data.wxSearchData
-    if (that.search_V && temData) {
-      if (temData.value != that.search_V) {
-        temData.value = that.search_V
+    var tem_data = that.data.wx_search_data
+    if (that.search_v && tem_data) {
+      if (tem_data.value != that.search_v) {
+        tem_data.value = that.search_v
         that.setData({
-          wxSearchData: temData,
+          wx_search_data: tem_data,
         })
       }
     }
@@ -542,7 +548,7 @@ Page({
     }
     wx.hideNavigationBarLoading()
     wx.stopPullDownRefresh()
-    WxSearch.wxSearchClear()
+    WxSearch.wx_search_clear()
   },
   onReachBottom: function () {
     return
@@ -567,7 +573,7 @@ Page({
     if (this != current_page) {
       that = current_page
     }
-    var q = that.data.wxSearchData.value
+    var q = that.data.wx_search_data.value
     return {
       title: 'i古诗词 ' + (q ? q : '我们都爱古诗词'),
       path: '/pages/catalog/catalog' + (q ? ('?q=' + q + '&sp=' + that.data.search_pattern) : ''),

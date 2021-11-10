@@ -1,79 +1,76 @@
-var __tipKeys = []
+var __tip_keys = []
 
-var __searchFunction = null
+var __search_function = null
 
-var __goBackFunction = null
+var __go_back_function = null
 
 var __that = null
 
-function init(that, hotKeys, tipKeys, searchFunction, goBackFunction) {
+function init(that, hot_keys, tip_keys, search_function, go_back_function) {
   __that = that
-  __tipKeys = tipKeys
-  __searchFunction = searchFunction
-  __goBackFunction = goBackFunction
+  __tip_keys = tip_keys
+  __search_function = search_function
+  __go_back_function = go_back_function
 
-  var temData = {}
-  if (that.search_V) {
-    temData.value = that.search_V
+  var tem_data = {}
+  if (that.search_v) {
+    tem_data.value = that.search_v
   }
-  var barHeight = 30
+  var bar_height = 30
   var view = {
-    barHeight: barHeight
+    bar_height: bar_height
   }
-  temData.hotKeys = hotKeys
+  tem_data.hot_keys = hot_keys
 
   wx.getSystemInfo({
     success: function (res) {
-      var wHeight = res.windowHeight
-      view.seachHeight = wHeight - barHeight
-      temData.view = view
+      var w_height = res.windowHeight
+      view.search_height = w_height - bar_height
+      tem_data.view = view
       __that.setData({
-        wxSearchData: temData,
+        wx_search_data: tem_data,
       })
     }
   })
 
-  getHisKeys(__that)
+  get_his_keys(__that)
 }
 
 
-function wxSearchInput(e) {
-  var inputValue = e.detail.value
+function wx_search_input(e) {
+  var input_value = e.detail.value
 
-  var temData = __that.data.wxSearchData
+  var tem_data = __that.data.wx_search_data
 
-  var tipKeys = []
-  if (inputValue && inputValue.length > 0) {
-    for (var i = 0; i < __tipKeys.length; i++) {
-      var mindKey = __tipKeys[i]
+  var tip_keys = []
+  if (input_value && input_value.length > 0) {
+    for (var i = 0; i < __tip_keys.length; i++) {
+      var mind_key = __tip_keys[i]
 
-      if (mindKey.indexOf(inputValue) != -1) {
-        tipKeys.push(mindKey)
+      if (mind_key.indexOf(input_value) != -1) {
+        tip_keys.push(mind_key)
       }
     }
   }
-
-  temData.value = inputValue
-  temData.tipKeys = tipKeys
+  tem_data.value = input_value
+  tem_data.tip_keys = tip_keys
 
   __that.setData({
-    wxSearchData: temData,
+    wx_search_data: tem_data,
   })
 }
 
 
-function wxSearchClear() {
-
-  var temData = __that.data.wxSearchData
-
-  temData.value = ''
-  temData.tipKeys = []
-  if (__that.search_V) {
-    __that.search_V = ''
+function wx_search_clear() {
+  var tem_data = __that.data.wx_search_data
+  tem_data.value = ''
+  tem_data.tip_keys = []
+  if (__that.search_v) {
+    __that.search_v = ''
   }
 
   __that.setData({
-    wxSearchData: temData,
+    wx_search_data: tem_data,
     show_bottom_button: false,
     page_num: 1,
     search_pattern: 'all',
@@ -89,40 +86,40 @@ function wxSearchClear() {
 }
 
 
-function wxSearchKeyTap(e) {
+function wx_search_key_tap(e) {
   search(e.target.dataset.key)
-  var temData = __that.data.wxSearchData
-  temData.tipKeys = []
+  var tem_data = __that.data.wx_search_data
+  tem_data.tip_keys = []
 
   __that.setData({
-    wxSearchData: temData,
+    wx_search_data: tem_data,
   })
 }
 
-function wxSearchConfirm(e) {
+function wx_search_confirm(e) {
   var key = e.target.dataset.key
-  __that.data.wxSearchData.tipKeys = []
+  __that.data.wx_search_data.tip_keys = []
   if (key == 'back') {
-    __goBackFunction()
+    __go_back_function()
   } else {
-    search(__that.data.wxSearchData.value)
+    search(__that.data.wx_search_data.value)
   }
 }
 
-function search(inputValue) {
-  if (inputValue) {
-    if (inputValue != '音频') {
-      wxSearchAddHisKey(inputValue)
+function search(input_value) {
+  if (input_value) {
+    if (input_value != '音频') {
+      wx_search_add_his_key(input_value)
     }
-    var temData = __that.data.wxSearchData
-    temData.value = inputValue
+    var tem_data = __that.data.wx_search_data
+    tem_data.value = input_value
     __that.setData({
-      wxSearchData: temData,
+      wx_search_data: tem_data,
       show_bottom_button: false,
       page_num: 1,
     })
 
-    __searchFunction(inputValue)
+    __search_function(input_value)
     wx.setNavigationBarTitle({
       title: 'i古诗词',
       page: 'main'
@@ -134,17 +131,15 @@ function search(inputValue) {
   }
 }
 
-
-function getHisKeys() {
+function get_his_keys() {
   var value = []
   try {
-    value = wx.getStorageSync('wxSearchHisKeys')
+    value = wx.getStorageSync('wx_search_his_keys')
     if (value) {
-
-      var temData = __that.data.wxSearchData
-      temData.his = value
+      var tem_data = __that.data.wx_search_data
+      tem_data.his = value.slice(0, 12)
       __that.setData({
-        wxSearchData: temData,
+        wx_search_data: tem_data,
       })
     }
   } catch (e) {
@@ -153,57 +148,56 @@ function getHisKeys() {
 }
 
 
-function wxSearchAddHisKey(inputValue) {
-  if (!inputValue || inputValue.length == 0) {
+function wx_search_add_his_key(input_value) {
+  if (!input_value || input_value.length == 0) {
     return
   }
-  var value = wx.getStorageSync('wxSearchHisKeys')
+  var value = wx.getStorageSync('wx_search_his_keys')
   if (value) {
-    if (value.indexOf(inputValue) < 0) {
-      value.unshift(inputValue)
+    if (value.indexOf(input_value) < 0) {
+      value.unshift(input_value)
     }
     wx.setStorage({
-      key: 'wxSearchHisKeys',
+      key: 'wx_search_his_keys',
       data: value,
       success: function () {
-        getHisKeys(__that)
+        get_his_keys(__that)
       }
     })
   } else {
     value = []
-    value.push(inputValue)
+    value.push(input_value)
     wx.setStorage({
-      key: 'wxSearchHisKeys',
+      key: 'wx_search_his_keys',
       data: value,
       success: function () {
-        getHisKeys(__that)
+        get_his_keys(__that)
       }
     })
   }
 }
 
 
-function wxSearchDeleteAll() {
+function wx_search_delete_all() {
   wx.removeStorage({
-    key: 'wxSearchHisKeys',
+    key: 'wx_search_his_keys',
     success: function (res) {
       var value = []
-      var temData = __that.data.wxSearchData
-      temData.his = value
+      var tem_data = __that.data.wx_search_data
+      tem_data.his = value
       __that.setData({
-        wxSearchData: temData,
+        wx_search_data: tem_data,
       })
     }
   })
 }
 
-
 module.exports = {
   init: init,
-  wxSearchInput: wxSearchInput,
-  wxSearchKeyTap: wxSearchKeyTap,
-  wxSearchDeleteAll: wxSearchDeleteAll,
-  wxSearchConfirm: wxSearchConfirm,
-  wxSearchClear: wxSearchClear,
+  wx_search_input: wx_search_input,
+  wx_search_key_tap: wx_search_key_tap,
+  wx_search_delete_all: wx_search_delete_all,
+  wx_search_confirm: wx_search_confirm,
+  wx_search_clear: wx_search_clear,
   search: search,
 }

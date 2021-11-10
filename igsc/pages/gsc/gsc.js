@@ -66,20 +66,20 @@ Page({
             break
         }
         try {
-          var setTimedInt = wx.getStorageSync('setTimedInt')
-          if (!setTimedInt) {
-            setTimedInt = 0
+          var set_timed_int = wx.getStorageSync('set_timed_int')
+          if (!set_timed_int) {
+            set_timed_int = 0
           }
         } catch (e) {
-          setTimedInt = 0
+          set_timed_int = 0
         }
         if (seconds == -1) {
           wx.removeStorageSync('time2close')
           wx.removeStorageSync('close_play_time')
           if (that.data.time2close && that.data.time2close != 0) {
-            if (setTimedInt > 0) {
-              clearInterval(setTimedInt)
-              wx.setStorageSync('setTimedInt', 0)
+            if (set_timed_int > 0) {
+              clearInterval(set_timed_int)
+              wx.setStorageSync('set_timed_int', 0)
             }
             wx.showToast({
               title: '取消成功',
@@ -97,9 +97,9 @@ Page({
               title: '播放器将于' + util.timetrans(time2close).slice(11) + '关闭',
               icon: 'none'
             })
-            if (setTimedInt > 0) {
-              clearInterval(setTimedInt)
-              wx.setStorageSync('setTimedInt', 0)
+            if (set_timed_int > 0) {
+              clearInterval(set_timed_int)
+              wx.setStorageSync('set_timed_int', 0)
             }
             wx.setStorageSync('time2close', time2close)
             wx.setStorageSync('close_play_time', parseInt(seconds / 60))
@@ -126,10 +126,10 @@ Page({
                 wx.removeStorageSync('time2close')
                 wx.removeStorageSync('close_play_time')
                 clearInterval(timedId)
-                wx.setStorageSync('setTimedInt', 0)
+                wx.setStorageSync('set_timed_int', 0)
               }
             }, 1000)
-            wx.setStorageSync('setTimedInt', timedId)
+            wx.setStorageSync('set_timed_int', timedId)
           } else {
             wx.showToast({
               title: '请先打开播放器',
@@ -210,7 +210,7 @@ Page({
         })
         if (time2close && time2close > 0) {
           var last_micro_seconds = time2close - (new Date()).getTime() / 1000
-          if (last_micro_seconds) {
+          if (last_micro_seconds > 0) {
             that.setData({
               close_play_time: parseInt(last_micro_seconds / 60.0 + 0.5),
             })
@@ -299,7 +299,7 @@ Page({
             })
             if (time2close && time2close > 0) {
               var last_micro_seconds = time2close - (new Date()).getTime() / 1000
-              if (last_micro_seconds) {
+              if (last_micro_seconds > 0) {
                 that.setData({
                   close_play_time: parseInt(last_micro_seconds / 60.0 + 0.5),
                 })
@@ -1038,28 +1038,28 @@ Page({
           close_play_time: 0,
         })
         try {
-          var setTimedInt = wx.getStorageSync('setTimedInt')
-          if (!setTimedInt) {
-            setTimedInt = 0
+          var set_timed_int = wx.getStorageSync('set_timed_int')
+          if (!set_timed_int) {
+            set_timed_int = 0
           }
         } catch (e) {
-          setTimedInt = 0
+          set_timed_int = 0
         }
         wx.removeStorageSync('time2close')
         wx.removeStorageSync('close_play_time')
-        if (setTimedInt > 0) {
+        if (set_timed_int > 0) {
           wx.showToast({
             title: '定时已到~~',
             icon: 'none',
           })
-          clearInterval(setTimedInt)
-          wx.setStorageSync('setTimedInt', 0)
+          clearInterval(set_timed_int)
+          wx.setStorageSync('set_timed_int', 0)
         }
         return
       }
       if (time2close && (new Date()).getTime() < time2close * 1000) {
         var last_micro_seconds = time2close - (new Date()).getTime() / 1000
-        if (last_micro_seconds) {
+        if (last_micro_seconds > 0) {
           that.setData({
             close_play_time: parseInt(last_micro_seconds / 60.0 + 0.5),
           })
