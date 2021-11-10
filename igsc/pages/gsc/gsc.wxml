@@ -1,4 +1,5 @@
 <view class='gsc container'>
+<view id="location_id"></view>
   <view class='title' data-q='{{work_item.work_title}}' data-id_='{{work_item.id}}' bindtap='search_' data-search_pattern='title'>
     {{work_item.work_title}}
   </view>

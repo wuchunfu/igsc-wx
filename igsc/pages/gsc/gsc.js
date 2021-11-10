@@ -1131,5 +1131,29 @@ Page({
       slide_value: v,
       sliding: 2,
     })
+  },
+  onPageScroll: function (e) {
+    var that = this
+    var query = wx.createSelectorQuery().in(this)
+    query.select('#location_id').boundingClientRect()
+    query.exec(res => {
+      if (res.length > 0 && res[0]) {
+        if(res[0].top < 0){
+          wx.setNavigationBarTitle({
+            title: that.data.work_item.work_title + '  ' + that.data.work_item.work_author + '  '+ that.data.work_item.content,
+          })
+        }else{
+          if(that.data.from_page != 'like'){
+            wx.setNavigationBarTitle({
+              title: 'i古诗词'
+            })
+          }else{
+            wx.setNavigationBarTitle({
+              title: '我的收藏'
+            })
+          }
+        }
+      }
+    })
   }
 })

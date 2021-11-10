@@ -11,7 +11,8 @@
     </view>
     <view style="margin-left:5px;margin-top:0.8em;;font-size:20rpx;">搜索结果({{total}})<label wx:if="{{show_bottom_button}}" style="float: right;"> 第{{page_num}}/{{total_page}}页</label></view>
   </view>
-  <scroll-view scroll-y="true" style="height: {{scroll_height}}px;" bindscroll="scroll" scroll-into-view="{{to_top}}" scroll-with-animation="true" enable-back-to-top="true" scroll-anchoring="true" enhanced="true" show-scrollbar="false">
+  <scroll-view scroll-y="true" style="height: {{scroll_height}}px;" bindscroll="scroll"
+  scroll-into-view="{{to_top}}" scroll-with-animation="true" enable-back-to-top="true" enhanced="true" show-scrollbar="false">
     <view wx:for="{{gscitems}}" wx:key="id">
       <view class='item_work' wx:if="{{showhead}}" id="work_item{{index+1}}">
         <view class='myclick' data-id_='{{item.id}}'>
