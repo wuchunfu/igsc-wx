@@ -17,18 +17,18 @@
         <image src='../../static/up_audio.png' class="operate_audio" bindtap='operate_play' data-key='up'></image>
       </view>
       <view style='flex:20;text-align:center;'>
-        <image src='../../static/{{playing && playing_audio_id==work_item.audio_id ? "pause" : "play_audio"}}.png' class="operate_audio" bindtap='playbackaudio'></image>
+        <image src='../../static/{{playing && playing_audio_id==work_item.audio_id ? "pause" : "play_audio"}}.png' class="operate_audio" bindtap='play_back_audio'></image>
       </view>
       <view style='flex:45;text-align:left;position:relative;'>
         <image src='../../static/next_audio.png' class="operate_audio" bindtap='operate_play' data-key='next'></image>
         <image wx:if="{{mode}}" src='../../static/{{mode}}.png' class="operate_audio" bindtap='change_mode'></image>
-        <image src='../../static/timed.png' class="operate_audio" bindtap='setTimed'>
+        <image src='../../static/timed.png' class="operate_audio" bindtap='set_timed'>
         </image>
         <text wx:if="{{time2close!=0}}" style='text-align:center;line-height:2em;display:inline-block;width:2em;height:2em;border-radius:1em;font-size:10rpx;color:white;background-color:#BB7E7E;opacity:0.8;position:absolute;top:0px;margin-left:-28rpx;'>{{close_play_time}}</text>
       </view>
     </view>
     <view style="margin-top:5rpx;" wx:if="{{work_item.audio_id >0}}">
-      <slider bindchanging="sliderChanging" bindchange="slider2change" step="1" min="1" block-size="15" value='{{slide_value}}' block-color="#BB7E7E" style="margin-top:5rpx;margin-bottom:5rpx;" />
+      <slider bindchanging="slider_changing" bindchange="slider2change" step="1" min="1" block-size="15" value='{{slide_value}}' block-color="#BB7E7E" style="margin-top:5rpx;margin-bottom:5rpx;" />
       <text style='font-size:18rpx;color:#BB7E7E;opacity:0.8;float:right;margin-right:18rpx;' wx:if="{{duration_show}}">{{duration_show}}</text>
       <text style='font-size:18rpx;color:#BB7E7E;opacity:0.8;float:left;margin-left:18rpx;' wx:if="{{current_time_show}}">{{current_time_show}}</text>
     </view>
@@ -51,28 +51,28 @@
         <image src='../../static/up_audio.png' class="operate_audio" bindtap='operate_play' data-key='up'></image>
       </view>
       <view style='flex:20;text-align:center;'>
-        <image src='../../static/{{playing && playing_audio_id == work_item.audio_id ? "pause" : "play_audio"}}.png' class="operate_audio" bindtap='playbackaudio'></image>
+        <image src='../../static/{{playing && playing_audio_id == work_item.audio_id ? "pause" : "play_audio"}}.png' class="operate_audio" bindtap='play_back_audio'></image>
       </view>
       <view style='flex:45;text-align:left;position:relative;'>
         <image src='../../static/next_audio.png' class="operate_audio" bindtap='operate_play' data-key='next'></image>
         <image wx:if="{{mode}}" src='../../static/{{mode}}.png' class="operate_audio" bindtap='change_mode'></image>
-        <image src='../../static/timed.png' class="operate_audio" bindtap='setTimed'>
+        <image src='../../static/timed.png' class="operate_audio" bindtap='set_timed'>
         </image>
         <text wx:if="{{time2close!=0}}" style='text-align:center;line-height:2em;display:inline-block;width:2em;height:2em;border-radius:1em;font-size:10rpx;color:white;background-color:#BB7E7E;opacity:0.8;position:absolute;top:0px;margin-left:-28rpx;'>{{close_play_time}}</text>
       </view>
     </view>
     <view style="margin-top:5rpx;" wx:if="{{work_item.audio_id >0}}">
-      <slider bindchanging="sliderChanging" bindchange="slider2change" step="1" min="1" block-size="15" value='{{slide_value}}' block-color="#BB7E7E" style="margin-top:5rpx;margin-bottom:5rpx;" />
+      <slider bindchanging="slider_changing" bindchange="slider2change" step="1" min="1" block-size="15" value='{{slide_value}}' block-color="#BB7E7E" style="margin-top:5rpx;margin-bottom:5rpx;" />
       <text style='font-size:18rpx;color:#BB7E7E;opacity:0.8;float:right;margin-right:18rpx;' wx:if="{{duration_show}}">{{duration_show}}</text>
       <text style='font-size:18rpx;color:#BB7E7E;opacity:0.8;float:left;margin-left:18rpx;' wx:if="{{current_time_show}}">{{current_time_show}}</text>
     </view>
   </view>
   <view class='tabs'>
-    <view wx:if="{{work_item.intro}}" bindtap='changeContent' data-item='0' class='tab-item {{current_tab==0?"active":""}}'>评析</view>
-    <view wx:if="{{work_item.annotation}}" bindtap='changeContent' data-item='1' class='tab-item {{current_tab==1?"active":""}}'>注释</view>
-    <view wx:if="{{work_item.translation}}" bindtap='changeContent' data-item='2' class='tab-item {{current_tab==2?"active":""}}'>译文</view>
-    <view wx:if="{{work_item.appreciation}}" bindtap='changeContent' data-item='3' class='tab-item {{current_tab==3?"active":""}}'>赏析</view>
-    <view wx:if="{{work_item.master_comment}}" bindtap='changeContent' data-item='4' class='tab-item {{current_tab==4?"active":""}}'>辑评</view>
+    <view wx:if="{{work_item.intro}}" bindtap='change_content' data-item='0' class='tab-item {{current_tab==0?"active":""}}'>评析</view>
+    <view wx:if="{{work_item.annotation}}" bindtap='change_content' data-item='1' class='tab-item {{current_tab==1?"active":""}}'>注释</view>
+    <view wx:if="{{work_item.translation}}" bindtap='change_content' data-item='2' class='tab-item {{current_tab==2?"active":""}}'>译文</view>
+    <view wx:if="{{work_item.appreciation}}" bindtap='change_content' data-item='3' class='tab-item {{current_tab==3?"active":""}}'>赏析</view>
+    <view wx:if="{{work_item.master_comment}}" bindtap='change_content' data-item='4' class='tab-item {{current_tab==4?"active":""}}'>辑评</view>
     <view bindtap="do_copy" class='tab-item'>
       <image src="../../static/copy.png" style='width:32rpx;height:32rpx;'></image>
     </view>

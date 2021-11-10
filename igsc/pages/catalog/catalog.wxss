@@ -7,16 +7,14 @@
   border-bottom-color: rgba(187, 126, 126, 0.4);
   margin-left: 15rpx;
   margin-right: 15rpx;
+  margin-bottom: 30rpx;
+  padding-top: 5rpx;
 }
 
 .catalog {
-  margin-left: 15rpx;
-  margin-right: 15rpx;
+  padding-left: 15rpx;
+  padding-right: 15rpx;
   padding-bottom: 40rpx;
-}
-
-.gsc {
-  margin-top: 30rpx;
 }
 
 .content_text {

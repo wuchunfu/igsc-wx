@@ -80,10 +80,10 @@ function wxSearchClear() {
   })
   if (__that.data.page != 'like') {
     __that.getData(__that)
-  }else{
+  } else {
     var open_id = wx.getStorageSync('user_open_id')
-    if(open_id){
-      __that.getLikeList(open_id)
+    if (open_id) {
+      __that.get_like_list(open_id)
     }
   }
 }
@@ -99,9 +99,9 @@ function wxSearchKeyTap(e) {
   })
 }
 
-
 function wxSearchConfirm(e) {
   var key = e.target.dataset.key
+  __that.data.wxSearchData.tipKeys = []
   if (key == 'back') {
     __goBackFunction()
   } else {

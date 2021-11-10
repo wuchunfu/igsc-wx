@@ -1,9 +1,9 @@
 var config = require('../config')
-const formatTime = date => {
+const format_time = date => {
   const year = date.getFullYear()
   const month = date.getMonth() + 1
   const day = date.getDate()
-  return [year, month, day].map(formatNumber).join('-')
+  return [year, month, day].map(format_number).join('-')
 }
 
 var timetrans = function (date) {
@@ -17,40 +17,39 @@ var timetrans = function (date) {
   return Y + M + D + h + m + s
 }
 
-const formatNumber = n => {
+const format_number = n => {
   n = n.toString()
   return n[1] ? n : '0' + n
 }
 
 
 // 显示繁忙提示
-var showBusy = (text, duration = 300) => wx.showToast({
+var show_busy = (text, duration = 300) => wx.showToast({
   title: text,
   icon: 'loading',
   duration: duration
 })
 
 // 显示成功提示
-var showSuccess = text => wx.showToast({
+var show_success = text => wx.showToast({
   title: text,
   icon: 'success'
 })
 
 // 显示失败提示
-var showModel = (content) => {
+var show_model = (content) => {
   wx.hideToast()
-
   wx.showModal({
     content: content,
     showCancel: false
   })
 }
 
-var closeToast = () => {
+var close_toast = () => {
   wx.hideToast()
 }
 
-var pageConfirm = (url) => {
+var page_confirm = (url) => {
   wx.showModal({
     content: '小程序最多能打开十层页面，是否要继续？',
     cancelText: '不要',
@@ -71,7 +70,7 @@ var pageConfirm = (url) => {
   })
 }
 
-var userLogin = function () {
+var user_login = function () {
   wx.login({
     success: function (loginCode) {
       wx.request({
@@ -107,32 +106,13 @@ var userLogin = function () {
   })
 }
 
-var loadFont = function () {
-  try {
-    wx.loadFontFace({
-      global: true,
-      family: 'syst',
-      source: 'url("https://igsc-1251460212.cos.ap-beijing.myqcloud.com/SourceHanSerifCN-Regular.ttf")',
-      success: function (res) {
-        console.log('load font success')
-      },
-      fail: function (res) {
-        console.log('load font failed', res)
-      }
-    })
-  } catch (e) {
-    console.log(e)
-  }
-}
-
 module.exports = {
-  formatTime,
-  showBusy,
-  showSuccess,
-  showModel,
-  closeToast,
-  pageConfirm,
-  userLogin,
-  timetrans,
-  loadFont
+  format_time,
+  show_busy,
+  show_success,
+  show_model,
+  close_toast,
+  page_confirm,
+  user_login,
+  timetrans
 }

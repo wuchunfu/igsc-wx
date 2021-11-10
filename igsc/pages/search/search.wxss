@@ -10,8 +10,6 @@
   text-align: left;
 }
 
-/** 提示样式 */
-
 .wxSearchMindKeyItem {
   padding: 10rpx 5rpx 10rpx 15rpx;
   margin-left: 10rpx;
@@ -20,8 +18,6 @@
   font-size: 20rpx;
 }
 
-/** 标签样式 */
-
 .wxSearchKeyList {
   display: flex;
   flex-direction: row;
@@ -29,23 +25,18 @@
   border-bottom: 1rpx solid #eee;
 }
 
-/** 标签样式 */
-
 .wxSearchKeyItem {
   flex: 0 0 20%;
   font-size: 20rpx;
   text-align: center;
-  /* border: 1px solid #eee; */
-  margin: 6rpx;
-  padding: 2rpx 4rpx;
-  border-radius: 4rpx;
+  margin: 10rpx;
+  padding: 4rpx 5rpx;
+  border-radius: 10rpx;
   background-color: rgba(200, 200, 200, 0.3);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-
-/** 搜索记录标题栏 */
 
 .wxSearchHistoryItem {
   padding-left: 5rpx;
@@ -54,14 +45,10 @@
   margin-bottom: -10rpx;
 }
 
-/** 搜索记录标题 */
-
 .wxSearchHistoryItemTitle {
   flex: 8;
   font-size: 20rpx;
 }
-
-/** 搜索记录删除按钮 */
 
 .wxSearchHistoryItemDel {
   flex: 1;
@@ -72,14 +59,6 @@
   border: 1rpx solid #eee;
   border-radius: 2rpx;
 }
-
-/** ---------------------- 以下是搜索框的 we-ui 样式--------------------------------*/
-
-/*!
- * WeUI v1.1.1 (https://github.com/weui/weui-wxss)
- * Copyright 2017 Tencent, Inc.
- * Licensed under the MIT license
- */
 
 .weui-search-bar {
   position: relative;
@@ -115,9 +94,13 @@
   -webkit-box-flex: 1;
   -webkit-flex: auto;
   flex: auto;
-  border-radius: 5rpx;
   background: #fff;
-  border: 1rpx solid #fcf9f4;
+  border-radius: 10rpx;
+  border: 1px dashed #bb7e7e;
+}
+
+.weui-search-bar__form:hover {
+  background: #f3f3f2;
 }
 
 .weui-search-bar__box {
@@ -132,7 +115,6 @@
 .weui-search-bar__input {
   height: 60rpx;
   line-height: 60rpx;
-  /* font: 26rpx; */
   padding: 0;
 }
 
@@ -153,8 +135,8 @@
   z-index: 2;
   border-radius: 3rpx;
   text-align: center;
-  color: #9b9b9b;
-  background: #fff;
+  color: #fff;
+  background: #f3f3f2;
   line-height: 28rpx;
 }
 
@@ -164,15 +146,19 @@
   white-space: nowrap;
   font-size: 30rpx;
   height: 60rpx;
+  border-radius: 10rpx;
+  border: 1px dashed #bb7e7e;
+  background-color: #fff;
+  padding: 0px 5rpx 0rpx 5rpx;
 }
 
 .weui-search-bar__cancel-btn:hover {
-  color: #bb7e7e;
   font-weight: 700;
+  background-color: #f3f3f2;
 }
 
 .search_radio {
   color: #bb7e7e;
   margin-right: 10rpx;
-  transform:scale(0.8);
+  transform: scale(0.8);
 }

@@ -37,7 +37,7 @@ Page({
     },
     from_page: 'main',
   },
-  setTimed: function () {
+  set_timed: function () {
     var that = this
     wx.showActionSheet({
       itemList: ['2小时', '1小时', '30分钟', '10分钟', '播放完这首', '不设置'],
@@ -114,7 +114,7 @@ Page({
                 time2closeS = 0
               }
               if (!time2closeS || time2closeS == 0 || (new Date()).getTime() >= time2close * 1000) {
-                that.pauseplaybackaudio()
+                that.pause_play_back_audio()
                 that.setData({
                   time2close: 0,
                   close_play_time: 0,
@@ -199,7 +199,7 @@ Page({
     }
     var that = this
     wx.getStorage({
-      key: 'gsc' + key + util.formatTime(new Date()),
+      key: 'gsc' + key + util.format_time(new Date()),
       success: function (res) {
         var d = res.data
         that.setData(d)
@@ -223,13 +223,13 @@ Page({
           open_id = wx.getStorageSync('user_open_id')
         } catch (e) {}
         if (!open_id) {
-          util.userLogin()
+          util.user_login()
         }
         if (open_id == '') {
           open_id = 'adcd'
         }
         wx.request({
-          url: config.gscUrl + 'index/' + key + '/' + open_id,
+          url: config.gsc_url + 'index/' + key + '/' + open_id,
           enableHttp2: true,
           success(result) {
             if (!result || result.data.code != 0) {
@@ -288,7 +288,7 @@ Page({
             })
             if (work.like == 1) {
               wx.setStorage({
-                key: 'gsc' + key + util.formatTime(new Date()),
+                key: 'gsc' + key + util.format_time(new Date()),
                 data: that.data,
               })
             }
@@ -390,7 +390,7 @@ Page({
         var try_times = 0
         var playInt = setInterval(() => {
           if (that.data.work_item && that.data.work_item.id == play_id) {
-            that.playsound()
+            that.play_sound()
             if (that.data.work_item.work_title) {
               that.record_play(play_id, that.data.work_item.work_title + '-' + that.data.work_item.work_author)
             }
@@ -514,7 +514,7 @@ Page({
     if (speeching) {
       inner_audio_context.pause()
     } else {
-      this.pauseplaybackaudio()
+      this.pause_play_back_audio()
       this.do_speak(this.data.work_item)
     }
   },
@@ -611,7 +611,7 @@ Page({
                 work_item: work_item,
               })
               wx.removeStorage({
-                key: 'gsc' + work_item.id + util.formatTime(new Date()),
+                key: 'gsc' + work_item.id + util.format_time(new Date()),
               })
             }
           }
@@ -622,11 +622,11 @@ Page({
           title: '请稍后再试',
           icon: 'none'
         })
-        util.userLogin()
+        util.user_login()
       }
     })
   },
-  pauseplaybackaudio: function () {
+  pause_play_back_audio: function () {
     background_audio_manager.pause()
     var currentTime = 1
     if (background_audio_manager.currentTime && background_audio_manager.currentTime > 1) {
@@ -641,14 +641,14 @@ Page({
       playing: false,
     })
   },
-  playbackaudio: function (e) {
+  play_back_audio: function (e) {
     var that = this
     var mode = wx.getStorageSync('play_mode')
     if (mode == 'hc') {
       that.reset_playmode()
     }
     if (that.data.playing) {
-      that.pauseplaybackaudio()
+      that.pause_play_back_audio()
     } else {
       if (that.data.mode == 'one') {
         wx.setStorageSync('singleid', {
@@ -659,7 +659,7 @@ Page({
           'audio_id': that.data.work_item.audio_id,
         })
       }
-      that.playsound()
+      that.play_sound()
       if (that.data.work_item && that.data.work_item.work_title) {
         that.record_play(that.data.work_item.id, that.data.work_item.work_title + '-' + that.data.work_item.work_author)
       }
@@ -689,8 +689,8 @@ Page({
     var q = e.target.dataset.q
     var search_pattern = e.target.dataset.search_pattern
     var pages = getCurrentPages()
-    var url = '/pages/catalog/catalog?id=' + id_ + '&q=' + q+ '&sp='+ search_pattern
-    if (pages.length == config.maxLayer) {
+    var url = '/pages/catalog/catalog?id=' + id_ + '&q=' + q + '&sp=' + search_pattern
+    if (pages.length == config.max_layer) {
       wx.redirectTo({
         url: url,
       })
@@ -700,7 +700,7 @@ Page({
       })
     }
   },
-  changeContent: function (e) {
+  change_content: function (e) {
     var target_id = e.target.dataset.item
     var gsc = this.data.work_item
     var show_content = ''
@@ -777,7 +777,7 @@ Page({
     }
     this.get_by_id(id_)
   },
-  playsound: function () {
+  play_sound: function () {
     if (this.data.work_item) {
       background_audio_manager.title = this.data.work_item.work_title
       background_audio_manager.epname = ' i古诗词 '
@@ -887,7 +887,7 @@ Page({
       }
     })
     inner_audio_context.onPlay(() => {
-      this.pauseplaybackaudio()
+      this.pause_play_back_audio()
       that.setData({
         speeching: true,
       })
@@ -936,13 +936,13 @@ Page({
     }
     var id_ = setInterval(() => {
       if (that.data.work_item) {
-        that.setCurrentPlaying()
+        that.set_current_playing()
         clearInterval(id_)
         wx.hideLoading()
       }
     }, 200)
   },
-  setCurrentPlaying: function () {
+  set_current_playing: function () {
     if (background_audio_manager && !background_audio_manager.paused) {
       if (background_audio_manager.src) {
         this.setData({
@@ -961,7 +961,7 @@ Page({
     var that = this
     var id_ = setInterval(() => {
       if (that.data.work_item) {
-        that.setCurrentPlaying()
+        that.set_current_playing()
         clearInterval(id_)
       }
     }, 200)
@@ -972,7 +972,7 @@ Page({
   onUnload: function () {
     inner_audio_context.stop()
   },
-  longPress: function () {
+  long_press: function () {
     var that = this
     if (parseInt(that.data.work_item.id) <= 1) {
       var id_ = 8101
@@ -982,7 +982,7 @@ Page({
     var key = parseInt(id_) - 1
     var pages = getCurrentPages()
     var url = '/pages/gsc/gsc?id=' + key
-    if (pages.length == config.maxLayer) {
+    if (pages.length == config.max_layer) {
       wx.redirectTo({
         url: url,
       })
@@ -998,10 +998,10 @@ Page({
       path: '/pages/gsc/gsc?id=' + this.data.work_item.id + '&from=main',
       imageUrl: '/static/share4.jpg',
       success: function (res) {
-        util.showSuccess('分享成功')
+        util.show_success('分享成功')
       },
       fail: function (res) {
-        util.showSuccess('取消分享')
+        util.show_success('取消分享')
       }
     }
   },
@@ -1015,14 +1015,14 @@ Page({
       query: 'id=' + this.data.work_item.id,
       imageUrl: '/static/share.jpg',
       success: function (res) {
-        util.showSuccess('分享成功')
+        util.show_success('分享成功')
       },
       fail: function (res) {
-        util.showSuccess('取消分享')
+        util.show_success('取消分享')
       }
     }
   },
-  longPressBack: function () {
+  long_press_back: function () {
     wx.redirectTo({
       url: '/pages/catalog/catalog',
     })
@@ -1032,7 +1032,7 @@ Page({
     try {
       var time2close = wx.getStorageSync('time2close')
       if (time2close && time2close > 0 && (new Date()).getTime() > time2close * 1000) {
-        that.pauseplaybackaudio()
+        that.pause_play_back_audio()
         that.setData({
           time2close: 0,
           close_play_time: 0,
@@ -1088,7 +1088,7 @@ Page({
       playing_audio_id: background_audio_manager._audio_id,
     })
   },
-  sliderChanging: function (e) {
+  slider_changing: function (e) {
     var that = this
     if (that.data['duration'] <= 0) {
       that.setData({

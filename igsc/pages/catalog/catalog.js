@@ -16,6 +16,9 @@ Page({
     total_page: 0,
     page_size: 20,
     search_pattern: 'all',
+    scroll_height: 0,
+    to_top: 'work_item1',
+    show_search_box: false,
   },
   getcurrent_paly_id: function () {
     var that = this
@@ -41,7 +44,7 @@ Page({
     var id_ = e.target.dataset.id_
     var pages = getCurrentPages()
     var url = '/pages/gsc/gsc?id=' + id_ + '&from=' + this.data.page
-    if (pages.length == config.maxLayer) {
+    if (pages.length == config.max_layer) {
       wx.redirectTo({
         url: url,
       })
@@ -53,11 +56,11 @@ Page({
   },
   getData: function (that) {
     wx.getStorage({
-      key: 'gscItems' + util.formatTime(new Date()),
+      key: 'gscItems' + util.format_time(new Date()),
       success: function (res) {
         var items = res.data
         if (!items || items.length == 0) {
-          that.getAllData(that)
+          that.get_all_data(that)
         } else {
           that.setData({
             gscitems: items,
@@ -67,17 +70,17 @@ Page({
         }
       },
       fail: function () {
-        that.getAllData(that)
+        that.get_all_data(that)
       }
     })
   },
-  getAllData: function (context) {
+  get_all_data: function (context) {
     var that = this
     wx.showLoading({
       title: '加载中...',
     })
     wx.request({
-      url: config.gscUrl + 'short_index',
+      url: config.gsc_url + 'short_index',
       enableHttp2: true,
       success(result) {
         if (!result || result.data.code != 0) {
@@ -109,10 +112,11 @@ Page({
         context.setData({
           gscitems: dd,
           total: dd.length,
+          to_top: 'work_item1',
         })
         that.storage_result(dd)
         wx.setStorage({
-          key: 'gscItems' + util.formatTime(new Date()),
+          key: 'gscItems' + util.format_time(new Date()),
           data: dd
         })
         wx.hideLoading()
@@ -177,7 +181,7 @@ Page({
       WxSearch.search(options.q)
     } else {
       wx.getStorage({
-        key: 'gscItems' + util.formatTime(new Date()),
+        key: 'gscItems' + util.format_time(new Date()),
         success: function (res) {
           if (!res) {
             wx.showToast({
@@ -188,7 +192,7 @@ Page({
           }
           var items = res.data
           if (!items || items.length == 0) {
-            that.getAllData(that)
+            that.get_all_data(that)
           } else {
             wx.showLoading({
               title: '加载中...',
@@ -202,18 +206,17 @@ Page({
           }
         },
         fail: function (err) {
-          that.getAllData(that)
+          that.get_all_data(that)
         }
       })
     }
-    that.interval_get_current_play()
   },
   wxSearchInput: WxSearch.wxSearchInput,
   wxSearchKeyTap: WxSearch.wxSearchKeyTap,
   wxSearchDeleteAll: WxSearch.wxSearchDeleteAll,
   wxSearchConfirm: WxSearch.wxSearchConfirm,
   wxSearchClear: WxSearch.wxSearchClear,
-  pageDown: function () {
+  page_down: function () {
     if (this.data.page_num >= this.data.total_page || (!this.search_V && this.data.page != 'like')) {
       return
     }
@@ -222,7 +225,7 @@ Page({
     })
     this.my_search_function(this.search_V)
   },
-  pageUp: function () {
+  page_up: function () {
     if (this.data.page_num <= 1 || (!this.search_V && this.data.page != 'like')) {
       return
     }
@@ -259,25 +262,28 @@ Page({
         open_id = wx.getStorageSync('user_open_id')
       } catch (e) {}
       if (!open_id) {
-        util.userLogin()
+        util.user_login()
         wx.showToast({
           title: '请重试一次',
           icon: 'none'
         })
       }
     }
+    var enable_cache = false
     if (!value && page == 'like') {
-      var url = config.gscUrl + 'mylike_by_page/' + open_id + '?page_num=' + that.data.page_num + '&page_size=' + that.data.page_size + '&search_pattern=' + that.data.search_pattern
+      var url = config.gsc_url + 'mylike_by_page/' + open_id + '?page_num=' + that.data.page_num + '&page_size=' + that.data.page_size + '&search_pattern=' + that.data.search_pattern
     } else {
       if (value && value == '音频') {
-        var url = config.gscUrl + 'query_by_page/' + value + '/' + page + '/' + open_id + '?page_num=' + that.data.page_num + '&page_size=' + that.data.page_size + '&search_pattern=' + that.data.search_pattern
+        var url = config.gsc_url + 'query_by_page/' + value + '/' + page + '/' + open_id + '?page_num=' + that.data.page_num + '&page_size=' + that.data.page_size + '&search_pattern=' + that.data.search_pattern
       } else {
-        var url = config.gscUrl + 'query_by_page_a/' + page + '/' + value + '/' + open_id + '?page_num=' + that.data.page_num + '&page_size=' + that.data.page_size + '&search_pattern=' + that.data.search_pattern
+        var url = config.gsc_url + 'query_by_page_a/' + page + '/' + value + '/' + open_id + '?page_num=' + that.data.page_num + '&page_size=' + that.data.page_size + '&search_pattern=' + that.data.search_pattern
+        enable_cache = true
       }
     }
     wx.request({
       url: url,
       enableHttp2: true,
+      enableCache: enable_cache,
       success(result) {
         if (!result || result.data.code != 0) {
           wx.showToast({
@@ -310,10 +316,11 @@ Page({
           total: result.data.data.total,
           show_bottom_button: result.data.data.total > that.data.page_size && value != '音频',
           total_page: Math.ceil(result.data.data.total / that.data.page_size),
+          to_top: 'work_item1',
         })
         that.storage_result(dd)
         if (dd.length == 0) {
-          util.showSuccess('没有相关内容')
+          util.show_success('没有相关内容')
         } else {
           wx.hideLoading()
         }
@@ -326,20 +333,33 @@ Page({
       }
     })
     setTimeout(() => {
+      that.set_scroll_height()
       if (page == 'like') {
         wx.setNavigationBarTitle({
           title: '我的收藏'
         })
       } else {
+        that.set_scroll_height()
         wx.setNavigationBarTitle({
           title: 'i古诗词'
         })
       }
-    }, 200)
+    }, 100)
   },
   my_goback_function: function () {
     wx.reLaunch({
       url: '../gsc/gsc?id=1&from=main'
+    })
+  },
+  set_scroll_height: function () {
+    var that = this
+    var screen_height = wx.getSystemInfoSync().windowHeight
+    var query = wx.createSelectorQuery().in(this)
+    query.select('#top_search').boundingClientRect()
+    query.exec(res => {
+      that.setData({
+        scroll_height: screen_height - res[0].height - 25,
+      })
     })
   },
   onReady: function () {
@@ -407,6 +427,7 @@ Page({
       }
     })
     that.interval_get_current_play()
+    that.set_scroll_height()
   },
   purge_some_data: function () {
     var playingint = wx.getStorageSync('playingint')
@@ -426,10 +447,10 @@ Page({
   onUnload: function () {
     this.purge_some_data()
   },
-  getLikeList: function (open_id) {
+  get_like_list: function (open_id) {
     var that = this
     wx.request({
-      url: config.gscUrl + 'mylike_by_page/' + open_id + '?page_num=' + that.data.page_num + '&page_size=' + that.data.page_size + '&search_pattern=' + that.data.search_pattern,
+      url: config.gsc_url + 'mylike_by_page/' + open_id + '?page_num=' + that.data.page_num + '&page_size=' + that.data.page_size + '&search_pattern=' + that.data.search_pattern,
       enableHttp2: true,
       success(result) {
         if (!result || result.data.code != 0) {
@@ -465,6 +486,7 @@ Page({
           total: result.data.data.total,
           show_bottom_button: result.data.data.total > that.data.page_size,
           total_page: Math.ceil(result.data.data.total / that.data.page_size),
+          to_top: 'work_item1',
         })
         that.storage_result(dd)
         wx.hideLoading()
@@ -487,7 +509,7 @@ Page({
         open_id = wx.getStorageSync('user_open_id')
       } catch (e) {}
       if (!open_id) {
-        util.userLogin()
+        util.user_login()
         wx.showToast({
           title: '请重试一次',
           icon: 'none'
@@ -496,7 +518,7 @@ Page({
         wx.stopPullDownRefresh()
         return
       }
-      that.getLikeList(open_id)
+      that.get_like_list(open_id)
       wx.setNavigationBarTitle({
         title: '我的收藏'
       })
@@ -531,10 +553,10 @@ Page({
       query: 'from=timeline',
       imageUrl: '/static/share.jpg',
       success: function (res) {
-        util.showSuccess('分享成功')
+        util.show_success('分享成功')
       },
       fail: function (res) {
-        util.showSuccess('取消分享')
+        util.show_success('取消分享')
       }
     }
   },
@@ -551,11 +573,20 @@ Page({
       path: '/pages/catalog/catalog' + (q ? ('?q=' + q + '&sp=' + that.data.search_pattern) : ''),
       imageUrl: '/static/share4.jpg',
       success: function (res) {
-        util.showSuccess('分享成功')
+        util.show_success('分享成功')
       },
       fail: function (res) {
-        util.showSuccess('取消分享')
+        util.show_success('取消分享')
       }
     }
+  },
+  scroll: function (e) {
+    this.set_scroll_height()
+  },
+  show_hide_search_box: function (e) {
+    this.setData({
+      show_search_box: e.detail.value,
+    })
+    this.set_scroll_height()
   }
 })

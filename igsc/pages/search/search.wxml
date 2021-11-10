@@ -1,11 +1,12 @@
-<view class='container'>
+<view class='container' id="top_search">
   <view class="weui-search-bar">
-    <view class="weui-search-bar__form">
+    <switch bindchange="show_hide_search_box" checked="{{show_search_box}}" color="#f3f3f2"></switch>
+    <view class="weui-search-bar__form" style="flex: 10;">
       <view class="weui-search-bar__box">
         <input type="text" class="weui-search-bar__input" placeholder="请输入查询内容" placeholder-class="placeholder" value="{{wxSearchData.value}}" bindinput="wxSearchInput" bindconfirm="wxSearchConfirm" />
-        <view class="weui-icon-clear" wx:if="{{wxSearchData.value && wxSearchData.value.length > 0}}">
-          <icon type="clear" bindtap="wxSearchClear" size="30rpx"></icon>
-        </view>
+      </view>
+      <view class="weui-icon-clear" wx:if="{{wxSearchData.value && wxSearchData.value.length > 0}}">
+        <icon type="clear" bindtap="wxSearchClear" size="30rpx"></icon>
       </view>
     </view>
     <view class="weui-search-bar__cancel-btn" bindtap="wxSearchConfirm">
@@ -21,32 +22,34 @@
           </block>
         </view>
       </view>
-      <view  wx:if="{{wxSearchData.value && wxSearchData.value.length > 0}}" style="margin-top: 10rpx;">
+      <view wx:if="{{wxSearchData.value && wxSearchData.value.length > 0}}" style="margin-top: 10rpx;">
         <radio-group bindchange="radio_change">
-          <radio  class="search_radio" value="all" checked="{{search_pattern=='all'}}" color="#bb7e7e"><text>全部</text></radio>
-          <radio value="title"  class="search_radio"checked="{{search_pattern=='title'}}" color="#bb7e7e"><text>标题</text></radio>
+          <radio class="search_radio" value="all" checked="{{search_pattern=='all'}}" color="#bb7e7e"><text>全部</text></radio>
+          <radio value="title" class="search_radio" checked="{{search_pattern=='title'}}" color="#bb7e7e"><text>标题</text></radio>
           <radio value="author" class="search_radio" checked="{{search_pattern=='author'}}" color="#bb7e7e"><text>作者</text></radio>
           <radio value="dynasty" class="search_radio" checked="{{search_pattern=='dynasty'}}" color="#bb7e7e"><text>朝代</text></radio>
-          <radio value="content"  class="search_radio" checked="{{search_pattern=='content'}}" color="#bb7e7e"><text>内容</text></radio>
+          <radio value="content" class="search_radio" checked="{{search_pattern=='content'}}" color="#bb7e7e"><text>内容</text></radio>
         </radio-group>
       </view>
-      <view wx:if="{{wxSearchData.his[0]}}" class="wxSearchHistory" style="display:{{wxSearchData.value.length>0 ? 'none':'block'}}">
-        <view class="wxSearchHistoryItem">
-          <text class="wxSearchHistoryItemTitle">搜索记录</text>
-          <icon type="clear" bindtap="wxSearchDeleteAll" size="30rpx" style="z-index:20000;margin-top:10rpx;" />
+      <view wx:if="{{show_search_box}}">
+        <view wx:if="{{wxSearchData.his[0]}}" class="wxSearchHistory" style="display:{{wxSearchData.value.length>0 ? 'none':'block'}}">
+          <view class="wxSearchHistoryItem">
+            <text class="wxSearchHistoryItemTitle">搜索记录</text>
+            <icon type="clear" bindtap="wxSearchDeleteAll" size="30rpx" style="z-index:20000;margin-top:10rpx;" />
+          </view>
+          <view class="wxSearchKeyList">
+            <block wx:for="{{wxSearchData.his}}" wx:key="*this">
+              <view class="wxSearchKeyItem" bindtap="wxSearchKeyTap" data-key="{{item}}">{{item}}</view>
+            </block>
+          </view>
         </view>
-        <view class="wxSearchKeyList">
-          <block wx:for="{{wxSearchData.his}}" wx:key="*this">
-            <view class="wxSearchKeyItem" bindtap="wxSearchKeyTap" data-key="{{item}}">{{item}}</view>
-          </block>
-        </view>
-      </view>
-      <view class="wxSearchKey" style="display:{{wxSearchData.value.length>0 ? 'none':'block'}}">
-        <text wx:if="{{wxSearchData.hotKeys[0]}}" class="wxSearchTitle">搜索热点</text>
-        <view class="wxSearchKeyList">
-          <block wx:for="{{wxSearchData.hotKeys}}" wx:key="*this">
-            <view class="wxSearchKeyItem" bindtap="wxSearchKeyTap" data-key="{{item}}">{{item}}</view>
-          </block>
+        <view class="wxSearchKey" style="display:{{wxSearchData.value.length>0 ? 'none':'block'}}">
+          <text wx:if="{{wxSearchData.hotKeys[0]}}" class="wxSearchTitle">搜索热点</text>
+          <view class="wxSearchKeyList">
+            <block wx:for="{{wxSearchData.hotKeys}}" wx:key="*this">
+              <view class="wxSearchKeyItem" bindtap="wxSearchKeyTap" data-key="{{item}}">{{item}}</view>
+            </block>
+          </view>
         </view>
       </view>
     </view>

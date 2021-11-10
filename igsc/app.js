@@ -3,7 +3,7 @@ var util = require('utils/util')
 App({
   get_audio_list: function () {
     var value = '音频'
-    var key = 'search_音频' + util.formatTime(new Date())
+    var key = 'search_音频' + util.format_time(new Date())
     wx.getStorage({
       key: key,
       success: function (res) {
@@ -18,7 +18,7 @@ App({
       },
       fail: function () {
         wx.request({
-          url: config.gscUrl + 'query/' + value + '/main/abcd',
+          url: config.gsc_url + 'query/' + value + '/main/abcd',
           success(result) {
             if (!result || result.data.code != 0) {
               return
@@ -43,10 +43,10 @@ App({
       var open_id = wx.getStorageSync('user_open_id')
     } catch (e) {}
     if (!open_id) {
-      util.userLogin()
+      util.user_login()
     }
     try {
-      var today = util.formatTime(new Date())
+      var today = util.format_time(new Date())
       open_id = wx.getStorageSync('user_open_id')
       var play_mode = wx.getStorageSync('play_mode')
       today = today.replace(/-/g, '')
@@ -71,7 +71,6 @@ App({
       }
       wx.setStorageSync('play_mode', play_mode ? play_mode : 'xunhuan')
     } catch (e) {}
-    // 加载字体
     //util.loadFont()
     wx.getSystemInfo({
       success: function (res) {
