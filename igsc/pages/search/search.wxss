@@ -123,11 +123,13 @@
 }
 
 .weui-icon-clear {
-  z-index: 10000;
+  z-index: 999999;
   position: absolute;
-  top: 10rpx;
-  right: 20rpx;
+  top: 0rpx;
+  right: 0rpx;
   font-size: 0;
+  width: 100rpx;
+  height: 60rpx;
 }
 
 .weui-search-bar__label {

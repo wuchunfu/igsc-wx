@@ -36,6 +36,7 @@ Page({
       index: 0,
     },
     from_page: 'main',
+    folding: false,
   },
   set_timed: function () {
     var that = this
@@ -1154,6 +1155,11 @@ Page({
           }
         }
       }
+    })
+  },
+  do_fold: function(e){
+    this.setData({
+      folding: !e.target.dataset.folding,
     })
   }
 })

@@ -594,5 +594,8 @@ Page({
       show_search_box: e.detail.value,
     })
     this.set_scroll_height()
+    this.setData({
+      to_top: 'work_item1'
+    })
   }
 })

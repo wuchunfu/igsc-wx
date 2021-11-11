@@ -7,7 +7,7 @@
     {{work_item.work_dynasty}} · {{work_item.work_author}}
   </view>
   <view wx:if="{{work_item.content.length>=300}}">
-    <view style='display:flex;flex-direction:row;margin-top:10rpx;' wx:if="{{work_item.audio_id!=0}}">
+    <view style='display:flex;flex-direction:row;margin-top:10rpx;' wx:if="{{work_item.audio_id > 0 && !folding}}">
       <view style='flex:40;text-align:right;'>
         <navigator redirect url='/pages/catalog/catalog?q=音频' style='display:inline-block;'>
           <image src='../../static/list.png' class="operate_audio"></image>
@@ -28,7 +28,7 @@
         <text wx:if="{{time2close!=0}}" style='text-align:center;line-height:2em;display:inline-block;width:2em;height:2em;border-radius:1em;font-size:10rpx;color:white;background-color:#BB7E7E;opacity:0.8;position:absolute;top:0px;margin-left:-28rpx;'>{{close_play_time}}</text>
       </view>
     </view>
-    <view style="margin-top:5rpx;" wx:if="{{work_item.audio_id >0}}">
+    <view style="margin-top:5rpx;" wx:if="{{work_item.audio_id >0 && !folding}}">
       <slider bindchanging="slider_changing" bindchange="slider2change" step="1" min="1" block-size="15" value='{{slide_value}}' block-color="#BB7E7E" style="margin-top:5rpx;margin-bottom:5rpx;" />
       <text style='font-size:18rpx;color:#BB7E7E;opacity:0.8;float:right;margin-right:18rpx;' wx:if="{{duration_show}}">{{duration_show}}</text>
       <text style='font-size:18rpx;color:#BB7E7E;opacity:0.8;float:left;margin-left:18rpx;' wx:if="{{current_time_show}}">{{current_time_show}}</text>
@@ -41,7 +41,7 @@
     <text selectable="true" decode="true" space='nbsp'>{{work_item.content}}</text>
   </view>
   <view wx:if="{{work_item.content.length<300}}">
-    <view style='display:flex;flex-direction:row;margin-top:10rpx;' wx:if="{{work_item.audio_id!=0}}">
+    <view style='display:flex;flex-direction:row;margin-top:10rpx;' wx:if="{{work_item.audio_id>0 && !folding}}">
       <view style='flex:40;text-align:right;'>
         <navigator redirect url='/pages/catalog/catalog?q=音频' style='display:inline-block;'>
           <image src='../../static/list.png' class="operate_audio"></image>
@@ -62,14 +62,14 @@
         <text wx:if="{{time2close!=0}}" style='text-align:center;line-height:2em;display:inline-block;width:2em;height:2em;border-radius:1em;font-size:10rpx;color:white;background-color:#BB7E7E;opacity:0.8;position:absolute;top:0px;margin-left:-28rpx;'>{{close_play_time}}</text>
       </view>
     </view>
-    <view style="margin-top:5rpx;" wx:if="{{work_item.audio_id >0}}">
+    <view style="margin-top:5rpx;" wx:if="{{work_item.audio_id >0 && !folding}}">
       <slider bindchanging="slider_changing" bindchange="slider2change" step="1" min="1" block-size="15" value='{{slide_value}}' block-color="#BB7E7E" style="margin-top:5rpx;margin-bottom:5rpx;" />
       <text style='font-size:18rpx;color:#BB7E7E;opacity:0.8;float:right;margin-right:18rpx;' wx:if="{{duration_show}}">{{duration_show}}</text>
       <text style='font-size:18rpx;color:#BB7E7E;opacity:0.8;float:left;margin-left:18rpx;' wx:if="{{current_time_show}}">{{current_time_show}}</text>
     </view>
   </view>
-  <view class='tabs'>
-    <view wx:if="{{work_item.intro}}" bindtap='change_content' data-item='0' class='tab-item {{current_tab==0?"active":""}}'>评析</view>
+  <view class='tabs' wx:if="{{!folding}}">
+    <view wx:if="{{work_item.intro}}" bindtap='change_content' data-item='0' class='tab-item {{current_tab==0?"active":""}}'>简介</view>
     <view wx:if="{{work_item.annotation}}" bindtap='change_content' data-item='1' class='tab-item {{current_tab==1?"active":""}}'>注释</view>
     <view wx:if="{{work_item.translation}}" bindtap='change_content' data-item='2' class='tab-item {{current_tab==2?"active":""}}'>译文</view>
     <view wx:if="{{work_item.appreciation}}" bindtap='change_content' data-item='3' class='tab-item {{current_tab==3?"active":""}}'>赏析</view>
@@ -87,4 +87,7 @@
       <text decode='true' space='nbsp' selectable="true">{{show_content}}</text>
     </view>
   </view>
+  <view bindtap="do_fold" data-folding="{{folding}}" style="position: fixed;right: 0rpx;bottom: 0rpx;opacity: 0.3;">
+      <image src='{{folding ? "../../static/unfold.png":"../../static/fold.png"}}' style='width:60rpx;height:60rpx;z-index: 99999;' data-folding="{{folding}}"></image>
+    </view>
 </view>

@@ -6,6 +6,8 @@
 
 后台项目: <https://github.com/bujnlc8/gsc-admin>
 
+vim插件: <https://github.com/bujnlc8/vim-gsc>
+
 欢迎扫码体验
 
-<img alt="i古诗词小程序码" src="./barcode.jpg" width="180">
+[![I0gcHH.jpg](https://z3.ax1x.com/2021/11/11/I0gcHH.jpg)](https://imgtu.com/i/I0gcHH)
