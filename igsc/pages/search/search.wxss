@@ -119,7 +119,7 @@
 .weui-search-bar__input {
   height: 60rpx;
   line-height: 60rpx;
-  padding: 0;
+  padding-right: 60rpx;
 }
 
 .weui-icon-clear {
@@ -128,7 +128,7 @@
   top: 0rpx;
   right: 0rpx;
   font-size: 0;
-  width: 100rpx;
+  width: 60rpx;
   height: 60rpx;
 }
 
