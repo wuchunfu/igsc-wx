@@ -42,8 +42,10 @@ Page({
   },
   go2detail: function (e) {
     var id_ = e.target.dataset.id_
+    var split_words = e.target.dataset.words
+    split_words = split_words ? split_words : ''
     var pages = getCurrentPages()
-    var url = '/pages/gsc/gsc?id=' + id_ + '&from=' + this.data.page
+    var url = '/pages/gsc/gsc?id=' + id_ + '&from=' + this.data.page + '&split_words=' + split_words
     if (pages.length == config.max_layer) {
       wx.redirectTo({
         url: url,
@@ -107,6 +109,7 @@ Page({
             data.short_content = data.content
           }
           data.short_content += fuhao
+          data.split_words = ''
           dd.push(data)
         }
         context.setData({
@@ -309,6 +312,11 @@ Page({
             data.short_content = data.content
           }
           data.short_content += fuhao
+          if ((that.data.search_pattern == 'content' || that.data.search_pattern == 'all') && that.search_v && result.data.data.split_words) {
+            data.split_words = result.data.data.split_words.replaceAll(' ', ',').replaceAll('+', '')
+          } else {
+            data.split_words = ''
+          }
           dd.push(data)
         }
         that.setData({
@@ -485,6 +493,7 @@ Page({
             data.short_content = data.content
           }
           data.short_content += fuhao
+          data.split_words = ''
           dd.push(data)
         }
         that.setData({
@@ -594,8 +603,5 @@ Page({
       show_search_box: e.detail.value,
     })
     this.set_scroll_height()
-    this.setData({
-      to_top: 'work_item1'
-    })
   }
 })

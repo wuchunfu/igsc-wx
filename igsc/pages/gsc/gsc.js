@@ -37,6 +37,7 @@ Page({
     },
     from_page: 'main',
     folding: false,
+    split_words: '',
   },
   set_timed: function () {
     var that = this
@@ -199,11 +200,157 @@ Page({
       })
     }
     var that = this
-    wx.getStorage({
-      key: 'gsc' + key + util.format_time(new Date()),
-      success: function (res) {
-        var d = res.data
-        that.setData(d)
+    var open_id = ''
+    try {
+      open_id = wx.getStorageSync('user_open_id')
+    } catch (e) {}
+    if (!open_id) {
+      util.user_login()
+    }
+    if (open_id == '') {
+      open_id = 'adcd'
+    }
+    wx.request({
+      url: config.gsc_url + 'index/' + key + '/' + open_id,
+      enableHttp2: true,
+      success(result) {
+        if (!result || result.data.code != 0) {
+          wx.showToast({
+            title: '网络异常~~',
+            icon: 'none'
+          })
+          return
+        }
+        var target_id = 0
+        var work = result.data.data.data
+        var show_content = ''
+        if (work.intro) {
+          target_id = 0
+          show_content = work.intro
+        } else if (work.annotation) {
+          target_id = 1
+          show_content = work.annotation
+        } else if (work.translation) {
+          target_id = 2
+          show_content = work.translation
+        } else if (work.appreciation) {
+          target_id = 3
+          show_content = work.appreciation
+        } else if (work.master_comment) {
+          target_id = 4
+          show_content = work.master_comment
+        }
+        show_content = show_content.replace(/　　/g, '\n')
+        show_content = show_content.replace(/\n/g, '\n　　')
+        show_content = show_content.replace(/\t/g, '\n　　')
+        if (work.id % 4 != 0) {
+          var url = config.neteaseaudio_url
+        } else {
+          var url = config.qaudio_url
+        }
+        if (work.layout == 'indent') {
+          work.content = work.content.replace(/　　/g, '\n')
+          work.content = work.content.replace(/\n/g, '\n　　')
+          work.content = work.content.replace(/\t/g, '\n　　')
+        }
+        if (that.data.split_words) {
+          var split_words = that.data.split_words.split(',')
+          var work_content = work.content
+          var work_foreword = work.foreword
+          for (var i = 0; i < split_words.length; i++) {
+            if (split_words[i].length == 0) {
+              continue
+            }
+            work_content = work_content.replaceAll(split_words[i], '<^>' + split_words[i] + '<$>')
+            if (work_foreword && work_foreword.length > 0) {
+              work_foreword = work_foreword.replaceAll(split_words[i], '<^>' + split_words[i] + '<$>')
+            }
+          }
+          var res = []
+          var splits = work_content.split('<^>')
+          for (var i = 0; i < splits.length; i++) {
+            if (splits[i].length == 0) {
+              continue
+            }
+            if (i == 0) {
+              res.push({
+                s: splits[i],
+                k: false,
+              })
+            } else {
+              var s = splits[i]
+              var index = s.lastIndexOf('<$>')
+              // 可能发生嵌套, 此时s应该高亮
+              if (index == -1) {
+                res.push({
+                  s: s,
+                  k: true
+                })
+              } else {
+                res.push({
+                  s: s.substring(0, index).replaceAll('<$>', ''),
+                  k: true
+                })
+                res.push({
+                  s: s.substring(index + 3, s.length),
+                  k: false
+                })
+              }
+            }
+          }
+          work.split_content = res
+          var foreword_res = []
+          var splits = work_foreword.split('<^>')
+          for (var i = 0; i < splits.length; i++) {
+            if (splits[i].length == 0) {
+              continue
+            }
+            if (i == 0) {
+              foreword_res.push({
+                s: splits[i],
+                k: false,
+              })
+            } else {
+              var s = splits[i]
+              var index = s.lastIndexOf('<$>')
+              // 可能发生嵌套, 此时s应该高亮
+              if (index == -1) {
+                foreword_res.push({
+                  s: s,
+                  k: true
+                })
+              } else {
+                foreword_res.push({
+                  s: s.substring(0, index).replaceAll('<$>', ''),
+                  k: true
+                })
+                foreword_res.push({
+                  s: s.substring(index + 3, s.length),
+                  k: false
+                })
+              }
+            }
+          }
+          work.split_foreword = foreword_res
+        } else {
+          work.split_content = []
+          work.split_foreword = []
+        }
+        that.setData({
+          work_item: work,
+          audio_id: work.audio_id,
+          audio_url: url + work.audio_id + '.m4a',
+          current_work_item: work.work_title + '-' + work.work_author,
+          current_tab: target_id,
+          show_content: show_content,
+          duration_show: '',
+          current_time_show: '',
+          seek2: {
+            seek: 0,
+            audio_id: work.audio_id,
+          },
+          slide_value: 0,
+        })
         that.get_play_mode()
         var time2close = wx.getStorageSync('time2close')
         that.setData({
@@ -217,97 +364,6 @@ Page({
             })
           }
         }
-      },
-      fail: function () {
-        var open_id = ''
-        try {
-          open_id = wx.getStorageSync('user_open_id')
-        } catch (e) {}
-        if (!open_id) {
-          util.user_login()
-        }
-        if (open_id == '') {
-          open_id = 'adcd'
-        }
-        wx.request({
-          url: config.gsc_url + 'index/' + key + '/' + open_id,
-          enableHttp2: true,
-          success(result) {
-            if (!result || result.data.code != 0) {
-              wx.showToast({
-                title: '网络异常~~',
-                icon: 'none'
-              })
-              return
-            }
-            var target_id = 0
-            var work = result.data.data.data
-            var show_content = ''
-            if (work.intro) {
-              target_id = 0
-              show_content = work.intro
-            } else if (work.annotation) {
-              target_id = 1
-              show_content = work.annotation
-            } else if (work.translation) {
-              target_id = 2
-              show_content = work.translation
-            } else if (work.appreciation) {
-              target_id = 3
-              show_content = work.appreciation
-            } else if (work.master_comment) {
-              target_id = 4
-              show_content = work.master_comment
-            }
-            show_content = show_content.replace(/　　/g, '\n')
-            show_content = show_content.replace(/\n/g, '\n　　')
-            show_content = show_content.replace(/\t/g, '\n　　')
-            if (work.id % 4 != 0) {
-              var url = config.neteaseaudio_url
-            } else {
-              var url = config.qaudio_url
-            }
-            if (work.layout == 'indent') {
-              work.content = work.content.replace(/　　/g, '\n')
-              work.content = work.content.replace(/\n/g, '\n　　')
-              work.content = work.content.replace(/\t/g, '\n　　')
-            }
-            that.setData({
-              work_item: work,
-              audio_id: work.audio_id,
-              audio_url: url + work.audio_id + '.m4a',
-              current_work_item: work.work_title + '-' + work.work_author,
-              current_tab: target_id,
-              show_content: show_content,
-              duration_show: '',
-              current_time_show: '',
-              seek2: {
-                seek: 0,
-                audio_id: work.audio_id,
-              },
-              slide_value: 0,
-            })
-            if (work.like == 1) {
-              wx.setStorage({
-                key: 'gsc' + key + util.format_time(new Date()),
-                data: that.data,
-              })
-            }
-            that.get_play_mode()
-            var time2close = wx.getStorageSync('time2close')
-            that.setData({
-              time2close: time2close && time2close > 0 ? time2close : 0,
-            })
-            if (time2close && time2close > 0) {
-              var last_micro_seconds = time2close - (new Date()).getTime() / 1000
-              if (last_micro_seconds > 0) {
-                that.setData({
-                  close_play_time: parseInt(last_micro_seconds / 60.0 + 0.5),
-                })
-              }
-            }
-          }
-        })
       }
     })
   },
@@ -611,9 +667,6 @@ Page({
               that.setData({
                 work_item: work_item,
               })
-              wx.removeStorage({
-                key: 'gsc' + work_item.id + util.format_time(new Date()),
-              })
             }
           }
         })
@@ -775,6 +828,11 @@ Page({
       }
     } else {
       id_ = parseInt(Math.random() * 8100)
+    }
+    if (options.hasOwnProperty('split_words') && options.split_words) {
+      this.setData({
+        'split_words': options.split_words,
+      })
     }
     this.get_by_id(id_)
   },
@@ -1139,16 +1197,16 @@ Page({
     query.select('#location_id').boundingClientRect()
     query.exec(res => {
       if (res.length > 0 && res[0]) {
-        if(res[0].top < 0){
+        if (res[0].top < -24) {
           wx.setNavigationBarTitle({
-            title: that.data.work_item.work_title + '  ' + that.data.work_item.work_author + '  '+ that.data.work_item.content,
+            title: that.data.work_item.work_title + '  ' + that.data.work_item.work_author + '  ' + that.data.work_item.content,
           })
-        }else{
-          if(that.data.from_page != 'like'){
+        } else {
+          if (that.data.from_page != 'like') {
             wx.setNavigationBarTitle({
               title: 'i古诗词'
             })
-          }else{
+          } else {
             wx.setNavigationBarTitle({
               title: '我的收藏'
             })
@@ -1157,7 +1215,7 @@ Page({
       }
     })
   },
-  do_fold: function(e){
+  do_fold: function (e) {
     this.setData({
       folding: !e.target.dataset.folding,
     })

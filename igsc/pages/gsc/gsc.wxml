@@ -1,5 +1,5 @@
 <view class='gsc container'>
-<view id="location_id"></view>
+  <view id="location_id"></view>
   <view class='title' data-q='{{work_item.work_title}}' data-id_='{{work_item.id}}' bindtap='search_' data-search_pattern='title'>
     {{work_item.work_title}}
   </view>
@@ -35,10 +35,20 @@
     </view>
   </view>
   <view wx:if="{{work_item.foreword}}" class='foreward' style='margin-left:72rpx;margin-top:10rpx;text-indent: 2em;font-style: oblique;'>
-    <text selectable='true' decode="true" space='nbsp'>{{work_item.foreword}}</text>
+    <view wx:if="{{work_item.split_foreword.length == 0}}">
+      <text selectable='true' decode="true" space='nbsp'>{{work_item.foreword}}</text>
+    </view>
+    <view wx:if="{{work_item.split_foreword.length > 0}}">
+      <text class="{{item.k?'hl':''}}" wx:for="{{work_item.split_foreword}}" selectable="true" decode="true" space='nbsp'>{{item.s}}</text>
+    </view>
   </view>
   <view class='content {{work_item.layout}}'>
-    <text selectable="true" decode="true" space='nbsp'>{{work_item.content}}</text>
+    <view wx:if="{{work_item.split_content.length == 0}}">
+      <text selectable="true" decode="true" space='nbsp'>{{work_item.content}}</text>
+    </view>
+    <view wx:if="{{work_item.split_content.length > 0}}">
+      <text class="{{item.k?'hl':''}}" wx:for="{{work_item.split_content}}" selectable="true" decode="true" space='nbsp'>{{item.s}}</text>
+    </view>
   </view>
   <view wx:if="{{work_item.content.length<300}}">
     <view style='display:flex;flex-direction:row;margin-top:10rpx;' wx:if="{{work_item.audio_id>0 && !folding}}">
@@ -88,6 +98,6 @@
     </view>
   </view>
   <view bindtap="do_fold" data-folding="{{folding}}" style="position: fixed;right: 0rpx;bottom: 0rpx;opacity: 0.3;">
-      <image src='{{folding ? "../../static/unfold.png":"../../static/fold.png"}}' style='width:60rpx;height:60rpx;z-index: 99999;' data-folding="{{folding}}"></image>
-    </view>
+    <image src='{{folding ? "../../static/unfold.png":"../../static/fold.png"}}' style='width:60rpx;height:60rpx;z-index: 99999;' data-folding="{{folding}}"></image>
+  </view>
 </view>

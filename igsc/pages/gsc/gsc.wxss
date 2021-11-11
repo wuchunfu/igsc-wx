@@ -48,7 +48,11 @@
   margin-top: 15rpx;
 }
 
-.author:hover,.title:hover,.translation:hover, .content:hover,.foreward:hover{
+.author:hover,
+.title:hover,
+.translation:hover,
+.content:hover,
+.foreward:hover {
   font-weight: bolder;
 }
 
@@ -69,4 +73,9 @@
   min-height: 100%;
   padding-left: 35rpx;
   padding-right: 35rpx;
+}
+
+.hl {
+  color: #a61b29;
+  font-weight: bold;
 }
