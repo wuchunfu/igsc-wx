@@ -106,6 +106,50 @@ var user_login = function () {
   })
 }
 
+var hl_content = function (content) {
+  var res = []
+  var splits = content.split('<^>')
+  for (var i = 0; i < splits.length; i++) {
+    if (splits[i].length == 0) {
+      continue
+    }
+    if (i == 0) {
+      res.push({
+        s: splits[i],
+        k: false,
+      })
+    } else {
+      var s = splits[i]
+      var index = s.lastIndexOf('<$>')
+      // 可能发生嵌套, 此时s应该高亮
+      if (index == -1) {
+        if (s) {
+          res.push({
+            s: s,
+            k: true
+          })
+        }
+      } else {
+        var ss = s.substring(0, index).replaceAll('<$>', '')
+        if (ss) {
+          res.push({
+            s: ss,
+            k: true
+          })
+        }
+        ss = s.substring(index + 3, s.length)
+        if (ss) {
+          res.push({
+            s: ss,
+            k: false
+          })
+        }
+      }
+    }
+  }
+  return res
+}
+
 module.exports = {
   format_time,
   show_busy,
@@ -114,5 +158,6 @@ module.exports = {
   close_toast,
   page_confirm,
   user_login,
-  timetrans
+  timetrans,
+  hl_content,
 }

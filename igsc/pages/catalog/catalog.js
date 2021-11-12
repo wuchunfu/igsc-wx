@@ -41,11 +41,11 @@ Page({
     return false
   },
   go2detail: function (e) {
-    var id_ = e.target.dataset.id_
-    var split_words = e.target.dataset.words
+    var id_ = e.currentTarget.dataset.id_
+    var split_words = e.currentTarget.dataset.words
     split_words = split_words ? split_words : ''
     var pages = getCurrentPages()
-    var url = '/pages/gsc/gsc?id=' + id_ + '&from=' + this.data.page + '&split_words=' + split_words
+    var url = '/pages/gsc/gsc?id=' + id_ + '&from=' + this.data.page + '&split_words=' + split_words + '&search_pattern=' + this.data.search_pattern
     if (pages.length == config.max_layer) {
       wx.redirectTo({
         url: url,
@@ -58,7 +58,7 @@ Page({
   },
   getData: function (that) {
     wx.getStorage({
-      key: 'gscItems' + util.format_time(new Date()),
+      key: 'gsc_items' + util.format_time(new Date()),
       success: function (res) {
         var items = res.data
         if (!items || items.length == 0) {
@@ -119,7 +119,7 @@ Page({
         })
         that.storage_result(dd)
         wx.setStorage({
-          key: 'gscItems' + util.format_time(new Date()),
+          key: 'gsc_items' + util.format_time(new Date()),
           data: dd
         })
         wx.hideLoading()
@@ -184,7 +184,7 @@ Page({
       wx_search.search(options.q)
     } else {
       wx.getStorage({
-        key: 'gscItems' + util.format_time(new Date()),
+        key: 'gsc_items' + util.format_time(new Date()),
         success: function (res) {
           if (!res) {
             wx.showToast({
@@ -274,12 +274,12 @@ Page({
     }
     var enable_cache = false
     if (!value && page == 'like') {
-      var url = config.gsc_url + 'mylike_by_page/' + open_id + '?page_num=' + that.data.page_num + '&page_size=' + that.data.page_size + '&search_pattern=' + that.data.search_pattern
+      var url = config.gsc_url + 'mylike_by_page/' + open_id + '?page_num=' + that.data.page_num + '&page_size=' + that.data.page_size + '&search_pattern=' + that.data.search_pattern + '&t=1'
     } else {
       if (value && value == '音频') {
-        var url = config.gsc_url + 'query_by_page/' + value + '/' + page + '/' + open_id + '?page_num=' + that.data.page_num + '&page_size=' + that.data.page_size + '&search_pattern=' + that.data.search_pattern
+        var url = config.gsc_url + 'query_by_page/' + value + '/' + page + '/' + open_id + '?page_num=' + that.data.page_num + '&page_size=' + that.data.page_size + '&search_pattern=' + that.data.search_pattern + '&t=1'
       } else {
-        var url = config.gsc_url + 'query_by_page_a/' + page + '/' + value + '/' + open_id + '?page_num=' + that.data.page_num + '&page_size=' + that.data.page_size + '&search_pattern=' + that.data.search_pattern
+        var url = config.gsc_url + 'query_by_page_a/' + page + '/' + value + '/' + open_id + '?page_num=' + that.data.page_num + '&page_size=' + that.data.page_size + '&search_pattern=' + that.data.search_pattern + '&t=1'
         enable_cache = true
       }
     }
@@ -312,10 +312,30 @@ Page({
             data.short_content = data.content
           }
           data.short_content += fuhao
-          if ((that.data.search_pattern == 'content' || that.data.search_pattern == 'all') && that.search_v && result.data.data.split_words) {
+          if (that.search_v && result.data.data && result.data.data.split_words) {
             data.split_words = result.data.data.split_words.replaceAll(' ', ',').replaceAll('+', '')
+            var split_words = data.split_words.split(',')
+            for (var i = 0; i < split_words.length; i++) {
+              if (split_words[i].length == 0) {
+                continue
+              }
+              if (that.data.search_pattern == 'all' || that.data.search_pattern == 'content') {
+                data.short_content = data.short_content.replaceAll(split_words[i], '<^>' + split_words[i] + '<$>')
+              }
+              if (that.data.search_pattern == 'all' || that.data.search_pattern == 'title') {
+                data.work_title = data.work_title.replaceAll(split_words[i], '<^>' + split_words[i] + '<$>')
+              }
+            }
+            if (data.short_content.indexOf('<^>') != -1) {
+              data.split_content = util.hl_content(data.short_content)
+            }
+            if (data.work_title.indexOf('<^>') != -1) {
+              data.split_title = util.hl_content(data.work_title)
+            }
           } else {
             data.split_words = ''
+            data.split_content = []
+            data.split_title = []
           }
           dd.push(data)
         }

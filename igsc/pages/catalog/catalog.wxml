@@ -14,23 +14,28 @@
   <scroll-view scroll-y="true" style="height: {{scroll_height}}px;" bindscroll="scroll" scroll-into-view="{{to_top}}" scroll-with-animation="true" enable-back-to-top="true" enhanced="true" show-scrollbar="false">
     <view wx:for="{{gscitems}}" wx:key="id">
       <view class='item_work' wx:if="{{showhead}}" id="work_item{{index+1}}">
-        <view class='myclick' data-id_='{{item.id}}' data-words='{{item.split_words}}'>
+        <view class='myclick'>
           <view bindtap='go2detail' data-words='{{item.split_words}}' data-id_='{{item.id}}' style='position:relative;'>
-            <text class='title' data-words='{{item.split_words}}' data-id_='{{item.id}}' style="{{current_paly_id==item.id?'color:#BB7E7E;font-weight:700;':''}}">{{item.work_title}}
-            </text>
-            <view wx:if="{{item.audio_id>0}}" style='position:absolute;top:2rpx;right:10rpx;'>
-              <image src="{{current_paly_id == item.id ? '../../static/sounding.png': '../../static/sound.png'}}" style='width:24rpx;height:24rpx;' data-id_='{{item.id}}' data-words='{{item.split_words}}'></image>
+            <text wx:if="{{!item.split_title || item.split_title.length == 0}}" class='title' style="{{current_paly_id==item.id?'color:#BB7E7E;font-weight:700;':''}}">{{item.work_title}}</text>
+            <view wx:if="{{item.split_title && item.split_title.length > 0}}" class='title' class="content_text" style="{{current_paly_id==item.id?'color:#BB7E7E;font-weight:700;':''}}">
+              <text class="{{item.k?'hl':''}}" wx:for="{{item.split_title}}" selectable="true" decode="true" space='nbsp'>{{item.s}}</text>
             </view>
-            <view data-id_='{{item.id}}' data-words='{{item.split_words}}'>
-              <text data-id_='{{item.id}}' data-words='{{item.split_words}}' class="content_text" style="{{current_paly_id==item.id?'color:#BB7E7E;font-weight:700;':''}}">{{item.short_content}}</text>
-              <text class='author' style="{{current_paly_id==item.id?'color:#BB7E7E;font-weight:700;':''}}" data-words='{{item.split_words}}' data-id_='{{item.id}}'>[{{item.work_dynasty}}] {{item.work_author}}</text>
+            <view wx:if="{{item.audio_id>0}}" style='position:absolute;top:2rpx;right:10rpx;'>
+              <image src="{{current_paly_id == item.id ? '../../static/sounding.png': '../../static/sound.png'}}" style='width:24rpx;height:24rpx;'></image>
+            </view>
+            <view>
+              <text wx:if="{{!item.split_content || item.split_content.length == 0}}" data-id_='{{item.id}}' class="content_text" style="{{current_paly_id==item.id?'color:#BB7E7E;font-weight:700;':''}}">{{item.short_content}}</text>
+              <view wx:if="{{item.split_content && item.split_content.length > 0}}" data-id_='{{item.id}}' class="content_text" style="{{current_paly_id==item.id?'color:#BB7E7E;font-weight:700;':''}}">
+                <text class="{{item.k?'hl':''}}" wx:for="{{item.split_content}}" selectable="true" decode="true" space='nbsp'>{{item.s}}</text>
+              </view>
+              <text class='author' style="{{current_paly_id==item.id?'color:#BB7E7E;font-weight:700;':''}}">[{{item.work_dynasty}}] {{item.work_author}}</text>
             </view>
           </view>
         </view>
       </view>
       <view class="item_work myclick" wx:if="{{!showhead}}" bindtap='go2detail' data-words='{{item.split_words}}' data-id_='{{item.id}}'>
-        <view class='title gsc myclick' data-words='{{item.split_words}}' data-id_='{{item.id}}' animation="{{current_paly_id==item.id?animationData:''}}">
-          <text style="{{current_paly_id==item.id?'color:#BB7E7E;font-weight:700;':''}}" data-id_='{{item.id}}' data-words='{{item.split_words}}'>{{index+1}}.{{item.work_title}} - {{item.work_author}}</text>
+        <view class='title gsc myclick' animation="{{current_paly_id==item.id?animationData:''}}">
+          <text style="{{current_paly_id==item.id?'color:#BB7E7E;font-weight:700;':''}}">{{index+1}}.{{item.work_title}} - {{item.work_author}}</text>
         </view>
       </view>
     </view>

@@ -38,6 +38,7 @@ Page({
     from_page: 'main',
     folding: false,
     split_words: '',
+    search_pattern: 'all',
   },
   set_timed: function () {
     var that = this
@@ -193,7 +194,7 @@ Page({
       wx.setStorageSync('play_mode', mode)
     } catch (e) {}
   },
-  get_by_id: function (key, pull = false) {
+  get_by_id: function (key, pull) {
     if (!pull) {
       wx.showLoading({
         title: '加载中...'
@@ -257,84 +258,32 @@ Page({
           var split_words = that.data.split_words.split(',')
           var work_content = work.content
           var work_foreword = work.foreword
+          var work_title = work.work_title
           for (var i = 0; i < split_words.length; i++) {
             if (split_words[i].length == 0) {
               continue
             }
-            work_content = work_content.replaceAll(split_words[i], '<^>' + split_words[i] + '<$>')
-            if (work_foreword && work_foreword.length > 0) {
-              work_foreword = work_foreword.replaceAll(split_words[i], '<^>' + split_words[i] + '<$>')
-            }
-          }
-          var res = []
-          var splits = work_content.split('<^>')
-          for (var i = 0; i < splits.length; i++) {
-            if (splits[i].length == 0) {
-              continue
-            }
-            if (i == 0) {
-              res.push({
-                s: splits[i],
-                k: false,
-              })
-            } else {
-              var s = splits[i]
-              var index = s.lastIndexOf('<$>')
-              // 可能发生嵌套, 此时s应该高亮
-              if (index == -1) {
-                res.push({
-                  s: s,
-                  k: true
-                })
-              } else {
-                res.push({
-                  s: s.substring(0, index).replaceAll('<$>', ''),
-                  k: true
-                })
-                res.push({
-                  s: s.substring(index + 3, s.length),
-                  k: false
-                })
+            if (that.data.search_pattern == 'all' || that.data.search_pattern == 'content') {
+              work_content = work_content.replaceAll(split_words[i], '<^>' + split_words[i] + '<$>')
+              if (work_foreword && work_foreword.length > 0) {
+                work_foreword = work_foreword.replaceAll(split_words[i], '<^>' + split_words[i] + '<$>')
               }
             }
-          }
-          work.split_content = res
-          var foreword_res = []
-          var splits = work_foreword.split('<^>')
-          for (var i = 0; i < splits.length; i++) {
-            if (splits[i].length == 0) {
-              continue
-            }
-            if (i == 0) {
-              foreword_res.push({
-                s: splits[i],
-                k: false,
-              })
-            } else {
-              var s = splits[i]
-              var index = s.lastIndexOf('<$>')
-              // 可能发生嵌套, 此时s应该高亮
-              if (index == -1) {
-                foreword_res.push({
-                  s: s,
-                  k: true
-                })
-              } else {
-                foreword_res.push({
-                  s: s.substring(0, index).replaceAll('<$>', ''),
-                  k: true
-                })
-                foreword_res.push({
-                  s: s.substring(index + 3, s.length),
-                  k: false
-                })
-              }
+            if(that.data.search_pattern == 'all' || that.data.search_pattern == 'title'){
+              work_title = work_title.replaceAll(split_words[i], '<^>' + split_words[i] + '<$>')
             }
           }
-          work.split_foreword = foreword_res
+          if (that.data.search_pattern == 'all' || that.data.search_pattern == 'content') {
+            work.split_content = util.hl_content(work_content)
+            work.split_foreword = util.hl_content(work_foreword)
+          }
+          if(that.data.search_pattern == 'all' || that.data.search_pattern == 'title'){
+            work.split_title = util.hl_content(work_title)
+          }
         } else {
           work.split_content = []
           work.split_foreword = []
+          work.split_title = []
         }
         that.setData({
           work_item: work,
@@ -363,6 +312,9 @@ Page({
               close_play_time: parseInt(last_micro_seconds / 60.0 + 0.5),
             })
           }
+        }
+        if (!pull) {
+          wx.hideLoading()
         }
       }
     })
@@ -443,7 +395,7 @@ Page({
     }
     if (mode != 'one') {
       try {
-        that.get_by_id(play_id)
+        that.get_by_id(play_id, false)
         var try_times = 0
         var playInt = setInterval(() => {
           if (that.data.work_item && that.data.work_item.id == play_id) {
@@ -471,7 +423,7 @@ Page({
     }
   },
   operate_play: function (e) {
-    this.do_operate_play(e.target.dataset.key, this.data.mode)
+    this.do_operate_play(e.currentTarget.dataset.key, this.data.mode)
   },
   _do_speak: function (s, start, urls, work_id) {
     var that = this
@@ -567,7 +519,7 @@ Page({
     return this._do_speak(s, 0, [], work_item.id)
   },
   speak: function (e) {
-    var speeching = e.target.dataset.speeching
+    var speeching = e.currentTarget.dataset.speeching
     if (speeching) {
       inner_audio_context.pause()
     } else {
@@ -591,7 +543,7 @@ Page({
     })
   },
   operate_like: function (e) {
-    var like = e.target.dataset.like
+    var like = e.currentTarget.dataset.like
     var operate = like == 1 ? 'dislike' : 'like'
     var that = this
     wx.getStorage({
@@ -739,9 +691,9 @@ Page({
     wx.setStorageSync('historyplay', historyplay)
   },
   search_: function (e) {
-    var id_ = e.target.dataset.id_
-    var q = e.target.dataset.q
-    var search_pattern = e.target.dataset.search_pattern
+    var id_ = e.currentTarget.dataset.id_
+    var q = e.currentTarget.dataset.q
+    var search_pattern = e.currentTarget.dataset.search_pattern
     var pages = getCurrentPages()
     var url = '/pages/catalog/catalog?id=' + id_ + '&q=' + q + '&sp=' + search_pattern
     if (pages.length == config.max_layer) {
@@ -755,7 +707,7 @@ Page({
     }
   },
   change_content: function (e) {
-    var target_id = e.target.dataset.item
+    var target_id = e.currentTarget.dataset.item
     var gsc = this.data.work_item
     var show_content = ''
     switch ('' + target_id) {
@@ -814,7 +766,7 @@ Page({
     return
   },
   onLoad: function (options) {
-    if (options.hasOwnProperty('id')) {
+    if (options && options.hasOwnProperty('id')) {
       var id_ = options.id
       if (options.hasOwnProperty('from')) {
         this.setData({
@@ -829,12 +781,17 @@ Page({
     } else {
       id_ = parseInt(Math.random() * 8100)
     }
-    if (options.hasOwnProperty('split_words') && options.split_words) {
+    if (options && options.hasOwnProperty('split_words') && options.split_words) {
       this.setData({
-        'split_words': options.split_words,
+        split_words: options.split_words,
       })
     }
-    this.get_by_id(id_)
+    if (options && options.hasOwnProperty('search_pattern') && options.search_pattern) {
+      this.setData({
+        search_pattern: options.search_pattern,
+      })
+    }
+    this.get_by_id(id_, false)
   },
   play_sound: function () {
     if (this.data.work_item) {
@@ -1217,7 +1174,7 @@ Page({
   },
   do_fold: function (e) {
     this.setData({
-      folding: !e.target.dataset.folding,
+      folding: !e.currentTarget.dataset.folding,
     })
   }
 })
