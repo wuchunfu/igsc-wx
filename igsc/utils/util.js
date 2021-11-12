@@ -150,6 +150,11 @@ var hl_content = function (content) {
   return res
 }
 
+var api_version = function() {
+  var v = wx.getStorageSync('api_version')
+  return v?v:new Date().getTime()
+}
+
 module.exports = {
   format_time,
   show_busy,
@@ -160,4 +165,5 @@ module.exports = {
   user_login,
   timetrans,
   hl_content,
+  api_version,
 }

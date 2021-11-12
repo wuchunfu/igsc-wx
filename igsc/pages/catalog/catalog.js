@@ -259,7 +259,7 @@ Page({
     }
     that.search_v = value
     var page = that.data.page
-    var open_id = 'abcd'
+    var open_id = 'a'
     if (page == 'like') {
       try {
         open_id = wx.getStorageSync('user_open_id')
@@ -274,12 +274,12 @@ Page({
     }
     var enable_cache = false
     if (!value && page == 'like') {
-      var url = config.gsc_url + 'mylike_by_page/' + open_id + '?page_num=' + that.data.page_num + '&page_size=' + that.data.page_size + '&search_pattern=' + that.data.search_pattern + '&t=1'
+      var url = config.gsc_url + 'mylike_by_page/' + open_id + '?page_num=' + that.data.page_num + '&page_size=' + that.data.page_size + '&search_pattern=' + that.data.search_pattern + '&t=' + util.api_version()
     } else {
       if (value && value == '音频') {
-        var url = config.gsc_url + 'query_by_page/' + value + '/' + page + '/' + open_id + '?page_num=' + that.data.page_num + '&page_size=' + that.data.page_size + '&search_pattern=' + that.data.search_pattern + '&t=1'
+        var url = config.gsc_url + 'query_by_page/' + value + '/' + page + '/' + open_id + '?page_num=' + that.data.page_num + '&page_size=' + that.data.page_size + '&search_pattern=' + that.data.search_pattern + '&t=' + util.api_version()
       } else {
-        var url = config.gsc_url + 'query_by_page_a/' + page + '/' + value + '/' + open_id + '?page_num=' + that.data.page_num + '&page_size=' + that.data.page_size + '&search_pattern=' + that.data.search_pattern + '&t=1'
+        var url = config.gsc_url + 'query_by_page_a/' + page + '/' + value + '/' + open_id + '?page_num=' + that.data.page_num + '&page_size=' + that.data.page_size + '&search_pattern=' + that.data.search_pattern + '&t=' + util.api_version()
         enable_cache = true
       }
     }
@@ -352,6 +352,7 @@ Page({
         } else {
           wx.hideLoading()
         }
+        that.set_scroll_height()
       },
       fail: (e) => {
         wx.showToast({
@@ -361,13 +362,11 @@ Page({
       }
     })
     setTimeout(() => {
-      that.set_scroll_height()
       if (page == 'like') {
         wx.setNavigationBarTitle({
           title: '我的收藏'
         })
       } else {
-        that.set_scroll_height()
         wx.setNavigationBarTitle({
           title: 'i古诗词'
         })
@@ -484,7 +483,7 @@ Page({
   get_like_list: function (open_id) {
     var that = this
     wx.request({
-      url: config.gsc_url + 'mylike_by_page/' + open_id + '?page_num=' + that.data.page_num + '&page_size=' + that.data.page_size + '&search_pattern=' + that.data.search_pattern,
+      url: config.gsc_url + 'mylike_by_page/' + open_id + '?page_num=' + that.data.page_num + '&page_size=' + that.data.page_size + '&search_pattern=' + that.data.search_pattern + '&t=' + util.api_version(),
       enableHttp2: true,
       success(result) {
         if (!result || result.data.code != 0) {

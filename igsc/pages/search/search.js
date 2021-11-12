@@ -149,7 +149,7 @@ function get_his_keys() {
 
 
 function wx_search_add_his_key(input_value) {
-  if (!input_value || input_value.length == 0) {
+  if (!input_value || input_value.length == 0 || input_value == 'undefined') {
     return
   }
   var value = wx.getStorageSync('wx_search_his_keys')

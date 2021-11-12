@@ -212,7 +212,7 @@ Page({
       open_id = 'adcd'
     }
     wx.request({
-      url: config.gsc_url + 'index/' + key + '/' + open_id,
+      url: config.gsc_url + 'index/' + key + '/' + open_id + '?t=' + util.api_version(),
       enableHttp2: true,
       success(result) {
         if (!result || result.data.code != 0) {

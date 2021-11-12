@@ -18,7 +18,7 @@ App({
       },
       fail: function () {
         wx.request({
-          url: config.gsc_url + 'query/' + value + '/main/abcd',
+          url: config.gsc_url + 'query/' + value + '/main/a',
           success(result) {
             if (!result || result.data.code != 0) {
               return
@@ -75,6 +75,12 @@ App({
     wx.getSystemInfo({
       success: function (res) {
         wx.setStorageSync('platform', 'pc')
+      }
+    })
+    wx.request({
+      url: config.service.host + '/version',
+      success: function(data) {
+        wx.setStorageSync('api_version', data.data.v + '')
       }
     })
   }
