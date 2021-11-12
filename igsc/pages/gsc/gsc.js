@@ -269,7 +269,7 @@ Page({
                 work_foreword = work_foreword.replaceAll(split_words[i], '<^>' + split_words[i] + '<$>')
               }
             }
-            if(that.data.search_pattern == 'all' || that.data.search_pattern == 'title'){
+            if (that.data.search_pattern == 'all' || that.data.search_pattern == 'title') {
               work_title = work_title.replaceAll(split_words[i], '<^>' + split_words[i] + '<$>')
             }
           }
@@ -277,7 +277,7 @@ Page({
             work.split_content = util.hl_content(work_content)
             work.split_foreword = util.hl_content(work_foreword)
           }
-          if(that.data.search_pattern == 'all' || that.data.search_pattern == 'title'){
+          if (that.data.search_pattern == 'all' || that.data.search_pattern == 'title') {
             work.split_title = util.hl_content(work_title)
           }
         } else {
@@ -1009,10 +1009,15 @@ Page({
     }
   },
   onShareAppMessage: function (res) {
+    if (this.data.work_item.id % 2 == 0) {
+      var share_image = '/static/share4.jpg'
+    } else {
+      var share_image = '/static/share5.jpg'
+    }
     return {
       title: '《' + this.data.work_item.work_title + '》' + this.data.work_item.work_author + '   ' + this.data.work_item.content.substr(0, 24),
       path: '/pages/gsc/gsc?id=' + this.data.work_item.id + '&from=main',
-      imageUrl: '/static/share4.jpg',
+      imageUrl: share_image,
       success: function (res) {
         util.show_success('分享成功')
       },
