@@ -155,6 +155,10 @@ var api_version = function() {
   return v?v:new Date().getTime()
 }
 
+var app_is_hide = function(){
+  return wx.getStorageSync('app_is_hide')
+}
+
 module.exports = {
   format_time,
   show_busy,
@@ -166,4 +170,5 @@ module.exports = {
   timetrans,
   hl_content,
   api_version,
+  app_is_hide,
 }

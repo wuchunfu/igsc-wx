@@ -523,11 +523,13 @@ Page({
           to_top: 'work_item1',
         })
         that.storage_result(dd)
-        wx.hideLoading()
       }
     })
   },
   onPullDownRefresh: function () {
+    wx.showLoading({
+      title: '加载中...',
+    })
     var that = this
     var pages = getCurrentPages()
     var current_page = pages[pages.length - 1]
@@ -556,9 +558,6 @@ Page({
       wx.setNavigationBarTitle({
         title: '我的收藏'
       })
-      wx.showLoading({
-        title: '加载中...',
-      })
     } else {
       wx.setNavigationBarTitle({
         title: 'i古诗词'
@@ -577,6 +576,7 @@ Page({
     wx.hideNavigationBarLoading()
     wx.stopPullDownRefresh()
     wx_search.wx_search_clear()
+    wx.hideLoading()
   },
   onReachBottom: function () {
     return
@@ -621,6 +621,9 @@ Page({
     this.setData({
       show_search_box: e.detail.value,
     })
+    this.set_scroll_height()
+  },
+  onResize:function(){
     this.set_scroll_height()
   }
 })

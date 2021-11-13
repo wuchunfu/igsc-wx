@@ -38,6 +38,15 @@ App({
       }
     })
   },
+  onHide(){
+    wx.setStorageSync('app_is_hide', true)
+  },
+  onShow(){
+    wx.setStorageSync('app_is_hide', false)
+  },
+  onUnload: function(e){
+    console.log('app onUnload')
+},
   onLaunch() {
     try {
       var open_id = wx.getStorageSync('user_open_id')

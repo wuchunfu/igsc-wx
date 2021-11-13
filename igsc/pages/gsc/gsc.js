@@ -148,13 +148,6 @@ Page({
     //xunhuan->one->shuffle->xunhuan
     var that = this
     var mode = 'xunhuan'
-    if (this.data.mode == 'hc') {
-      wx.showToast({
-        title: '请等待语音播放完毕...',
-        icon: 'none'
-      })
-      return false
-    }
     if (this.data.mode == 'xunhuan') {
       this.setData({
         mode: 'one',
@@ -194,8 +187,8 @@ Page({
       wx.setStorageSync('play_mode', mode)
     } catch (e) {}
   },
-  get_by_id: function (key, pull) {
-    if (!pull) {
+  get_by_id: function (key, play) {
+    if (!play) {
       wx.showLoading({
         title: '加载中...'
       })
@@ -244,11 +237,6 @@ Page({
         show_content = show_content.replace(/　　/g, '\n')
         show_content = show_content.replace(/\n/g, '\n　　')
         show_content = show_content.replace(/\t/g, '\n　　')
-        if (work.id % 4 != 0) {
-          var url = config.neteaseaudio_url
-        } else {
-          var url = config.qaudio_url
-        }
         if (work.layout == 'indent') {
           work.content = work.content.replace(/　　/g, '\n')
           work.content = work.content.replace(/\n/g, '\n　　')
@@ -288,7 +276,7 @@ Page({
         that.setData({
           work_item: work,
           audio_id: work.audio_id,
-          audio_url: url + work.audio_id + '.m4a',
+          audio_url: config.qaudio_url + work.audio_id + '.m4a',
           current_work_item: work.work_title + '-' + work.work_author,
           current_tab: target_id,
           show_content: show_content,
@@ -313,9 +301,23 @@ Page({
             })
           }
         }
-        if (!pull) {
+        if (!play) {
           wx.hideLoading()
         }
+        if (play && work.audio_id > 0) {
+          setTimeout(() => {
+            that.play_sound()
+            if (work.work_title) {
+              that.record_play(work.id, work.work_title + '-' + work.work_author)
+            }
+          }, 500);
+        }
+      },
+      fail: function (res) {
+        wx.showToast({
+          title: '网络异常~~',
+          icon: 'none'
+        })
       }
     })
   },
@@ -394,32 +396,7 @@ Page({
       play_id = audio_ids[play_id]
     }
     if (mode != 'one') {
-      try {
-        that.get_by_id(play_id, false)
-        var try_times = 0
-        var playInt = setInterval(() => {
-          if (that.data.work_item && that.data.work_item.id == play_id) {
-            that.play_sound()
-            if (that.data.work_item.work_title) {
-              that.record_play(play_id, that.data.work_item.work_title + '-' + that.data.work_item.work_author)
-            }
-            clearInterval(playInt)
-          }
-          try_times++
-          if (try_times >= 100) {
-            wx.showToast({
-              title: '播放失败:(',
-              icon: 'none'
-            })
-            clearInterval(playInt)
-          }
-        }, 600)
-      } catch (e) {
-        wx.showToast({
-          title: '播放失败:(',
-          icon: 'none'
-        })
-      }
+      that.get_by_id(play_id, true)
     }
   },
   operate_play: function (e) {
@@ -536,7 +513,7 @@ Page({
     }
     s.push(this.data.work_item.content.replace(/　　/g, ''))
     if (this.data.work_item.audio_id > 0) {
-      s.push('\n' + config.neteaseaudio_url + this.data.work_item.audio_id + '.m4a')
+      s.push('\n' + config.qaudio_url + this.data.work_item.audio_id + '.m4a')
     }
     wx.setClipboardData({
       data: s.join('\n'),
@@ -649,10 +626,6 @@ Page({
   },
   play_back_audio: function (e) {
     var that = this
-    var mode = wx.getStorageSync('play_mode')
-    if (mode == 'hc') {
-      that.reset_playmode()
-    }
     if (that.data.playing) {
       that.pause_play_back_audio()
     } else {
@@ -751,11 +724,11 @@ Page({
     }
     if (key == 0) {
       key = this.data.work_item.id + 1
-      if (key > 8100) {
+      if (key > 297) {
         key = 1
       }
     }
-    this.get_by_id(key, true)
+    this.get_by_id(key, false)
     setTimeout(() => {
       wx.hideNavigationBarLoading()
       wx.stopPullDownRefresh()
@@ -779,7 +752,10 @@ Page({
         }
       }
     } else {
-      id_ = parseInt(Math.random() * 8100)
+      id_ = parseInt(Math.random() * 297)
+      if (id_ <= 0) {
+        id_ = 1
+      }
     }
     if (options && options.hasOwnProperty('split_words') && options.split_words) {
       this.setData({
@@ -830,30 +806,9 @@ Page({
     })
     return mode
   },
-  reset_playmode: function () {
-    var that = this
-    try {
-      var old_play_mode = wx.getStorageSync('old_play_mode')
-    } catch (e) {
-      old_play_mode = 'xunhuan'
-    }
-    old_play_mode = old_play_mode == 'hc' ? 'xunhuan' : old_play_mode
-    wx.setStorageSync('play_mode', old_play_mode)
-    that.setData({
-      mode: old_play_mode,
-    })
-  },
-  onReady: function (e) {
-    var that = this
-    inner_audio_context.loop = false
-    inner_audio_context.playbackRate = 0.8
+  listen_play: function (that) {
     background_audio_manager.onEnded(() => {
-      var mode = that.get_play_mode()
-      if (mode != 'hc') {
-        that.do_operate_play('next', mode)
-      } else {
-        that.reset_playmode()
-      }
+      that.do_operate_play('next', that.get_play_mode())
     })
     background_audio_manager.onPause(() => {
       that.setData({
@@ -864,15 +819,17 @@ Page({
       that.setData({
         playing: false,
       })
+      if (util.app_is_hide()) {
+        that.do_operate_play('next', that.get_play_mode())
+      }
     })
     background_audio_manager.onError((e) => {
       that.setData({
         playing: false,
       })
-      wx.showToast({
-        title: '播放失败:(',
-        icon: 'none',
-      })
+      if (util.app_is_hide()) {
+        that.do_operate_play('next', that.get_play_mode())
+      }
     })
     background_audio_manager.onWaiting(() => {
       wx.showLoading({
@@ -890,18 +847,22 @@ Page({
       })
     })
     background_audio_manager.onPrev(() => {
-      var mode = that.get_play_mode()
-      that.do_operate_play('up', mode)
+      that.do_operate_play('up', that.get_play_mode())
     })
     background_audio_manager.onNext(() => {
-      var mode = that.get_play_mode()
-      that.do_operate_play('next', mode)
+      that.do_operate_play('next', that.get_play_mode())
     })
     background_audio_manager.onTimeUpdate(() => {
       if (that.data.sliding != 1) {
         that.audio_start()
       }
     })
+  },
+  onReady: function (e) {
+    var that = this
+    inner_audio_context.loop = false
+    inner_audio_context.playbackRate = 0.8
+    that.listen_play(that)
     inner_audio_context.onPlay(() => {
       this.pause_play_back_audio()
       that.setData({
@@ -954,7 +915,6 @@ Page({
       if (that.data.work_item) {
         that.set_current_playing()
         clearInterval(id_)
-        wx.hideLoading()
       }
     }, 200)
   },
@@ -981,12 +941,15 @@ Page({
         clearInterval(id_)
       }
     }, 200)
+    that.listen_play(that)
   },
   onHide: function () {
     inner_audio_context.stop()
+    this.listen_play(this)
   },
   onUnload: function () {
     inner_audio_context.stop()
+    this.listen_play(this)
   },
   long_press: function () {
     var that = this
