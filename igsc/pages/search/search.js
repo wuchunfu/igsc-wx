@@ -177,7 +177,6 @@ function wx_search_add_his_key(input_value) {
   }
 }
 
-
 function wx_search_delete_all() {
   wx.removeStorage({
     key: 'wx_search_his_keys',
@@ -188,6 +187,7 @@ function wx_search_delete_all() {
       __that.setData({
         wx_search_data: tem_data,
       })
+      __that.set_scroll_height()
     }
   })
 }

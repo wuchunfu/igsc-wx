@@ -907,6 +907,7 @@ Page({
     var that = this
     inner_audio_context.loop = false
     inner_audio_context.playbackRate = 0.8
+    console.log('onReady')
     that.listen_play(that)
     that.listen_speeching(that)
     var audio_ids = wx.getStorageSync('audio_ids')
@@ -944,10 +945,9 @@ Page({
         clearInterval(id_)
       }
     }, 200)
-    that.listen_play(that)
-    that.listen_speeching(that)
   },
   onHide: function () {
+    console.log('onHide')
     inner_audio_context.stop()
     this.listen_play(this)
     this.listen_speeching(this)
