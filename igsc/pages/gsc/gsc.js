@@ -324,9 +324,9 @@ Page({
   do_operate_play: function (key, mode = 'xunhuan') {
     var that = this
     var audio_ids = wx.getStorageSync('audio_ids')
-    if (!audio_ids) {
+    if (!audio_ids && mode != 'one') {
       wx.showToast({
-        title: '播放失败~~',
+        title: '未找到播放列表~~',
         icon: 'none',
       })
       return
