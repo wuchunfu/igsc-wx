@@ -858,13 +858,9 @@ Page({
       }
     })
   },
-  onReady: function (e) {
-    var that = this
-    inner_audio_context.loop = false
-    inner_audio_context.playbackRate = 0.8
-    that.listen_play(that)
+  listen_speeching: function (that) {
     inner_audio_context.onPlay(() => {
-      this.pause_play_back_audio()
+      that.pause_play_back_audio()
       that.setData({
         speeching: true,
       })
@@ -885,11 +881,11 @@ Page({
       })
     })
     inner_audio_context.onEnded(() => {
-      if (inner_audio_context._start_index == this.data.speeching_urls.length - 1) {
-        var url = this.data.speeching_urls[0]
+      if (inner_audio_context._start_index == that.data.speeching_urls.length - 1) {
+        var url = that.data.speeching_urls[0]
         inner_audio_context._start_index = 0
       } else {
-        var url = this.data.speeching_urls[inner_audio_context._start_index + 1]
+        var url = that.data.speeching_urls[inner_audio_context._start_index + 1]
         inner_audio_context._start_index += 1
       }
       inner_audio_context.src = url
@@ -906,6 +902,13 @@ Page({
         speeching: false,
       })
     })
+  },
+  onReady: function (e) {
+    var that = this
+    inner_audio_context.loop = false
+    inner_audio_context.playbackRate = 0.8
+    that.listen_play(that)
+    that.listen_speeching(that)
     var audio_ids = wx.getStorageSync('audio_ids')
     if (!audio_ids) {
       var app = getApp()
@@ -942,14 +945,17 @@ Page({
       }
     }, 200)
     that.listen_play(that)
+    that.listen_speeching(that)
   },
   onHide: function () {
     inner_audio_context.stop()
     this.listen_play(this)
+    this.listen_speeching(this)
   },
   onUnload: function () {
     inner_audio_context.stop()
     this.listen_play(this)
+    this.listen_speeching(this)
   },
   long_press: function () {
     var that = this
