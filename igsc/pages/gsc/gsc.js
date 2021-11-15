@@ -3,8 +3,7 @@ var wechat_si = requirePlugin('WechatSI')
 var util = require('../../utils/util.js')
 const background_audio_manager = wx.getBackgroundAudioManager()
 background_audio_manager.referrerPolicy = 'origin'
-const inner_audio_context = wx.createInnerAudioContext()
-inner_audio_context.referrerPolicy = 'origin'
+var inner_audio_context = null
 Page({
   data: {
     work_item: null,
@@ -273,6 +272,12 @@ Page({
           work.split_foreword = []
           work.split_title = []
         }
+        var slide_value = 0
+        var seek = 0
+        if(background_audio_manager._audio_id == work.audio_id){
+           seek = background_audio_manager.currentTime
+           slide_value = parseInt(seek / background_audio_manager.duration * 100)
+        }
         that.setData({
           work_item: work,
           audio_id: work.audio_id,
@@ -283,10 +288,10 @@ Page({
           duration_show: '',
           current_time_show: '',
           seek2: {
-            seek: 0,
+            seek: seek,
             audio_id: work.audio_id,
           },
-          slide_value: 0,
+          slide_value: slide_value,
         })
         that.get_play_mode()
         var time2close = wx.getStorageSync('time2close')
@@ -362,7 +367,13 @@ Page({
         background_audio_manager.startTime = 0
         background_audio_manager._audio_id = play_id_url.audio_id
         background_audio_manager.seek(0)
-        inner_audio_context.pause()
+        if(inner_audio_context){
+          inner_audio_context.pause()
+          that.setData({
+            speeching: false
+          }
+          )
+        }
         background_audio_manager.play()
         if (play_id_url.title) {
           that.record_play(play_id_url.id, play_id_url.title + '-' + play_id_url.author)
@@ -381,7 +392,12 @@ Page({
         background_audio_manager.singer = that.data.work_item.work_author
         background_audio_manager.coverImgUrl = that.data.poster
         background_audio_manager._audio_id = that.data.work_item.audio_id
-        inner_audio_context.pause()
+        if(inner_audio_context){
+          inner_audio_context.pause()
+          that.setData({
+            speeching: false
+          })
+        }
         background_audio_manager.play()
         if (that.data.work_item && that.data.work_item.work_title) {
           that.record_play(that.data.work_item.id, that.data.work_item.work_title + '-' + that.data.work_item.work_author)
@@ -415,6 +431,7 @@ Page({
           that.setData({
             speeching_urls: urls,
             speeching_id: work_id,
+            speeching: true,
           })
           //inner_audio_context.stop()
           if (that.data.seek3.work_id == work_id) {
@@ -462,6 +479,7 @@ Page({
         this.setData({
           speeching_urls: data.urls,
           speeching_id: work_item.id,
+          speeching: true,
         })
         if (this.data.seek3.work_id == work_item.id) {
           inner_audio_context.src = data.urls[this.data.seek3.index]
@@ -498,7 +516,12 @@ Page({
   speak: function (e) {
     var speeching = e.currentTarget.dataset.speeching
     if (speeching) {
-      inner_audio_context.pause()
+      if(inner_audio_context){
+        inner_audio_context.pause()
+        this.setData({
+          speeching: false
+        })
+      }
     } else {
       this.pause_play_back_audio()
       this.do_speak(this.data.work_item)
@@ -611,8 +634,8 @@ Page({
   },
   pause_play_back_audio: function () {
     background_audio_manager.pause()
-    var currentTime = 1
-    if (background_audio_manager.currentTime && background_audio_manager.currentTime > 1) {
+    var currentTime = 0
+    if (background_audio_manager.currentTime && background_audio_manager.currentTime > 1 && background_audio_manager._audio_id == this.data.work_item.audio_id) {
       currentTime = background_audio_manager.currentTime
     }
     this.setData({
@@ -626,7 +649,7 @@ Page({
   },
   play_back_audio: function (e) {
     var that = this
-    if (that.data.playing) {
+    if (that.data.playing && that.data.playing_audio_id == that.data.work_item.audio_id) {
       that.pause_play_back_audio()
     } else {
       if (that.data.mode == 'one') {
@@ -645,12 +668,11 @@ Page({
     }
   },
   record_play: function (id_, title) {
-    var that = this
     var historyplay = wx.getStorageSync('historyplay')
     if (!historyplay) {
       historyplay = {}
     }
-    if (historyplay.hasOwnProperty(id_ + '')) {
+    if (historyplay.hasOwnProperty(id_)) {
       var old_data = historyplay[id_]
       old_data['times'] += 1
       historyplay[id_] = old_data
@@ -782,7 +804,12 @@ Page({
       }
       background_audio_manager.src = this.data.audio_url
       background_audio_manager._audio_id = this.data.work_item.audio_id
-      inner_audio_context.pause()
+      if(inner_audio_context){
+        inner_audio_context.pause()
+        this.setData({
+          speeching: false
+        })
+      }
       background_audio_manager.play()
     } else {
       wx.showToast({
@@ -840,7 +867,12 @@ Page({
       wx.hideLoading()
     })
     background_audio_manager.onPlay(() => {
-      inner_audio_context.pause()
+      if(inner_audio_context){
+        inner_audio_context.pause()
+        this.setData({
+          speeching: false
+        })
+      }
       this.setData({
         playing: true,
         playing_audio_id: background_audio_manager._audio_id,
@@ -879,6 +911,7 @@ Page({
       that.setData({
         speeching: false,
       })
+      inner_audio_context.destroy()
     })
     inner_audio_context.onEnded(() => {
       if (inner_audio_context._start_index == that.data.speeching_urls.length - 1) {
@@ -901,15 +934,12 @@ Page({
       that.setData({
         speeching: false,
       })
+      inner_audio_context.destroy()
     })
   },
   onReady: function (e) {
     var that = this
-    inner_audio_context.loop = false
-    inner_audio_context.playbackRate = 0.8
-    console.log('onReady')
     that.listen_play(that)
-    that.listen_speeching(that)
     var audio_ids = wx.getStorageSync('audio_ids')
     if (!audio_ids) {
       var app = getApp()
@@ -921,6 +951,12 @@ Page({
         clearInterval(id_)
       }
     }, 200)
+    inner_audio_context = wx.createInnerAudioContext()
+    inner_audio_context._start_index = 0
+    inner_audio_context.loop = false
+    inner_audio_context.playbackRate = 0.8
+    inner_audio_context.referrerPolicy = 'origin'
+    that.listen_speeching(that)
   },
   set_current_playing: function () {
     if (background_audio_manager && !background_audio_manager.paused) {
@@ -947,15 +983,12 @@ Page({
     }, 200)
   },
   onHide: function () {
-    console.log('onHide')
     inner_audio_context.stop()
     this.listen_play(this)
-    this.listen_speeching(this)
   },
   onUnload: function () {
     inner_audio_context.stop()
     this.listen_play(this)
-    this.listen_speeching(this)
   },
   long_press: function () {
     var that = this

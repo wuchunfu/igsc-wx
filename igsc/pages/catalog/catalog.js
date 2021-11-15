@@ -625,5 +625,12 @@ Page({
   },
   onResize:function(){
     this.set_scroll_height()
+  },
+  clear_play_history: function(){
+    wx.removeStorageSync('historyplay')
+    this.setData({
+      historyplay: null,
+    })
+    this.set_scroll_height()
   }
 })

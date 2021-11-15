@@ -3,6 +3,7 @@
     <include src="../search/search.wxml" />
     <view style='margin-top:10px;' wx:if="{{historyplay&&historyplay.length>0 && show_search_box}}">
       <view style='margin-left:5px;font-size:20rpx;'>最近播放</view>
+      <icon bindtap="clear_play_history" type="clear" size="30rpx" style="float: right;margin-right: 10rpx;margin-top: 5rpx;z-index: 99999;"></icon>
       <view style='border-bottom:1px solid #eee;'>
         <text bindtap='go2detail' class='title myclick' data-words='{{item.split_words}}' data-id_='{{item.id}}' wx:for="{{historyplay}}" style='border:1rpx solid #eee;display:inline-block;height:2em;line-height:2em;font-size:20rpx;padding:2rpx 4rpx;margin-right:40rpx;margin-top:10rpx;border-radius:4rpx;position:relative;background-color: rgba(200, 200, 200, 0.3);' wx:key="id">{{item.title}}
           <text style='display:inline-block;width:40rpx;height:40rpx;border-radius:20rpx;background-color:#bb7e7e;text-align:center;line-height:40rpx;font-size:20rpx;position:absolute;top:-14rpx;right:-28rpx;opacity:0.7;color:white;'>{{item.times}}</text>
