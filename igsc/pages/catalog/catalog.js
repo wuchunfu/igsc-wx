@@ -313,24 +313,14 @@ Page({
           }
           data.short_content += fuhao
           if (that.search_v && result.data.data && result.data.data.split_words) {
-            data.split_words = result.data.data.split_words.replaceAll(' ', ',').replaceAll('+', '')
-            var split_words = data.split_words.split(',')
-            for (var i = 0; i < split_words.length; i++) {
-              if (split_words[i].length == 0) {
-                continue
-              }
-              if (that.data.search_pattern == 'all' || that.data.search_pattern == 'content') {
-                data.short_content = data.short_content.replaceAll(split_words[i], '<^>' + split_words[i] + '<$>')
-              }
-              if (that.data.search_pattern == 'all' || that.data.search_pattern == 'title') {
-                data.work_title = data.work_title.replaceAll(split_words[i], '<^>' + split_words[i] + '<$>')
-              }
+            var split_words = result.data.data.split_words.replaceAll('+', '').replaceAll(' ', '')
+            data.split_words = split_words
+            split_words = split_words.split(',').filter((item, pos) => item && item.length > 0)
+            if (that.data.search_pattern == 'all' || that.data.search_pattern == 'content') {
+              data.split_content = util.hl_content(data.short_content, split_words, [], split_words, true)
             }
-            if (data.short_content.indexOf('<^>') != -1) {
-              data.split_content = util.hl_content(data.short_content)
-            }
-            if (data.work_title.indexOf('<^>') != -1) {
-              data.split_title = util.hl_content(data.work_title)
+            if (that.data.search_pattern == 'all' || that.data.search_pattern == 'title') {
+              data.split_title = util.hl_content(data.work_title, split_words, [], split_words, true)
             }
           } else {
             data.split_words = ''
@@ -623,10 +613,10 @@ Page({
     })
     this.set_scroll_height()
   },
-  onResize:function(){
+  onResize: function () {
     this.set_scroll_height()
   },
-  clear_play_history: function(){
+  clear_play_history: function () {
     wx.removeStorageSync('historyplay')
     this.setData({
       historyplay: null,

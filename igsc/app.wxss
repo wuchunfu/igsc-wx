@@ -25,6 +25,6 @@ scroll-view ::-webkit-scrollbar {
   display: none;
 }
 .hl {
-  color: #a61b29;
+  color: #a61b29 !important;
   font-weight: bold;
 }

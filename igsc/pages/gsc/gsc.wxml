@@ -1,10 +1,10 @@
 <view class='gsc container'>
   <view id="location_id"></view>
-  <view wx:if="{{!work_item.split_title || work_item.split_title.length == 0}}" class='title' data-q='{{work_item.work_title}}' data-id_='{{work_item.id}}' bindtap='search_' data-search_pattern='title'>{{work_item.work_title}}</view>
-  <view wx:if="{{work_item.split_title && work_item.split_title.length > 0}}" class='title' data-q='{{work_item.work_title}}' data-id_='{{work_item.id}}' bindtap='search_' data-search_pattern='title'>
-    <text class="{{item.k?'hl':''}}" wx:for="{{work_item.split_title}}">{{item.s}}</text>
+  <view wx:if="{{!work_item.split_title || work_item.split_title.length == 0}}" class='title' data-q='{{work_item.work_title}}' data-id_='{{work_item.id}}' bindlongpress='search_' data-search_pattern='title'>{{work_item.work_title}}</view>
+  <view wx:if="{{work_item.split_title && work_item.split_title.length > 0}}" class='title' data-q='{{work_item.work_title}}' data-id_='{{work_item.id}}' bindlongpress='search_' data-search_pattern='title'>
+    <text class="{{item.k? 'hl' :''}}" wx:for="{{work_item.split_title}}" style="color: {{item.a ? '#a1afc9': '#161823'}};" bindtap="{{item.a?'show_anno':''}}" data-anno="{{item.a?item.s:''}}">{{item.s}}</text>
   </view>
-  <view wx:if="{{work_item.work_dynasty}}" class='myclick author' data-q='{{work_item.work_author}}' data-id_='{{work_item.id}}' data-search_pattern='author' bindtap='search_'>
+  <view wx:if="{{work_item.work_dynasty}}" class='myclick author' data-q='{{work_item.work_author}}' data-id_='{{work_item.id}}' data-search_pattern='author' bindlongpress='search_'>
     {{work_item.work_dynasty}} · {{work_item.work_author}}
   </view>
   <view wx:if="{{work_item.content.length>=300}}">
@@ -40,7 +40,7 @@
       <text selectable='true' decode="true" space='nbsp'>{{work_item.foreword}}</text>
     </view>
     <view wx:if="{{work_item.split_foreword && work_item.split_foreword.length > 0}}">
-      <text class="{{item.k?'hl':''}}" wx:for="{{work_item.split_foreword}}" selectable="true" decode="true" space='nbsp'>{{item.s}}</text>
+      <text class="{{item.k?'hl':''}}" wx:for="{{work_item.split_foreword}}" selectable="true" decode="true" space='nbsp' style="color: {{item.a ? '#a1afc9': '#161823'}};" bindtap="{{item.a?'show_anno':''}}" data-anno="{{item.a?item.s:''}}">{{item.s}}</text>
     </view>
   </view>
   <view class='content {{work_item.layout}}'>
@@ -48,7 +48,7 @@
       <text selectable="true" decode="true" space='nbsp'>{{work_item.content}}</text>
     </view>
     <view wx:if="{{work_item.split_content && work_item.split_content.length > 0}}">
-      <text class="{{item.k?'hl':''}}" wx:for="{{work_item.split_content}}" selectable="true" decode="true" space='nbsp'>{{item.s}}</text>
+      <text class="{{item.k?'hl':''}}" wx:for="{{work_item.split_content}}" selectable="true" decode="true" space='nbsp' style="color: {{item.a ? '#a1afc9': '#161823'}};" bindtap="{{item.a?'show_anno':''}}" data-anno="{{item.a?item.s:''}}">{{item.s}}</text>
     </view>
   </view>
   <view wx:if="{{work_item.content.length<300}}">
@@ -89,7 +89,7 @@
       <image src="../../static/copy.png" style='width:32rpx;height:32rpx;'></image>
     </view>
     <view bindtap="speak" class='tab-item' data-speeching='{{speeching && speeching_id == work_item.id}}'>
-      <image src='{{speeching &&  speeching_id == work_item.id ? "../../static/speak.png":"../../static/un_speak.png"}}' style='width:32rpx;height:32rpx;' ></image>
+      <image src='{{speeching &&  speeching_id == work_item.id ? "../../static/speak.png":"../../static/un_speak.png"}}' style='width:32rpx;height:32rpx;'></image>
     </view>
     <view bindtap="operate_like" class='tab-item' data-like='{{work_item.like}}'>
       <image src='{{work_item.like==1 ? "../../static/liked.png":"../../static/like.png"}}' style='width:32rpx;height:32rpx;'></image>
@@ -101,4 +101,5 @@
   <view bindtap="do_fold" data-folding="{{folding}}" style="position: fixed;right: 0rpx;bottom: 0rpx;opacity: 0.3;">
     <image src='{{folding ? "../../static/unfold.png":"../../static/fold.png"}}' style='width:60rpx;height:60rpx;z-index: 99999;'></image>
   </view>
+  <view style="display: {{annotation_detail.show ? 'inherit': 'none'}};position: absolute;left: {{annotation_detail.left}}px;top: {{annotation_detail.top}}px;background-color: aliceblue; color:#161823;border-radius: 25rpx;padding: 12rpx;border: 1rpx solid #a61b29; margin-right: 20rpx;" bindtap="close_anno">{{annotation_detail.detail}}</view>
 </view>

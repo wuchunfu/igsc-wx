@@ -48,11 +48,7 @@
   margin-top: 15rpx;
 }
 
-.author:hover,
-.title:hover,
-.translation:hover,
-.content:hover,
-.foreward:hover {
+.translation:hover{
   font-weight: bolder;
 }
 

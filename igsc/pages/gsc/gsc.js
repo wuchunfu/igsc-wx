@@ -3,6 +3,7 @@ var wechat_si = requirePlugin('WechatSI')
 var util = require('../../utils/util.js')
 const background_audio_manager = wx.getBackgroundAudioManager()
 background_audio_manager.referrerPolicy = 'origin'
+var win_width = wx.getSystemInfoSync().windowWidth
 var inner_audio_context = null
 Page({
   data: {
@@ -38,6 +39,14 @@ Page({
     folding: false,
     split_words: '',
     search_pattern: 'all',
+    annotation_dict: {},
+    annotation_reserve_dict: {},
+    annotation_detail: {
+      show: false,
+      top: 0,
+      left: 0,
+      detail: ''
+    }
   },
   set_timed: function () {
     var that = this
@@ -241,31 +250,60 @@ Page({
           work.content = work.content.replace(/\n/g, '\n　　')
           work.content = work.content.replace(/\t/g, '\n　　')
         }
-        if (that.data.split_words) {
-          var split_words = that.data.split_words.split(',')
-          var work_content = work.content
-          var work_foreword = work.foreword
-          var work_title = work.work_title
-          for (var i = 0; i < split_words.length; i++) {
-            if (split_words[i].length == 0) {
-              continue
-            }
-            if (that.data.search_pattern == 'all' || that.data.search_pattern == 'content') {
-              work_content = work_content.replaceAll(split_words[i], '<^>' + split_words[i] + '<$>')
-              if (work_foreword && work_foreword.length > 0) {
-                work_foreword = work_foreword.replaceAll(split_words[i], '<^>' + split_words[i] + '<$>')
-              }
-            }
-            if (that.data.search_pattern == 'all' || that.data.search_pattern == 'title') {
-              work_title = work_title.replaceAll(split_words[i], '<^>' + split_words[i] + '<$>')
+        var split_words = that.data.split_words.split(',').filter((item, pos) => item && item.length > 0)
+        var annotation_lines = work.annotation.split('\n')
+        var annotation_dict = {}
+        var annotation_reserve_dict = {}
+        for (var i = 0; i < annotation_lines.length; i++) {
+          var tmp = annotation_lines[i].split('：')
+          if (tmp.length < 2) {
+            continue
+          }
+          var tmp0 = tmp[0]
+          // 有些注释有引号
+          if (tmp0.indexOf('“') != -1) {
+            var tmp1 = tmp0.match(/“(.*)”/)
+            if (tmp1 && tmp1.length > 1) {
+              tmp0 = tmp1[1]
             }
           }
+          if (tmp0.indexOf('「') != -1) {
+            var tmp1 = tmp0.match(/「(.*)」/)
+            if (tmp1 && tmp1.length > 1) {
+              tmp0 = tmp1[1]
+            }
+          }
+          // 有些注释有拼音，去掉
+          if (tmp0.indexOf('（') != -1) {
+            tmp0 = tmp0.replaceAll(/（.*）/g, '')
+          }
+          annotation_dict[tmp0] = tmp.slice(1).join('：')
+          annotation_reserve_dict[tmp.slice(1).join('：')] = tmp[0]
+        }
+        that.setData({
+          annotation_dict: annotation_dict,
+          annotation_reserve_dict: annotation_reserve_dict,
+        })
+        var annotation_words = Object.keys(annotation_dict).filter((item, pos) => item && item.length > 0)
+        var words = annotation_words.concat(split_words)
+        words = words.filter((item, pos) => words.indexOf(item) === pos)
+        var work_content = work.content
+        var work_foreword = work.foreword
+        var work_title = work.work_title
+        if (words.length > 0) {
           if (that.data.search_pattern == 'all' || that.data.search_pattern == 'content') {
-            work.split_content = util.hl_content(work_content)
-            work.split_foreword = util.hl_content(work_foreword)
+            work.split_content = util.hl_content(work_content, words, annotation_words, split_words, true)
+            if (work_foreword && work_foreword.length > 0) {
+              work.split_foreword = util.hl_content(work_foreword, words, annotation_words, split_words, true)
+            }
+          } else {
+            work.split_content = util.hl_content(work_content, words, annotation_words, split_words, false)
+            if (work_foreword && work_foreword.length > 0) {
+              work.split_foreword = util.hl_content(work_foreword, words, annotation_words, split_words, false)
+            }
           }
           if (that.data.search_pattern == 'all' || that.data.search_pattern == 'title') {
-            work.split_title = util.hl_content(work_title)
+            work.split_title = util.hl_content(work_title, words, annotation_words, split_words, true)
           }
         } else {
           work.split_content = []
@@ -274,9 +312,9 @@ Page({
         }
         var slide_value = 0
         var seek = 0
-        if(background_audio_manager._audio_id == work.audio_id){
-           seek = background_audio_manager.currentTime
-           slide_value = parseInt(seek / background_audio_manager.duration * 100)
+        if (background_audio_manager._audio_id == work.audio_id) {
+          seek = background_audio_manager.currentTime
+          slide_value = parseInt(seek / background_audio_manager.duration * 100)
         }
         that.setData({
           work_item: work,
@@ -367,12 +405,11 @@ Page({
         background_audio_manager.startTime = 0
         background_audio_manager._audio_id = play_id_url.audio_id
         background_audio_manager.seek(0)
-        if(inner_audio_context){
+        if (inner_audio_context) {
           inner_audio_context.pause()
           that.setData({
             speeching: false
-          }
-          )
+          })
         }
         background_audio_manager.play()
         if (play_id_url.title) {
@@ -392,7 +429,7 @@ Page({
         background_audio_manager.singer = that.data.work_item.work_author
         background_audio_manager.coverImgUrl = that.data.poster
         background_audio_manager._audio_id = that.data.work_item.audio_id
-        if(inner_audio_context){
+        if (inner_audio_context) {
           inner_audio_context.pause()
           that.setData({
             speeching: false
@@ -516,7 +553,7 @@ Page({
   speak: function (e) {
     var speeching = e.currentTarget.dataset.speeching
     if (speeching) {
-      if(inner_audio_context){
+      if (inner_audio_context) {
         inner_audio_context.pause()
         this.setData({
           speeching: false
@@ -804,7 +841,7 @@ Page({
       }
       background_audio_manager.src = this.data.audio_url
       background_audio_manager._audio_id = this.data.work_item.audio_id
-      if(inner_audio_context){
+      if (inner_audio_context) {
         inner_audio_context.pause()
         this.setData({
           speeching: false
@@ -867,7 +904,7 @@ Page({
       wx.hideLoading()
     })
     background_audio_manager.onPlay(() => {
-      if(inner_audio_context){
+      if (inner_audio_context) {
         inner_audio_context.pause()
         this.setData({
           speeching: false
@@ -1182,6 +1219,23 @@ Page({
   do_fold: function (e) {
     this.setData({
       folding: !e.currentTarget.dataset.folding,
+    })
+  },
+  show_anno: function (e) {
+    this.setData({
+      annotation_detail: {
+        show: true,
+        left: e.currentTarget.offsetLeft > win_width - (120 / 750 * win_width) ? e.currentTarget.offsetLeft - (120 / 750 * win_width) : e.currentTarget.offsetLeft,
+        top: e.currentTarget.offsetTop + (40 / 750 * win_width),
+        detail: this.data.annotation_reserve_dict[this.data.annotation_dict[e.currentTarget.dataset.anno]] + '：' + this.data.annotation_dict[e.currentTarget.dataset.anno],
+      }
+    })
+  },
+  close_anno: function () {
+    this.setData({
+      annotation_detail: {
+        show: false,
+      }
     })
   }
 })
