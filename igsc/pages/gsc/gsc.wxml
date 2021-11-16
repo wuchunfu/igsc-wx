@@ -80,19 +80,22 @@
     </view>
   </view>
   <view class='tabs' wx:if="{{!folding}}">
-    <view wx:if="{{work_item.intro}}" bindtap='change_content' data-item='0' class='tab-item {{current_tab==0?"active":""}}'>简介</view>
-    <view wx:if="{{work_item.annotation}}" bindtap='change_content' data-item='1' class='tab-item {{current_tab==1?"active":""}}'>注释</view>
-    <view wx:if="{{work_item.translation}}" bindtap='change_content' data-item='2' class='tab-item {{current_tab==2?"active":""}}'>译文</view>
-    <view wx:if="{{work_item.appreciation}}" bindtap='change_content' data-item='3' class='tab-item {{current_tab==3?"active":""}}'>赏析</view>
-    <view wx:if="{{work_item.master_comment}}" bindtap='change_content' data-item='4' class='tab-item {{current_tab==4?"active":""}}'>辑评</view>
+    <view wx:if="{{work_item.intro}}" bindtap='change_content' data-item='0' class='tab-item {{current_tab==0?"active":""}}'>{{fti? '簡介':'简介'}}</view>
+    <view wx:if="{{work_item.annotation}}" bindtap='change_content' data-item='1' class='tab-item {{current_tab==1?"active":""}}'>{{fti? '註釋': '注释'}}</view>
+    <view wx:if="{{work_item.translation}}" bindtap='change_content' data-item='2' class='tab-item {{current_tab==2?"active":""}}'>{{fti? '譯文': '译文'}}</view>
+    <view wx:if="{{work_item.appreciation}}" bindtap='change_content' data-item='3' class='tab-item {{current_tab==3?"active":""}}'>{{fti? '賞析': '赏析'}}</view>
+    <view wx:if="{{work_item.master_comment}}" bindtap='change_content' data-item='4' class='tab-item {{current_tab==4?"active":""}}'>{{fti? '輯評': '辑评'}}</view>
     <view bindtap="do_copy" class='tab-item'>
-      <image src="../../static/copy.png" style='width:32rpx;height:32rpx;'></image>
+      <image src="../../static/copy.png" style='width:28rpx;height:28rpx;'></image>
+    </view>
+    <view bindtap="change_fti" class='tab-item' data-fti='{{fti}}'>
+      <image src='{{fti ? "../../static/fti.png": "../../static/jti.png"}}' style='width:28rpx;height:28rpx;'></image>
     </view>
     <view bindtap="speak" class='tab-item' data-speeching='{{speeching && speeching_id == work_item.id}}'>
-      <image src='{{speeching &&  speeching_id == work_item.id ? "../../static/speak.png":"../../static/un_speak.png"}}' style='width:32rpx;height:32rpx;'></image>
+      <image src='{{speeching &&  speeching_id == work_item.id ? "../../static/speak.png":"../../static/un_speak.png"}}' style='width:28rpx;height:28rpx;'></image>
     </view>
     <view bindtap="operate_like" class='tab-item' data-like='{{work_item.like}}'>
-      <image src='{{work_item.like==1 ? "../../static/liked.png":"../../static/like.png"}}' style='width:32rpx;height:32rpx;'></image>
+      <image src='{{work_item.like==1 ? "../../static/liked.png":"../../static/like.png"}}' style='width:28rpx;height:28rpx;'></image>
     </view>
     <view class='translation'>
       <text decode='true' space='nbsp' selectable="true">{{show_content}}</text>

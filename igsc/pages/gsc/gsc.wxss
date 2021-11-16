@@ -12,11 +12,11 @@
 
 .tab-item {
   display: inline-block;
-  width: 64rpx;
-  margin-right: 20rpx;
-  height: 32rpx;
-  line-height: 30rpx;
-  font-size: 30rpx;
+  width: 56rpx;
+  margin-right: 16rpx;
+  height: 28rpx;
+  line-height: 28rpx;
+  font-size: 28rpx;
   font-weight: 700;
 }
 

@@ -46,7 +46,8 @@ Page({
       top: 0,
       left: 0,
       detail: ''
-    }
+    },
+    fti: false,
   },
   set_timed: function () {
     var that = this
@@ -250,7 +251,16 @@ Page({
           work.content = work.content.replace(/\n/g, '\n　　')
           work.content = work.content.replace(/\t/g, '\n　　')
         }
-        var split_words = that.data.split_words.split(',').filter((item, pos) => item && item.length > 0)
+        var split_words_ = that.data.split_words
+        if (that.data.fti) {
+          show_content = util.traditionalized(show_content)
+          split_words_ = util.traditionalized(split_words_)
+          work.annotation = util.traditionalized(work.annotation)
+          work.content = util.traditionalized(work.content)
+          work.foreword = util.traditionalized(work.foreword)
+          work.work_title = util.traditionalized(work.work_title)
+        }
+        var split_words = split_words_.split(',').filter((item, pos) => item && item.length > 0)
         var annotation_lines = work.annotation.split('\n')
         var annotation_dict = {}
         var annotation_reserve_dict = {}
@@ -762,6 +772,9 @@ Page({
     show_content = show_content.replace(/\　　/g, '\n')
     show_content = show_content.replace(/\n/g, '\n　　')
     show_content = show_content.replace(/\t/g, '\n　　')
+    if (this.data.fti) {
+      show_content = util.traditionalized(show_content)
+    }
     this.setData({
       current_tab: target_id,
       show_content: show_content,
@@ -826,6 +839,9 @@ Page({
         search_pattern: options.search_pattern,
       })
     }
+    this.setData({
+      fti: wx.getStorageSync('fti') ? true: false
+    })
     this.get_by_id(id_, false)
   },
   play_sound: function () {
@@ -1237,5 +1253,13 @@ Page({
         show: false,
       }
     })
+  },
+  change_fti: function () {
+    var fti = !this.data.fti
+    this.setData({
+      fti: fti,
+    })
+    wx.setStorageSync('fti', fti)
+    this.get_by_id(this.data.work_item.id)
   }
 })

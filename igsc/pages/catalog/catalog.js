@@ -19,6 +19,7 @@ Page({
     scroll_height: 0,
     to_top: 'work_item1',
     show_search_box: false,
+    fti: false,
   },
   getcurrent_paly_id: function () {
     var that = this
@@ -56,6 +57,17 @@ Page({
       })
     }
   },
+  trans_fti: function (item) {
+    if(item.hasOwnProperty('short_content')){
+      item.short_content = util.traditionalized(item.short_content)
+    }
+    if(item.hasOwnProperty('content')){
+      item.content = util.traditionalized(item.content)
+    }
+    item.work_author = util.traditionalized(item.work_author)
+    item.work_dynasty = util.traditionalized(item.work_dynasty)
+    item.work_title = util.traditionalized(item.work_title)
+  },
   getData: function (that) {
     wx.getStorage({
       key: 'gsc_items' + util.format_time(new Date()),
@@ -64,6 +76,11 @@ Page({
         if (!items || items.length == 0) {
           that.get_all_data(that)
         } else {
+          if (that.data.fti) {
+            for (var i = 0; i < items.length; i++) {
+              that.trans_fti(items[i])
+            }
+          }
           that.setData({
             gscitems: items,
             total: items.length,
@@ -97,6 +114,11 @@ Page({
           datas = []
         }
         var dd = []
+        if (that.data.fti) {
+          for (var i = 0; i < datas.length; i++) {
+            that.trans_fti(datas[i])
+          }
+        }
         for (var data of datas) {
           var splits = data.content.split('。')
           var fuhao = '。'
@@ -112,7 +134,7 @@ Page({
           data.split_words = ''
           dd.push(data)
         }
-        context.setData({
+        that.setData({
           gscitems: dd,
           total: dd.length,
           to_top: 'work_item1',
@@ -200,6 +222,11 @@ Page({
             wx.showLoading({
               title: '加载中...',
             })
+            if (that.data.fti) {
+              for (var i = 0; i < items.length; i++) {
+                that.trans_fti(items[i])
+              }
+            }
             that.setData({
               gscitems: items,
               total: items.length,
@@ -272,6 +299,7 @@ Page({
         })
       }
     }
+    value = util.simplized(value)
     var enable_cache = false
     if (!value && page == 'like') {
       var url = config.gsc_url + 'mylike_by_page/' + open_id + '?page_num=' + that.data.page_num + '&page_size=' + that.data.page_size + '&search_pattern=' + that.data.search_pattern + '&t=' + util.api_version()
@@ -300,6 +328,11 @@ Page({
           datas = []
         }
         var dd = []
+        if (that.data.fti) {
+          for (var i = 0; i < datas.length; i++) {
+            that.trans_fti(datas[i])
+          }
+        }
         for (var data of datas) {
           var splits = data.content.split('。')
           var fuhao = '。'
@@ -451,6 +484,13 @@ Page({
     })
     that.interval_get_current_play()
     that.set_scroll_height()
+    var fti = wx.getStorageSync('fti') ? true: false
+    if(fti != that.data.fti){
+      that.setData({
+        fti: fti,
+      })
+      that.getData(that)
+    }
   },
   purge_some_data: function () {
     var playingint = wx.getStorageSync('playingint')
@@ -490,6 +530,11 @@ Page({
           datas = []
         }
         var dd = []
+        if (that.data.fti) {
+          for (var i = 0; i < datas.length; i++) {
+            that.trans_fti(datas[i])
+          }
+        }
         for (var data of datas) {
           var splits = data.content.split('。')
           var fuhao = '。'

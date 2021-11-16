@@ -10,7 +10,7 @@
         </text>
       </view>
     </view>
-    <view style="margin-left:5px;margin-top:0.8em;;font-size:20rpx;">搜索结果({{total}})<label wx:if="{{show_bottom_button}}" style="float: right;"> 第<text style="color: #bb7e7e;font-weight: 700;">{{page_num}}</text>/{{total_page}}页</label></view>
+    <view style="margin-left:5px;margin-top:0.8em;;font-size:20rpx;">{{fti ? '搜索結果': '搜索结果'}}({{total}})<label wx:if="{{show_bottom_button}}" style="float: right;">第<text style="color: #bb7e7e;font-weight: 700;">{{page_num}}</text>/{{total_page}}{{fti? '頁': '页'}}</label></view>
   </view>
   <scroll-view scroll-y="true" style="height: {{scroll_height}}px;" bindscroll="scroll" scroll-into-view="{{to_top}}" scroll-with-animation="true" enable-back-to-top="true" enhanced="true" show-scrollbar="false">
     <view wx:for="{{gscitems}}" wx:key="id">
