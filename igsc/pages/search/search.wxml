@@ -1,6 +1,6 @@
 <view class='container' id="top_search">
   <view class="weui-search-bar">
-    <switch bindchange="show_hide_search_box" checked="{{show_search_box}}" color="#f3f3f2" style="transform: scale(0.85);"></switch>
+    <switch bindchange="show_hide_search_box" checked="{{show_search_box}}" color="#f3f3f2" style="transform: scale(0.8);"></switch>
     <view class="weui-search-bar__form" style="flex: 10;">
       <view class="weui-search-bar__box">
         <input type="text" class="weui-search-bar__input" placeholder="{{fti ?'請輸入查詢內容': '请输入查询内容'}}" placeholder-class="placeholder" value="{{wx_search_data.value}}" bindinput="wx_search_input" bindconfirm="wx_search_confirm" bindblur="wx_search_confirm"/>

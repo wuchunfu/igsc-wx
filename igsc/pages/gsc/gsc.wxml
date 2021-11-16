@@ -30,8 +30,8 @@
       </view>
     </view>
     <view style="margin-top:5rpx;" wx:if="{{work_item.audio_id >0 && !folding}}">
-      <slider bindchanging="slider_changing" bindchange="slider2change" step="1" min="1" block-size="15" value='{{slide_value}}' block-color="#BB7E7E" style="margin-top:5rpx;margin-bottom:5rpx;" />
-      <text style='font-size:18rpx;color:#BB7E7E;opacity:0.8;float:right;margin-right:18rpx;' wx:if="{{duration_show}}">{{duration_show}}</text>
+      <slider activeColor="#BB7E7E" bindchanging="slider_changing" bindchange="slider2change" step="1" min="1" block-size="15" value='{{slide_value}}' block-color="#BB7E7E" style="margin-top:5rpx;margin-bottom:5rpx;" />
+      <text style='font-size:18rpx;color:#b9adad;opacity:0.8;float:right;margin-right:18rpx;' wx:if="{{duration_show}}">{{duration_show}}</text>
       <text style='font-size:18rpx;color:#BB7E7E;opacity:0.8;float:left;margin-left:18rpx;' wx:if="{{current_time_show}}">{{current_time_show}}</text>
     </view>
   </view>
@@ -74,7 +74,7 @@
       </view>
     </view>
     <view style="margin-top:5rpx;" wx:if="{{work_item.audio_id >0 && !folding}}">
-      <slider bindchanging="slider_changing" bindchange="slider2change" step="1" min="1" block-size="15" value='{{slide_value}}' block-color="#BB7E7E" style="margin-top:5rpx;margin-bottom:5rpx;" />
+      <slider activeColor="#BB7E7E" bindchanging="slider_changing" bindchange="slider2change" step="1" min="1" block-size="15" value='{{slide_value}}' block-color="#BB7E7E" style="margin-top:5rpx;margin-bottom:5rpx;" />
       <text style='font-size:18rpx;color:#BB7E7E;opacity:0.8;float:right;margin-right:18rpx;' wx:if="{{duration_show}}">{{duration_show}}</text>
       <text style='font-size:18rpx;color:#BB7E7E;opacity:0.8;float:left;margin-left:18rpx;' wx:if="{{current_time_show}}">{{current_time_show}}</text>
     </view>
@@ -89,7 +89,7 @@
       <image src="../../static/copy.png" style='width:28rpx;height:28rpx;'></image>
     </view>
     <view bindtap="change_fti" class='tab-item' data-fti='{{fti}}'>
-      <image src='{{fti ? "../../static/fti.png": "../../static/jti.png"}}' style='width:28rpx;height:28rpx;'></image>
+      <image src='{{fti ? "../../static/jti.png": "../../static/fti.png"}}' style='width:28rpx;height:28rpx;'></image>
     </view>
     <view bindtap="speak" class='tab-item' data-speeching='{{speeching && speeching_id == work_item.id}}'>
       <image src='{{speeching &&  speeching_id == work_item.id ? "../../static/speak.png":"../../static/un_speak.png"}}' style='width:28rpx;height:28rpx;'></image>

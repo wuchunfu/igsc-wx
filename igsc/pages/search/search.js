@@ -1,3 +1,5 @@
+var util = require('../../utils/util.js')
+
 var __tip_keys = []
 
 var __search_function = null
@@ -21,7 +23,6 @@ function init(that, hot_keys, tip_keys, search_function, go_back_function) {
     bar_height: bar_height
   }
   tem_data.hot_keys = hot_keys
-
   wx.getSystemInfo({
     success: function (res) {
       var w_height = res.windowHeight
@@ -32,7 +33,6 @@ function init(that, hot_keys, tip_keys, search_function, go_back_function) {
       })
     }
   })
-
   get_his_keys(__that)
 }
 
@@ -46,7 +46,6 @@ function wx_search_input(e) {
   if (input_value && input_value.length > 0) {
     for (var i = 0; i < __tip_keys.length; i++) {
       var mind_key = __tip_keys[i]
-
       if (mind_key.indexOf(input_value) != -1) {
         tip_keys.push(mind_key)
       }
@@ -54,7 +53,6 @@ function wx_search_input(e) {
   }
   tem_data.value = input_value
   tem_data.tip_keys = tip_keys
-
   __that.setData({
     wx_search_data: tem_data,
   })
@@ -138,6 +136,11 @@ function get_his_keys() {
     if (value) {
       var tem_data = __that.data.wx_search_data
       tem_data.his = value.slice(0, 12)
+      if(__that.data.fti){
+        tem_data.his = tem_data.his.map((item)=>util.traditionalized(item))
+      }else{
+        tem_data.his = tem_data.his.map((item)=>util.simplized(item))
+      }
       __that.setData({
         wx_search_data: tem_data,
       })

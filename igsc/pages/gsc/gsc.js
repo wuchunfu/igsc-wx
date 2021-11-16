@@ -106,7 +106,7 @@ Page({
           var time2close = (new Date).getTime() / 1000 + seconds
           if (that.data.playing) {
             wx.showToast({
-              title: '播放器将于' + util.timetrans(time2close).slice(11) + '关闭',
+              title: (that.data.fti ? '播放器將於' : '播放器将于') + util.timetrans(time2close).slice(11) + (that.data.fti ? '關閉' : '关闭'),
               icon: 'none'
             })
             if (set_timed_int > 0) {
@@ -132,7 +132,7 @@ Page({
                   close_play_time: 0,
                 })
                 wx.showToast({
-                  title: '定时已到~~',
+                  title: that.data.fti ? '定時已到~~' : '定时已到~~',
                   icon: 'none'
                 })
                 wx.removeStorageSync('time2close')
@@ -144,7 +144,7 @@ Page({
             wx.setStorageSync('set_timed_int', timedId)
           } else {
             wx.showToast({
-              title: '请先打开播放器',
+              title: that.data.fti ? '請先打開播放器' : '请先打开播放器',
               icon: 'none'
             })
           }
@@ -163,7 +163,7 @@ Page({
       })
       mode = 'one'
       wx.showToast({
-        title: '单曲循环',
+        title: this.data.fti ? '單曲循環' : '单曲循环',
         icon: 'none'
       })
       wx.setStorageSync('singleid', {
@@ -178,7 +178,7 @@ Page({
         mode: 'shuffle',
       })
       wx.showToast({
-        title: '随机播放',
+        title: this.data.fti ? '隨機播放' : '随机播放',
         icon: 'none'
       })
       mode = 'shuffle'
@@ -187,7 +187,7 @@ Page({
         mode: 'xunhuan',
       })
       wx.showToast({
-        title: '循环播放',
+        title: this.data.fti ? '循環播放' : '循环播放',
         icon: 'none'
       })
       mode = 'xunhuan'
@@ -219,7 +219,7 @@ Page({
       success(result) {
         if (!result || result.data.code != 0) {
           wx.showToast({
-            title: '网络异常~~',
+            title: that.data.fti ? '網絡異常~~' : '网络异常~~',
             icon: 'none'
           })
           return
@@ -259,6 +259,8 @@ Page({
           work.content = util.traditionalized(work.content)
           work.foreword = util.traditionalized(work.foreword)
           work.work_title = util.traditionalized(work.work_title)
+          work.work_author = util.traditionalized(work.work_author)
+          work.work_dynasty = util.traditionalized(work.work_dynasty)
         }
         var split_words = split_words_.split(',').filter((item, pos) => item && item.length > 0)
         var annotation_lines = work.annotation.split('\n')
@@ -340,6 +342,12 @@ Page({
             audio_id: work.audio_id,
           },
           slide_value: slide_value,
+          annotation_detail: {
+            show: false,
+            top: 0,
+            left: 0,
+            detail: ''
+          },
         })
         that.get_play_mode()
         var time2close = wx.getStorageSync('time2close')
@@ -368,7 +376,7 @@ Page({
       },
       fail: function (res) {
         wx.showToast({
-          title: '网络异常~~',
+          title: that.data.fti ? '網絡異常~~' : '网络异常~~',
           icon: 'none'
         })
       }
@@ -411,7 +419,11 @@ Page({
         background_audio_manager.title = play_id_url.title
         background_audio_manager.singer = play_id_url.author
         background_audio_manager.coverImgUrl = that.data.poster
-        background_audio_manager.epname = ' i古诗词 '
+        var title = 'i古诗词'
+        if (that.data.fti) {
+          title = 'i古詩詞'
+        }
+        background_audio_manager.epname = ' ' + title + ' '
         background_audio_manager.startTime = 0
         background_audio_manager._audio_id = play_id_url.audio_id
         background_audio_manager.seek(0)
@@ -435,7 +447,11 @@ Page({
         })
         background_audio_manager.src = that.data.audio_url
         background_audio_manager.title = that.data.work_item.work_title
-        background_audio_manager.epname = ' i古诗词 '
+        var title = 'i古诗词'
+        if (that.data.fti) {
+          title = 'i古詩詞'
+        }
+        background_audio_manager.epname = ' ' + title + ' '
         background_audio_manager.singer = that.data.work_item.work_author
         background_audio_manager.coverImgUrl = that.data.poster
         background_audio_manager._audio_id = that.data.work_item.audio_id
@@ -512,7 +528,7 @@ Page({
         wx.hideLoading()
         inner_audio_context.pause()
         wx.showToast({
-          title: '播放出错:(',
+          title: that.data.fti ? '播放出錯:(' : '播放出错:(',
           icon: 'none',
         })
       }
@@ -556,7 +572,7 @@ Page({
     s.push(work_item.content)
     var s = s.join('\n')
     wx.showLoading({
-      title: '音频加载中...',
+      title: this.data.fti ? '音頻加載中...' : '音频加载中...',
     })
     return this._do_speak(s, 0, [], work_item.id)
   },
@@ -600,7 +616,7 @@ Page({
         var gsc_id = that.data.work_item.id
         if (open_id.length == 0 || gsc_id == 0) {
           wx.showToast({
-            title: '操作失败，请稍后再试',
+            title: that.data.fti ? '操作失敗，請稍後再試' : '操作失败，请稍后再试',
             icon: 'none'
           })
           return
@@ -611,7 +627,7 @@ Page({
           success: function (res) {
             if (!res || res.data.code != 0) {
               wx.showToast({
-                title: '网络异常~~',
+                title: that.data.fti ? '網絡異常~~' : '网络异常~~',
                 icon: 'none'
               })
               return
@@ -627,7 +643,7 @@ Page({
                   var toast_num = parseInt(res.data)
                   if (toast_num < 3) {
                     wx.showToast({
-                      title: '收藏成功，可在首页下拉查看~',
+                      title: that.data.fti ? '收藏成功，可在首頁下拉查看~' : '收藏成功，可在首页下拉查看~',
                       duration: 3000,
                       icon: 'none',
                       success: function (res) {
@@ -643,7 +659,7 @@ Page({
                   wx.hideToast()
                   wx.showModal({
                     title: '收藏成功',
-                    content: '可在首页下拉进入收藏页面查看~',
+                    content: that.data.fti ? '可在首頁下拉進入收藏頁面查看' : '可在首页下拉进入收藏页面查看~',
                     showCancel: false,
                     confirmText: '知道了',
                     success: function (res) {
@@ -672,7 +688,7 @@ Page({
       },
       fail: function () {
         wx.showToast({
-          title: '请稍后再试',
+          title: this.data.fti ? '請稍後再試' : '请稍后再试',
           icon: 'none'
         })
         util.user_login()
@@ -811,6 +827,9 @@ Page({
     return
   },
   onLoad: function (options) {
+    this.setData({
+      fti: wx.getStorageSync('fti') ? true : false
+    })
     if (options && options.hasOwnProperty('id')) {
       var id_ = options.id
       if (options.hasOwnProperty('from')) {
@@ -821,6 +840,16 @@ Page({
           wx.setNavigationBarTitle({
             title: '我的收藏'
           })
+        } else {
+          if (this.data.fti) {
+            wx.setNavigationBarTitle({
+              title: 'i古詩詞'
+            })
+          } else {
+            wx.setNavigationBarTitle({
+              title: 'i古诗词'
+            })
+          }
         }
       }
     } else {
@@ -839,15 +868,16 @@ Page({
         search_pattern: options.search_pattern,
       })
     }
-    this.setData({
-      fti: wx.getStorageSync('fti') ? true: false
-    })
     this.get_by_id(id_, false)
   },
   play_sound: function () {
     if (this.data.work_item) {
       background_audio_manager.title = this.data.work_item.work_title
-      background_audio_manager.epname = ' i古诗词 '
+      var title = 'i古诗词'
+      if (this.data.fti) {
+        title = 'i古詩詞'
+      }
+      background_audio_manager.epname = ' ' + title + ' '
       background_audio_manager.singer = this.data.work_item.work_author
       background_audio_manager.coverImgUrl = this.data.poster
       if (this.data.seek2.seek > 0 && this.data.seek2.audio_id == this.data.work_item.audio_id) {
@@ -866,7 +896,7 @@ Page({
       background_audio_manager.play()
     } else {
       wx.showToast({
-        title: '播放失败，请稍后重试~~',
+        title: this.data.fti ? '播放失敗，請稍後重試~~' : '播放失败，请稍后重试~~',
         icon: 'none'
       })
     }
@@ -913,7 +943,7 @@ Page({
     })
     background_audio_manager.onWaiting(() => {
       wx.showLoading({
-        title: '音频加载中...',
+        title: this.data.fti ? '音頻加載中...' : '音频加载中...',
       })
     })
     background_audio_manager.onCanplay(() => {
@@ -1084,7 +1114,7 @@ Page({
   onShareTimeline: function () {
     var prefix = ''
     if (this.data.audio_id > 0) {
-      prefix = '【音频】'
+      prefix = this.data.fti ? '音頻' : '【音频】'
     }
     return {
       title: prefix + '《' + this.data.work_item.work_title + '》' + this.data.work_item.work_dynasty + '·' + this.data.work_item.work_author + '   ' + this.data.work_item.content.substr(0, 28),
@@ -1125,7 +1155,7 @@ Page({
         wx.removeStorageSync('close_play_time')
         if (set_timed_int > 0) {
           wx.showToast({
-            title: '定时已到~~',
+            title: that.data.fti ? '定時已到' : '定时已到~~',
             icon: 'none',
           })
           clearInterval(set_timed_int)
@@ -1220,8 +1250,12 @@ Page({
           })
         } else {
           if (that.data.from_page != 'like') {
+            var title = 'i古诗词'
+            if (that.data.fti) {
+              title = 'i古詩詞'
+            }
             wx.setNavigationBarTitle({
-              title: 'i古诗词'
+              title: title
             })
           } else {
             wx.setNavigationBarTitle({
