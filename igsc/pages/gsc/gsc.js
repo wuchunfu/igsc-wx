@@ -12,7 +12,7 @@ Page({
     duration: 0,
     audio_url: '',
     current_work_item: '',
-    poster: 'http://m.qpic.cn/psb?/V121Rqgy1YUsix/IviqfBJYA85bdpCyovu1Pi2.YVOCku1MlgYcy4FbGv0!/b/dDEBAAAAAAAA&bo=7wHzAQAAAAARByw!&rf=viewer_4',
+    poster: 'http://m.qpic.cn/psc?/V508X0Kk3euvqv03b43z25G0Qe0TpSaJ/Sc7wZG8Q0BUeMz.O80ebfJMm7LImTWHjPAd8LHFk.wOaXLsE8DUZgFs291qJtJhKtKX5OWYUCr6tczsEJvI6.XJIzdtYlKUPStN72nR081E!/b&bo=wgHCAcIBwgEDJwI!&rf=viewer_4',
     current_tab: 0,
     show_content: '',
     playing: false,
@@ -731,6 +731,13 @@ Page({
     }
   },
   record_play: function (id_, title) {
+    setTimeout(() => {
+      if (!background_audio_manager.paused) {
+        this._record_play(id_, title)
+      }
+    }, 3000);
+  },
+  _record_play: function (id_, title) {
     var historyplay = wx.getStorageSync('historyplay')
     if (!historyplay) {
       historyplay = {}
