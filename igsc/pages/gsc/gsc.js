@@ -243,13 +243,17 @@ Page({
           target_id = 4
           show_content = work.master_comment
         }
-        show_content = show_content.replace(/　　/g, '\n')
+        show_content = show_content.replace(/　　/g, '')
         show_content = show_content.replace(/\n/g, '\n　　')
         show_content = show_content.replace(/\t/g, '\n　　')
+        show_content = show_content.replace(/\r\n/g, '\n')
+        show_content = show_content.replace(/\n\n/g, '\n')
         if (work.layout == 'indent') {
-          work.content = work.content.replace(/　　/g, '\n')
+          work.content = work.content.replace(/　　/g, '')
           work.content = work.content.replace(/\n/g, '\n　　')
           work.content = work.content.replace(/\t/g, '\n　　')
+          work.content = work.content.replace(/\r\n/g, '\n')
+          work.content = work.content.replace(/\n\n/g, '\n')
         }
         var split_words_ = that.data.split_words
         if (that.data.fti) {
@@ -792,9 +796,11 @@ Page({
         show_content = gsc.master_comment
         break
     }
-    show_content = show_content.replace(/\　　/g, '\n')
+    show_content = show_content.replace(/　　/g, '')
     show_content = show_content.replace(/\n/g, '\n　　')
     show_content = show_content.replace(/\t/g, '\n　　')
+    show_content = show_content.replace(/\r\n/g, '\n')
+    show_content = show_content.replace(/\n\n/g, '\n')
     if (this.data.fti) {
       show_content = util.traditionalized(show_content)
     }

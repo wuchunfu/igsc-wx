@@ -104,5 +104,5 @@
   <view bindtap="do_fold" data-folding="{{folding}}" style="position: fixed;right: 0rpx;bottom: 0rpx;opacity: 0.3;">
     <image src='{{folding ? "../../static/unfold.png":"../../static/fold.png"}}' style='width:60rpx;height:60rpx;z-index: 99999;'></image>
   </view>
-  <view style="display: {{annotation_detail.show ? 'inherit': 'none'}};position: absolute;left: {{annotation_detail.left}}px;top: {{annotation_detail.top}}px;background-color: aliceblue; color:#161823;border-radius: 25rpx;padding: 12rpx;border: 1rpx solid #a61b29; margin-right: 20rpx;" bindtap="close_anno">{{annotation_detail.detail}}</view>
+  <view style="display: {{annotation_detail.show ? 'inherit': 'none'}};position: absolute;left: {{annotation_detail.left}}px;top: {{annotation_detail.top}}px;background-color: aliceblue; color:#161823;border-radius: 25rpx;padding: 12rpx;border: 1rpx solid #a61b29; margin-right: 20rpx;opacity: 0.95;" bindtap="close_anno">{{annotation_detail.detail}}</view>
 </view>

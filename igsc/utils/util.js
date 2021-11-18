@@ -107,25 +107,34 @@ var user_login = function () {
 }
 
 var hl_content = function (content, words, annotation_words, split_words, hl = false) {
-  var res = []
-  var re = new RegExp('(' + words.join('|') + ')')
-  var split_res = content.split(re).filter((item, pos) => item && item.length > 0)
-  for (var i = 0; i < split_res.length; i++) {
-    var a = false
-    var k = false
-    if (annotation_words.indexOf(split_res[i]) != -1) {
-      a = true
+  try {
+    var res = []
+    var re = new RegExp(('(' + words.join('|') + ')').replace('?', ''))
+    var split_res = content.split(re).filter((item, pos) => item && item.length > 0)
+    for (var i = 0; i < split_res.length; i++) {
+      var a = false
+      var k = false
+      if (annotation_words.indexOf(split_res[i]) != -1) {
+        a = true
+      }
+      if (hl && split_words.indexOf(split_res[i]) != -1) {
+        k = true
+      }
+      res.push({
+        s: split_res[i],
+        a: a,
+        k: k,
+      })
     }
-    if (hl && split_words.indexOf(split_res[i]) != -1) {
-      k = true
-    }
-    res.push({
-      s: split_res[i],
-      a: a,
-      k: k,
-    })
+    return res
+  } catch (e) {
+    console.log(e)
+    return [{
+      s: content,
+      a: false,
+      k: false,
+    }, ]
   }
-  return res
 }
 
 var api_version = function () {
