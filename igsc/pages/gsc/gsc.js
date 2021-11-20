@@ -1296,10 +1296,14 @@ Page({
     })
   },
   show_anno: function (e) {
+    var w = 120
+    if(this.data.annotation_dict[e.currentTarget.dataset.anno].length > 60){
+      w = 240
+    }
     this.setData({
       annotation_detail: {
         show: true,
-        left: e.currentTarget.offsetLeft > win_width - (120 / 750 * win_width) ? e.currentTarget.offsetLeft - (120 / 750 * win_width) : e.currentTarget.offsetLeft,
+        left: e.currentTarget.offsetLeft > win_width - (w / 750 * win_width) ? e.currentTarget.offsetLeft - (w / 750 * win_width) : e.currentTarget.offsetLeft,
         top: e.currentTarget.offsetTop + (45 / 750 * win_width),
         detail: this.data.annotation_reserve_dict[this.data.annotation_dict[e.currentTarget.dataset.anno]] + '：' + this.data.annotation_dict[e.currentTarget.dataset.anno],
       }

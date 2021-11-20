@@ -120,17 +120,7 @@ Page({
           }
         }
         for (var data of datas) {
-          var splits = data.content.split('。')
-          var fuhao = '。'
-          if (splits.length > 0) {
-            if (splits[0].indexOf('？') >= 0) {
-              fuhao = '？'
-            }
-            data.short_content = splits[0].split('？')[0]
-          } else {
-            data.short_content = data.content
-          }
-          data.short_content += fuhao
+          data.short_content = that.process_short_content(data.content)
           data.split_words = ''
           dd.push(data)
         }
@@ -279,6 +269,23 @@ Page({
       this.my_search_function(this.data.wx_search_data.value)
     }
   },
+  process_short_content: function(content){
+    var splits = content.split(/([。！？! ? \n ；;])/)
+    if (splits.length > 0) {
+      var s = ''
+      for (var i = 0; i < splits.length; i++) {
+        if (!splits[i] || splits[i].length == 0) {
+          continue
+        }
+        s += splits[i]
+        if (['。', '！', '？', '!', '?', '\n' , '；', ';'].indexOf(splits[i]) != -1) {
+          break
+        }
+      }
+      return s
+    }
+    return content
+  },
   my_search_function: function (value) {
     var that = this
     wx.showLoading({
@@ -339,17 +346,7 @@ Page({
           }
         }
         for (var data of datas) {
-          var splits = data.content.split('。')
-          var fuhao = '。'
-          if (splits.length > 0) {
-            if (splits[0].indexOf('？') >= 0) {
-              fuhao = '？'
-            }
-            data.short_content = splits[0].split('？')[0]
-          } else {
-            data.short_content = data.content
-          }
-          data.short_content += fuhao
+          data.short_content = that.process_short_content(data.content)
           if (that.search_v && result.data.data && result.data.data.split_words) {
             var split_words = result.data.data.split_words.replaceAll('+', ',').replaceAll(' ', ',')
             if (that.data.fti) {
@@ -573,17 +570,7 @@ Page({
           }
         }
         for (var data of datas) {
-          var splits = data.content.split('。')
-          var fuhao = '。'
-          if (splits.length > 0) {
-            if (splits[0].indexOf('？') >= 0) {
-              fuhao = '？'
-            }
-            data.short_content = splits[0].split('？')[0]
-          } else {
-            data.short_content = data.content
-          }
-          data.short_content += fuhao
+          data.short_content = that.process_short_content(data.content)
           data.split_words = ''
           dd.push(data)
         }

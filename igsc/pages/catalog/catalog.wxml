@@ -18,7 +18,7 @@
       <view class='item_work' wx:if="{{showhead}}" id="work_item{{index+1}}">
           <view bindtap='go2detail' data-words='{{item.split_words}}' data-id_='{{item.id}}' style='position:relative;'>
             <text wx:if="{{!item.split_title || item.split_title.length == 0}}" class='title' style="{{current_paly_id==item.id?'color:#7c4b00;font-weight:700;':''}}">{{item.work_title}}</text>
-            <view wx:if="{{item.split_title && item.split_title.length > 0}}" class='title' class="content_text" style="{{current_paly_id==item.id?'color:#7c4b00;font-weight:700;':''}}">
+            <view wx:if="{{item.split_title && item.split_title.length > 0}}" class='title' style="{{current_paly_id==item.id?'color:#7c4b00;font-weight:700;':''}}">
               <text class="{{item.k?'hl':''}}" wx:for="{{item.split_title}}" selectable="true" decode="true" space='nbsp'>{{item.s}}</text>
             </view>
             <view wx:if="{{item.audio_id>0}}" style='position:absolute;top:2rpx;right:10rpx;'>
