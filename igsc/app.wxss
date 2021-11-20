@@ -8,6 +8,7 @@
   box-sizing: border-box;
   font: 25rpx/1.5 SimSun, "Product San", 'Noto Serif CJK SC', 'Source Han Serif SC', "Source Han Serif", source-han-serif-sc, "Noto SansCJK", "Helvetica Neue", Helvetica, "Heiti SC", "WenQuanYi Micro Hei";
   line-height: 2em;
+  color: #161823;
 }
 
 page {

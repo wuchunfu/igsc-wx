@@ -48,7 +48,7 @@
   margin-top: 15rpx;
 }
 
-.translation:hover{
+.translation:hover {
   font-weight: bolder;
 }
 
@@ -69,4 +69,12 @@
   min-height: 100%;
   padding-left: 35rpx;
   padding-right: 35rpx;
+}
+
+.anno_text {
+  color: #758a99;
+}
+
+.anno_text:hover {
+  color: #7c4b00;
 }

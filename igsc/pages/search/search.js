@@ -150,11 +150,11 @@ function get_his_keys() {
   }
 }
 
-
 function wx_search_add_his_key(input_value) {
   if (!input_value || input_value.length == 0 || input_value == 'undefined') {
     return
   }
+  input_value = util.simplized(input_value)
   var value = wx.getStorageSync('wx_search_his_keys')
   if (value) {
     if (value.indexOf(input_value) < 0) {

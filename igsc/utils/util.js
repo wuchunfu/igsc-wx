@@ -111,11 +111,27 @@ var hl_content = function (content, words, annotation_words, split_words, hl = f
     var res = []
     var re = new RegExp(('(' + words.join('|') + ')').replace('?', ''))
     var split_res = content.split(re).filter((item, pos) => item && item.length > 0)
+    var exist = {}
     for (var i = 0; i < split_res.length; i++) {
       var a = false
       var k = false
-      if (annotation_words.indexOf(split_res[i]) != -1) {
-        a = true
+      var index = annotation_words.indexOf(split_res[i])
+      if (index != -1) {
+        if (index <= annotation_words.length - 2) {
+          // 如果后面的都已经存在，那么前面的肯定也已存在
+          if (exist.hasOwnProperty(annotation_words[index + 1])) {
+            a = false
+          } else { // 如果后面的还不存在，那么可能需要包含
+            a = true
+            exist[split_res[i]] = 1
+          }
+        } else {
+          // 如果不包含，那么可能需要注释
+          if (!exist.hasOwnProperty(split_res[i])) {
+            a = true
+            exist[split_res[i]] = 1
+          }
+        }
       }
       if (hl && split_words.indexOf(split_res[i]) != -1) {
         k = true

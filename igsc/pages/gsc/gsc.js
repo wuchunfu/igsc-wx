@@ -275,24 +275,7 @@ Page({
           if (tmp.length < 2) {
             continue
           }
-          var tmp0 = tmp[0]
-          // 有些注释有引号
-          if (tmp0.indexOf('“') != -1) {
-            var tmp1 = tmp0.match(/“(.*)”/)
-            if (tmp1 && tmp1.length > 1) {
-              tmp0 = tmp1[1]
-            }
-          }
-          if (tmp0.indexOf('「') != -1) {
-            var tmp1 = tmp0.match(/「(.*)」/)
-            if (tmp1 && tmp1.length > 1) {
-              tmp0 = tmp1[1]
-            }
-          }
-          // 有些注释有拼音，去掉
-          if (tmp0.indexOf('（') != -1) {
-            tmp0 = tmp0.replaceAll(/（.*）/g, '')
-          }
+          var tmp0 = that.process_annotation(tmp[0])
           annotation_dict[tmp0] = tmp.slice(1).join('：')
           annotation_reserve_dict[tmp.slice(1).join('：')] = tmp[0]
         }
@@ -385,6 +368,35 @@ Page({
         })
       }
     })
+  },
+  process_annotation: function (tmp0) {
+    // 有些注释有引号
+    if (tmp0.indexOf('“') != -1) {
+      var tmp1 = tmp0.match(/“(.*)”/)
+      if (tmp1 && tmp1.length > 1) {
+        tmp0 = tmp1[1]
+      }
+    }
+    if (tmp0.indexOf('"') != -1) {
+      var tmp1 = tmp0.match(/"(.*)"/)
+      if (tmp1 && tmp1.length > 1) {
+        tmp0 = tmp1[1]
+      }
+    }
+    if (tmp0.indexOf('「') != -1) {
+      var tmp1 = tmp0.match(/「(.*)」/)
+      if (tmp1 && tmp1.length > 1 && tmp1[1].length < 8) {
+        tmp0 = tmp1[1]
+      }
+    }
+    // 有些注释有拼音，去掉
+    if (tmp0.indexOf('（') != -1) {
+      tmp0 = tmp0.replaceAll(/（[a-z A-Z āáǎàōóǒòêēéěèīíǐìūúǔùǖǘǚǜüńňǹɑɡ]*(，.*)?）/g, '')
+    }
+    if (tmp0.indexOf('(') != -1) {
+      tmp0 = tmp0.replaceAll(/\([a-z A-Z āáǎàōóǒòêēéěèīíǐìūúǔùǖǘǚǜüńňǹɑɡ]*(，.*)?\)/g, '')
+    }
+    return tmp0
   },
   do_operate_play: function (key, mode = 'xunhuan') {
     var that = this
@@ -1292,7 +1304,7 @@ Page({
       annotation_detail: {
         show: true,
         left: e.currentTarget.offsetLeft > win_width - (120 / 750 * win_width) ? e.currentTarget.offsetLeft - (120 / 750 * win_width) : e.currentTarget.offsetLeft,
-        top: e.currentTarget.offsetTop + (40 / 750 * win_width),
+        top: e.currentTarget.offsetTop + (45 / 750 * win_width),
         detail: this.data.annotation_reserve_dict[this.data.annotation_dict[e.currentTarget.dataset.anno]] + '：' + this.data.annotation_dict[e.currentTarget.dataset.anno],
       }
     })

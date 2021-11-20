@@ -177,7 +177,7 @@ Page({
     }
     currentInterval = setInterval(() => {
       that.getcurrent_paly_id()
-    }, 1500)
+    }, 500)
     wx.setStorageSync('currentInterval', currentInterval)
   },
   onLoad: function (options) {
