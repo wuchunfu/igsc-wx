@@ -779,7 +779,7 @@ Page({
     var q = e.currentTarget.dataset.q
     var search_pattern = e.currentTarget.dataset.search_pattern
     var pages = getCurrentPages()
-    var url = '/pages/catalog/catalog?id=' + id_ + '&q=' + q + '&sp=' + search_pattern
+    var url = '/pages/catalog/catalog?id=' + id_ + '&q=' + q + '&sp=' + search_pattern+'&fp=' + this.data.from_page
     if (pages.length == config.max_layer) {
       wx.redirectTo({
         url: url,
@@ -1122,11 +1122,7 @@ Page({
     }
   },
   onShareAppMessage: function (res) {
-    if (this.data.work_item.id % 2 == 0) {
-      var share_image = '/static/share4.jpg'
-    } else {
-      var share_image = '/static/share5.jpg'
-    }
+    var share_image = '/static/share.jpg'
     return {
       title: '《' + this.data.work_item.work_title + '》' + this.data.work_item.work_author + '   ' + this.data.work_item.content.substr(0, 24),
       path: '/pages/gsc/gsc?id=' + this.data.work_item.id + '&from=main',

@@ -3,40 +3,39 @@
     <include src="../search/search.wxml" />
     <view style='margin-top:10px;' wx:if="{{historyplay&&historyplay.length>0 && show_search_box}}">
       <view style='margin-left:5px;font-size:20rpx;'>最近播放</view>
-      <icon bindtap="clear_play_history" type="clear" size="30rpx" style="float: right;margin-right: 10rpx;margin-top: 5rpx;z-index: 99999;"></icon>
+      <icon bindtap="clear_play_history" type="clear" size="30rpx" style="float: right;margin-right: 10rpx;margin-top: 5rpx;z-index: 99999;" color="#c0c6c9"></icon>
       <view style='border-bottom:1px solid #eee;'>
-        <text bindtap='go2detail' class='title myclick' data-words='{{item.split_words}}' data-id_='{{item.id}}' wx:for="{{historyplay}}" style='border:1rpx solid #eee;display:inline-block;height:2em;line-height:2em;font-size:20rpx;padding:2rpx 4rpx;margin-right:40rpx;margin-top:10rpx;border-radius:4rpx;position:relative;background-color: rgba(200, 200, 200, 0.3);' wx:key="id">{{item.title}}
-          <text style='display:inline-block;width:40rpx;height:40rpx;border-radius:20rpx;background-color:#bb7e7e;text-align:center;line-height:40rpx;font-size:20rpx;position:absolute;top:-14rpx;right:-28rpx;opacity:0.7;color:white;'>{{item.times}}</text>
+        <text bindtap='go2detail' class='title' data-words='{{item.split_words}}' data-id_='{{item.id}}' wx:for="{{historyplay}}" style='border:1rpx solid #eee;display:inline-block;height:2em;line-height:2em;font-size:20rpx;padding:2rpx 4rpx;margin-right:40rpx;margin-top:10rpx;border-radius:4rpx;position:relative;background-color: rgba(200, 200, 200, 0.3);' wx:key="id">{{item.title}}
+          <text style='display:inline-block;width:40rpx;height:40rpx;border-radius:20rpx;background-color:#7c4b00;text-align:center;line-height:40rpx;font-size:20rpx;position:absolute;top:-14rpx;right:-28rpx;opacity:0.7;color:white;'>{{item.times}}</text>
         </text>
       </view>
     </view>
-    <view style="margin-left:5px;margin-top:0.8em;;font-size:20rpx;">{{fti ? '搜索結果': '搜索结果'}}({{total}})<label wx:if="{{show_bottom_button}}" style="float: right;">第<text style="color: #bb7e7e;font-weight: 700;">{{page_num}}</text>/{{total_page}}{{fti? '頁': '页'}}</label></view>
+    <view style="margin-left:5px;margin-top:0.8em;;font-size:20rpx;">{{fti ? '搜索結果': '搜索结果'}}({{total}})<label wx:if="{{show_bottom_button}}" style="float: right;">第<text style="color: #7c4b00;font-weight: 700;">{{page_num}}</text>/{{total_page}}{{fti? '頁': '页'}}</label></view>
   </view>
+  <view style="height: 10rpx;"></view>
   <scroll-view scroll-y="true" style="height: {{scroll_height}}px;" bindscroll="scroll" scroll-into-view="{{to_top}}" scroll-with-animation="true" enable-back-to-top="true" enhanced="true" show-scrollbar="false">
     <view wx:for="{{gscitems}}" wx:key="id">
       <view class='item_work' wx:if="{{showhead}}" id="work_item{{index+1}}">
-        <view class='myclick'>
           <view bindtap='go2detail' data-words='{{item.split_words}}' data-id_='{{item.id}}' style='position:relative;'>
-            <text wx:if="{{!item.split_title || item.split_title.length == 0}}" class='title' style="{{current_paly_id==item.id?'color:#BB7E7E;font-weight:700;':''}}">{{item.work_title}}</text>
-            <view wx:if="{{item.split_title && item.split_title.length > 0}}" class='title' class="content_text" style="{{current_paly_id==item.id?'color:#BB7E7E;font-weight:700;':''}}">
+            <text wx:if="{{!item.split_title || item.split_title.length == 0}}" class='title' style="{{current_paly_id==item.id?'color:#7c4b00;font-weight:700;':''}}">{{item.work_title}}</text>
+            <view wx:if="{{item.split_title && item.split_title.length > 0}}" class='title' class="content_text" style="{{current_paly_id==item.id?'color:#7c4b00;font-weight:700;':''}}">
               <text class="{{item.k?'hl':''}}" wx:for="{{item.split_title}}" selectable="true" decode="true" space='nbsp'>{{item.s}}</text>
             </view>
             <view wx:if="{{item.audio_id>0}}" style='position:absolute;top:2rpx;right:10rpx;'>
               <image src="{{current_paly_id == item.id ? '../../static/sounding.png': '../../static/sound.png'}}" style='width:24rpx;height:24rpx;'></image>
             </view>
             <view>
-              <text wx:if="{{!item.split_content || item.split_content.length == 0}}" data-id_='{{item.id}}' class="content_text" style="{{current_paly_id==item.id?'color:#BB7E7E;font-weight:700;':''}}">{{item.short_content}}</text>
-              <view wx:if="{{item.split_content && item.split_content.length > 0}}" data-id_='{{item.id}}' class="content_text" style="{{current_paly_id==item.id?'color:#BB7E7E;font-weight:700;':''}}">
+              <text wx:if="{{!item.split_content || item.split_content.length == 0}}" data-id_='{{item.id}}' class="content_text" style="{{current_paly_id==item.id?'color:#7c4b00;font-weight:700;':''}}">{{item.short_content}}</text>
+              <view wx:if="{{item.split_content && item.split_content.length > 0}}" data-id_='{{item.id}}' class="content_text" style="{{current_paly_id==item.id?'color:#7c4b00;font-weight:700;':''}}">
                 <text class="{{item.k?'hl':''}}" wx:for="{{item.split_content}}" selectable="true" decode="true" space='nbsp'>{{item.s}}</text>
               </view>
-              <text class='author' style="{{current_paly_id==item.id?'color:#BB7E7E;font-weight:700;':''}}">[{{item.work_dynasty}}] {{item.work_author}}</text>
+              <text class='author' style="{{current_paly_id==item.id?'color:#7c4b00;font-weight:700;':''}}">[{{item.work_dynasty}}] {{item.work_author}}</text>
             </view>
           </view>
-        </view>
       </view>
-      <view class="item_work myclick" wx:if="{{!showhead}}" bindtap='go2detail' data-words='{{item.split_words}}' data-id_='{{item.id}}'>
-        <view class='title gsc myclick' animation="{{current_paly_id==item.id?animationData:''}}">
-          <text style="{{current_paly_id==item.id?'color:#BB7E7E;font-weight:700;':''}}">{{index+1}}.{{item.work_title}} - {{item.work_author}}</text>
+      <view class="item_work" wx:if="{{!showhead}}" bindtap='go2detail' data-words='{{item.split_words}}' data-id_='{{item.id}}'>
+        <view class='title gsc' animation="{{current_paly_id==item.id?animationData:''}}">
+          <text style="{{current_paly_id==item.id?'color:#7c4b00;font-weight:700;':''}}">{{index+1}}.{{item.work_title}} - {{item.work_author}}</text>
         </view>
       </view>
     </view>

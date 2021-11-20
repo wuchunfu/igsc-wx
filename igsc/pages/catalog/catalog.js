@@ -177,7 +177,7 @@ Page({
     }
     currentInterval = setInterval(() => {
       that.getcurrent_paly_id()
-    }, 500)
+    }, 600)
     wx.setStorageSync('currentInterval', currentInterval)
   },
   onLoad: function (options) {
@@ -200,6 +200,11 @@ Page({
       if (options.hasOwnProperty('sp')) {
         that.setData({
           search_pattern: options.sp,
+        })
+      }
+      if (options.hasOwnProperty('fp')) {
+        that.setData({
+          page: options.fp,
         })
       }
       that.my_search_function(options.q)
@@ -677,7 +682,7 @@ Page({
     return {
       title: title,
       path: '/pages/catalog/catalog' + (q ? ('?q=' + q + '&sp=' + that.data.search_pattern) : ''),
-      imageUrl: '/static/share4.jpg',
+      imageUrl: '/static/share.jpg',
       success: function (res) {
         util.show_success('分享成功')
       },

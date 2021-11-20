@@ -1,7 +1,3 @@
-.myclick :hover {
-  font-weight: bolder;
-}
-
 .container {
   display: flex;
   flex-direction: column;
@@ -27,5 +23,5 @@ scroll-view ::-webkit-scrollbar {
 }
 .hl {
   color: #a61b29 !important;
-  font-weight: bold;
+  font-weight: 600;
 }

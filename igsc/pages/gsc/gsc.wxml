@@ -4,17 +4,17 @@
   <view wx:if="{{work_item.split_title && work_item.split_title.length > 0}}" class='title' data-q='{{work_item.work_title}}' data-id_='{{work_item.id}}' bindlongpress='search_' data-search_pattern='title'>
     <text class="{{item.k? 'hl' : (item.a ? 'anno_text': '')}}" wx:for="{{work_item.split_title}}" bindtap="{{item.a?'show_anno':''}}" data-anno="{{item.a?item.s:''}}">{{item.s}}</text>
   </view>
-  <view wx:if="{{work_item.work_dynasty}}" class='myclick author' data-q='{{work_item.work_author}}' data-id_='{{work_item.id}}' data-search_pattern='author' bindlongpress='search_'>
+  <view wx:if="{{work_item.work_dynasty}}" class='author' data-q='{{work_item.work_author}}' data-id_='{{work_item.id}}' data-search_pattern='author' bindlongpress='search_'>
     {{work_item.work_dynasty}} · {{work_item.work_author}}
   </view>
   <view wx:if="{{work_item.content.length>=300}}">
-    <view style='display:flex;flex-direction:row;margin-top:10rpx;' wx:if="{{work_item.audio_id > 0 && !folding}}">
+    <view style='display:flex;flex-direction:row;margin-top:15rpx;' wx:if="{{work_item.audio_id > 0 && !folding}}">
       <view style='flex:40;text-align:right;'>
         <navigator redirect url='/pages/catalog/catalog?q=音频' style='display:inline-block;'>
           <image src='../../static/list.png' class="operate_audio"></image>
         </navigator>
         <navigator redirect url='/pages/catalog/catalog' style='display:inline-block;'>
-          <image src='../../static/search.png' class="operate_audio"></image>
+          <image src='../../static/home.png' class="operate_audio"></image>
         </navigator>
         <image src='../../static/up_audio.png' class="operate_audio" bindtap='operate_play' data-key='up'></image>
       </view>
@@ -26,13 +26,13 @@
         <image wx:if="{{mode}}" src='../../static/{{mode}}.png' class="operate_audio" bindtap='change_mode'></image>
         <image src='../../static/timed.png' class="operate_audio" bindtap='set_timed'>
         </image>
-        <text wx:if="{{time2close!=0}}" style='text-align:center;line-height:2em;display:inline-block;width:2em;height:2em;border-radius:1em;font-size:10rpx;color:white;background-color:#BB7E7E;opacity:0.8;position:absolute;top:0px;margin-left:-28rpx;'>{{close_play_time}}</text>
+        <text wx:if="{{time2close!=0}}" style='text-align:center;line-height:2em;display:inline-block;width:2em;height:2em;border-radius:1em;font-size:10rpx;color:white;background-color:#7c4b00;opacity:0.8;position:absolute;top:0px;margin-left:-28rpx;'>{{close_play_time}}</text>
       </view>
     </view>
     <view style="margin-top:5rpx;" wx:if="{{work_item.audio_id >0 && !folding}}">
-      <slider activeColor="#BB7E7E" bindchanging="slider_changing" bindchange="slider2change" step="1" min="1" block-size="15" value='{{slide_value}}' block-color="#BB7E7E" style="margin-top:5rpx;margin-bottom:5rpx;" />
+      <slider activeColor="#7c4b00" backgroundColor="#f3f3f2" bindchanging="slider_changing" bindchange="slider2change" step="1" min="1" block-size="15" value='{{slide_value}}' block-color="#7c4b00" style="margin-top:5rpx;margin-bottom:5rpx;" />
       <text style='font-size:18rpx;color:#b9adad;opacity:0.8;float:right;margin-right:18rpx;' wx:if="{{duration_show}}">{{duration_show}}</text>
-      <text style='font-size:18rpx;color:#BB7E7E;opacity:0.8;float:left;margin-left:18rpx;' wx:if="{{current_time_show}}">{{current_time_show}}</text>
+      <text style='font-size:18rpx;color:#7c4b00;opacity:0.8;float:left;margin-left:18rpx;' wx:if="{{current_time_show}}">{{current_time_show}}</text>
     </view>
   </view>
   <view wx:if="{{work_item.foreword}}" class='foreward' style='margin-left:72rpx;margin-top:10rpx;text-indent: 2em;font-style: oblique;'>
@@ -52,13 +52,13 @@
     </view>
   </view>
   <view wx:if="{{work_item.content.length<300}}">
-    <view style='display:flex;flex-direction:row;margin-top:10rpx;' wx:if="{{work_item.audio_id>0 && !folding}}">
+    <view style='display:flex;flex-direction:row;margin-top:15rpx;' wx:if="{{work_item.audio_id>0 && !folding}}">
       <view style='flex:40;text-align:right;'>
         <navigator redirect url='/pages/catalog/catalog?q=音频' style='display:inline-block;'>
           <image src='../../static/list.png' class="operate_audio"></image>
         </navigator>
         <navigator redirect url='/pages/catalog/catalog' style='display:inline-block;'>
-          <image src='../../static/search.png' class="operate_audio"></image>
+          <image src='../../static/home.png' class="operate_audio"></image>
         </navigator>
         <image src='../../static/up_audio.png' class="operate_audio" bindtap='operate_play' data-key='up'></image>
       </view>
@@ -70,13 +70,13 @@
         <image wx:if="{{mode}}" src='../../static/{{mode}}.png' class="operate_audio" bindtap='change_mode'></image>
         <image src='../../static/timed.png' class="operate_audio" bindtap='set_timed'>
         </image>
-        <text wx:if="{{time2close!=0}}" style='text-align:center;line-height:2em;display:inline-block;width:2em;height:2em;border-radius:1em;font-size:10rpx;color:white;background-color:#BB7E7E;opacity:0.8;position:absolute;top:0px;margin-left:-28rpx;'>{{close_play_time}}</text>
+        <text wx:if="{{time2close!=0}}" style='text-align:center;line-height:2em;display:inline-block;width:2em;height:2em;border-radius:1em;font-size:10rpx;color:white;background-color:#7c4b00;opacity:0.8;position:absolute;top:0px;margin-left:-28rpx;'>{{close_play_time}}</text>
       </view>
     </view>
     <view style="margin-top:5rpx;" wx:if="{{work_item.audio_id >0 && !folding}}">
-      <slider activeColor="#BB7E7E" bindchanging="slider_changing" bindchange="slider2change" step="1" min="1" block-size="15" value='{{slide_value}}' block-color="#BB7E7E" style="margin-top:5rpx;margin-bottom:5rpx;" />
-      <text style='font-size:18rpx;color:#BB7E7E;opacity:0.8;float:right;margin-right:18rpx;' wx:if="{{duration_show}}">{{duration_show}}</text>
-      <text style='font-size:18rpx;color:#BB7E7E;opacity:0.8;float:left;margin-left:18rpx;' wx:if="{{current_time_show}}">{{current_time_show}}</text>
+      <slider activeColor="#7c4b00" backgroundColor="#f3f3f2" bindchanging="slider_changing" bindchange="slider2change" step="1" min="1" block-size="15" value='{{slide_value}}' block-color="#7c4b00" style="margin-top:5rpx;margin-bottom:5rpx;" />
+      <text style='font-size:18rpx;color:#7c4b00;opacity:0.8;float:right;margin-right:18rpx;' wx:if="{{duration_show}}">{{duration_show}}</text>
+      <text style='font-size:18rpx;color:#7c4b00;opacity:0.8;float:left;margin-left:18rpx;' wx:if="{{current_time_show}}">{{current_time_show}}</text>
     </view>
   </view>
   <view class='tabs' wx:if="{{!folding}}">
@@ -104,5 +104,5 @@
   <view bindtap="do_fold" data-folding="{{folding}}" style="position: fixed;right: 0rpx;bottom: 0rpx;opacity: 0.3;">
     <image src='{{folding ? "../../static/unfold.png":"../../static/fold.png"}}' style='width:60rpx;height:60rpx;z-index: 99999;'></image>
   </view>
-  <view style="display: {{annotation_detail.show ? 'inherit': 'none'}};position: absolute;left: {{annotation_detail.left}}px;top: {{annotation_detail.top}}px;background-color: aliceblue; color:#392f41;border-radius: 20rpx;padding: 12rpx;border: 1rpx dashed #7c4b00; margin-right: 20rpx;" bindtap="close_anno">{{annotation_detail.detail}}</view>
+  <view style="display: {{annotation_detail.show ? 'inherit': 'none'}};position: absolute;left: {{annotation_detail.left}}px;top: {{annotation_detail.top}}px;background-color: #f3f3f2; color:#392f41;border-radius: 20rpx;padding: 12rpx;border: 1rpx dashed #7c4b00; margin-right: 20rpx;" bindtap="close_anno">{{annotation_detail.detail}}</view>
 </view>

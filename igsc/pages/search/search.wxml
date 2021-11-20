@@ -3,10 +3,10 @@
     <switch bindchange="show_hide_search_box" checked="{{show_search_box}}" color="#f3f3f2" style="transform: scale(0.8);"></switch>
     <view class="weui-search-bar__form" style="flex: 10;">
       <view class="weui-search-bar__box">
-        <input type="text" class="weui-search-bar__input" placeholder="{{fti ?'請輸入查詢內容': '请输入查询内容'}}" placeholder-class="placeholder" value="{{wx_search_data.value}}" bindinput="wx_search_input" bindconfirm="wx_search_confirm" bindblur="wx_search_confirm"/>
+        <input type="text" class="weui-search-bar__input" placeholder="{{fti ?'請輸入查詢內容': '请输入查询内容'}}" placeholder-class="placeholder" value="{{wx_search_data.value}}" bindinput="wx_search_input" bindconfirm="wx_search_confirm"/>
       </view>
       <view class="weui-icon-clear" wx:if="{{wx_search_data.value && wx_search_data.value.length > 0}}" bindtap="wx_search_clear">
-        <icon type="clear" size="30rpx" style="float: right;margin-right: 10rpx;margin-top: 5rpx;"></icon>
+        <icon color="#c0c6c9" type="clear" size="30rpx" style="float: right;margin-right: 10rpx;margin-top: 5rpx;"></icon>
       </view>
     </view>
     <view class="weui-search-bar__cancel-btn" bindtap="wx_search_confirm">
@@ -24,18 +24,18 @@
       </view>
       <view wx:if="{{wx_search_data.value && wx_search_data.value.length > 0}}" style="margin-top: 10rpx;">
         <radio-group bindchange="radio_change">
-          <radio class="search_radio" value="all" checked="{{search_pattern=='all'}}" color="#bb7e7e"><text>全部</text></radio>
-          <radio value="title" class="search_radio" checked="{{search_pattern=='title'}}" color="#bb7e7e"><text>{{fti?'標題': '标题'}}</text></radio>
-          <radio value="author" class="search_radio" checked="{{search_pattern=='author'}}" color="#bb7e7e"><text>作者</text></radio>
-          <radio value="dynasty" class="search_radio" checked="{{search_pattern=='dynasty'}}" color="#bb7e7e"><text>朝代</text></radio>
-          <radio value="content" class="search_radio" checked="{{search_pattern=='content'}}" color="#bb7e7e"><text>{{fti? '內容': '内容'}}</text></radio>
+          <radio class="search_radio" value="all" checked="{{search_pattern=='all'}}" color="#7c4b00"><text>全部</text></radio>
+          <radio value="title" class="search_radio" checked="{{search_pattern=='title'}}" color="#7c4b00"><text>{{fti?'標題': '标题'}}</text></radio>
+          <radio value="author" class="search_radio" checked="{{search_pattern=='author'}}" color="#7c4b00"><text>作者</text></radio>
+          <radio value="dynasty" class="search_radio" checked="{{search_pattern=='dynasty'}}" color="#7c4b00"><text>朝代</text></radio>
+          <radio value="content" class="search_radio" checked="{{search_pattern=='content'}}" color="#7c4b00"><text>{{fti? '內容': '内容'}}</text></radio>
         </radio-group>
       </view>
       <view wx:if="{{show_search_box}}">
         <view wx:if="{{wx_search_data.his[0]}}" class="wx_search_history" style="display:{{wx_search_data.value.length>0 ? 'none':'block'}}">
           <view class="wx_search_history_item">
             <text class="wx_search_history_item_title">{{fti? '搜索記錄': '搜索记录'}}</text>
-            <icon type="clear" bindtap="wx_search_delete_all" size="30rpx" style="z-index:20000;margin-top:10rpx;" />
+            <icon type="clear" color="#c0c6c9" bindtap="wx_search_delete_all" size="30rpx" style="z-index:20000;margin-top:10rpx;" />
           </view>
           <view class="wx_search_key_list">
             <block wx:for="{{wx_search_data.his}}" wx:key="*this">

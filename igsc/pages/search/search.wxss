@@ -96,17 +96,17 @@
   flex: auto;
   background: #fff;
   border-radius: 10rpx;
-  border: 1px dashed #bb7e7e;
+  border: 1px dashed #7c4b00;
 }
 
 .weui-search-bar__form:hover {
   background: #f3f3f2;
-  border: 1px solid #bb7e7e;
+  border: 1px solid #7c4b00;
 }
 
 .weui-search-bar__form:focus {
   background: #f3f3f2;
-  border: 1px solid #bb7e7e;
+  border: 1px solid #7c4b00;
 }
 
 .weui-search-bar__box {
@@ -122,7 +122,7 @@
   height: 60rpx;
   line-height: 60rpx;
   padding-right: 60rpx;
-  caret-color: #bb7e7e;
+  caret-color: #7c4b00;
 }
 
 .weui-icon-clear {
@@ -156,7 +156,7 @@
   font-size: 30rpx;
   height: 60rpx;
   border-radius: 10rpx;
-  border: 1px dashed #bb7e7e;
+  border: 1px dashed #7c4b00;
   background-color: #fff;
   padding: 0px 5rpx 0rpx 5rpx;
 }
@@ -164,11 +164,11 @@
 .weui-search-bar__cancel-btn:hover {
   font-weight: 700;
   background-color: #f3f3f2;
-  border: 1px solid #bb7e7e;
+  border: 1px solid #7c4b00;
 }
 
 .search_radio {
-  color: #bb7e7e;
+  color: #7c4b00;
   margin-right: 10rpx;
   transform: scale(0.8);
 }
