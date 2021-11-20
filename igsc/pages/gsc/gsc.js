@@ -613,6 +613,9 @@ Page({
     var like = e.currentTarget.dataset.like
     var operate = like == 1 ? 'dislike' : 'like'
     var that = this
+    wx.showLoading({
+      title: '操作中...',
+    })
     wx.getStorage({
       key: 'user_open_id',
       success: function (res) {
@@ -636,10 +639,6 @@ Page({
               })
               return
             }
-            wx.showToast({
-              title: res.data.data,
-              icon: 'none'
-            })
             if (operate == 'like') {
               wx.getStorage({
                 key: 'not_show_like_toast',
@@ -687,6 +686,10 @@ Page({
                 work_item: work_item,
               })
             }
+            wx.showToast({
+              title: res.data.data,
+              icon: 'none'
+            })
           }
         })
       },
