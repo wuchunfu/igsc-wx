@@ -1,5 +1,5 @@
 <view class='container catalog'>
-  <view wx:if="{{showhead}}" id='top_search'>
+  <view id='top_search'>
     <include src="../search/search.wxml" />
     <view style='margin-top:10px;' wx:if="{{historyplay&&historyplay.length>0 && show_search_box}}">
       <view style='margin-left:5px;font-size:20rpx;'>最近播放</view>
@@ -15,7 +15,7 @@
   <view style="height: 10rpx;"></view>
   <scroll-view scroll-y="true" style="height: {{scroll_height}}px;" bindscroll="scroll" scroll-into-view="{{to_top}}" scroll-with-animation="true" enable-back-to-top="true" enhanced="true" show-scrollbar="false">
     <view wx:for="{{gscitems}}" wx:key="id">
-      <view class='item_work' wx:if="{{showhead}}" id="work_item{{index+1}}">
+      <view class='item_work' id="work_item{{index+1}}">
           <view bindtap='go2detail' data-words='{{item.split_words}}' data-id_='{{item.id}}' style='position:relative;'>
             <text wx:if="{{!item.split_title || item.split_title.length == 0}}" class='title' style="{{current_paly_id==item.id?'color:#7c4b00;font-weight:700;':''}}">{{item.work_title}}</text>
             <view wx:if="{{item.split_title && item.split_title.length > 0}}" class='title' style="{{current_paly_id==item.id?'color:#7c4b00;font-weight:700;':''}}">
@@ -32,11 +32,6 @@
               <text class='author' style="{{current_paly_id==item.id?'color:#7c4b00;font-weight:700;':''}}">[{{item.work_dynasty}}] {{item.work_author}}</text>
             </view>
           </view>
-      </view>
-      <view class="item_work" wx:if="{{!showhead}}" bindtap='go2detail' data-words='{{item.split_words}}' data-id_='{{item.id}}'>
-        <view class='title gsc' animation="{{current_paly_id==item.id?animationData:''}}">
-          <text style="{{current_paly_id==item.id?'color:#7c4b00;font-weight:700;':''}}">{{index+1}}.{{item.work_title}} - {{item.work_author}}</text>
-        </view>
       </view>
     </view>
   </scroll-view>

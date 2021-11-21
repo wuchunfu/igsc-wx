@@ -74,12 +74,9 @@ function wx_search_clear() {
     search_pattern: 'all',
   })
   if (__that.data.page != 'like') {
-    __that.getData(__that)
+    __that.get_home_data(__that)
   } else {
-    var open_id = wx.getStorageSync('user_open_id')
-    if (open_id) {
-      __that.get_like_list(open_id)
-    }
+    __that.get_like_list()
   }
 }
 
@@ -124,7 +121,9 @@ function search(input_value) {
     })
   } else {
     if (__that.data.page != 'like') {
-      __that.getData(__that)
+      __that.get_home_data(__that)
+    } else {
+      __that.get_like_list()
     }
   }
 }
@@ -136,10 +135,10 @@ function get_his_keys() {
     if (value) {
       var tem_data = __that.data.wx_search_data
       tem_data.his = value.slice(0, 12)
-      if(__that.data.fti){
-        tem_data.his = tem_data.his.map((item)=>util.traditionalized(item))
-      }else{
-        tem_data.his = tem_data.his.map((item)=>util.simplized(item))
+      if (__that.data.fti) {
+        tem_data.his = tem_data.his.map((item) => util.traditionalized(item))
+      } else {
+        tem_data.his = tem_data.his.map((item) => util.simplized(item))
       }
       __that.setData({
         wx_search_data: tem_data,

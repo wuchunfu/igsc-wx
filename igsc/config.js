@@ -9,8 +9,7 @@ var config = {
         uploadUrl: `${host}/weapp/upload`,
     },
     gsc_url: `${host}/gsc/`,
-    qaudio_url: 'https://qcloudtest-1256650966.cos.ap-guangzhou.myqcloud.com/songci-audio/',
+    qaudio_url: 'https://igsc.audio.haihui.site/songci-audio/',
     max_layer: 10, //最多10层页面
 }
-
 module.exports = config

@@ -68,9 +68,53 @@
 }
 
 .anno_text {
-  color: #758a99;
+  color: #617172;
 }
 
 .anno_text:hover {
   color: #7c4b00;
+}
+
+.playlist {
+  position: fixed;
+  background-color: #f3f3f2;
+  width: calc(100% - 55rpx);
+  bottom: 0rpx;
+  height: 600rpx;
+  overflow-y: scroll;
+  margin-left: -35rpx;
+  padding: 25rpx;
+  border-radius: 30rpx;
+}
+
+.play_item {
+  font-size: 28rpx;
+  border-bottom: 1px dotted;
+  padding-bottom: 5rpx;
+  margin-top: 10rpx;
+  border-bottom-color: rgb(97, 113, 114, 0.4);
+}
+
+.playlist_text {
+  position: fixed;
+  bottom: 600rpx;
+  left: 0;
+  background-color: #617172;
+  width: 100%;
+  margin-left: 0rpx;
+  padding-top: 2rpx;
+  border-top-left-radius: 30rpx;
+  border-top-right-radius: 30rpx;
+  height: 50rpx;
+  text-align: center;
+  color:#f3f3f2;
+}
+
+#item1 {
+  margin-top: 35rpx;
+}
+
+.no_scroll {
+  height: 100vh;
+  overflow: hidden;
 }

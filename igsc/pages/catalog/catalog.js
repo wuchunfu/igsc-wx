@@ -8,7 +8,6 @@ Page({
     gscitems: [],
     page: 'main',
     historyplay: null,
-    showhead: true,
     current_paly_id: 0,
     page_num: 1,
     show_bottom_button: false,
@@ -68,7 +67,7 @@ Page({
     item.work_dynasty = util.traditionalized(item.work_dynasty)
     item.work_title = util.traditionalized(item.work_title)
   },
-  getData: function (that) {
+  get_home_data: function (that) {
     wx.getStorage({
       key: 'gsc_items' + util.format_time(new Date()),
       success: function (res) {
@@ -84,6 +83,7 @@ Page({
           that.setData({
             gscitems: items,
             total: items.length,
+            show_bottom_button: false,
           })
           that.storage_result(items)
         }
@@ -128,6 +128,7 @@ Page({
           gscitems: dd,
           total: dd.length,
           to_top: 'work_item1',
+          show_bottom_button: false,
         })
         that.storage_result(dd)
         wx.setStorage({
@@ -148,15 +149,22 @@ Page({
   storage_result: function (items) {
     var search_result_ids = []
     var audio_ids = []
+    var playlist = []
     for (var d of items) {
       search_result_ids.push(d.id)
       if (d.audio_id > 0) {
         audio_ids.push(d.audio_id)
+        playlist.push({
+          work_id: d.id,
+          title: d.work_title,
+          author: d.work_dynasty + '·' + d.work_author
+        })
       }
     }
     wx.setStorageSync('search_result_ids', search_result_ids)
     if (audio_ids.length > 0) {
       wx.setStorageSync('audio_ids', audio_ids)
+      wx.setStorageSync('playlist', playlist)
     }
   },
   interval_get_current_play: function () {
@@ -178,15 +186,6 @@ Page({
       that = current_page
     }
     if (options && options.hasOwnProperty('q')) {
-      if (options.q == '音频') {
-        that.setData({
-          showhead: false,
-        })
-      } else {
-        that.setData({
-          showhead: true,
-        })
-      }
       if (options.hasOwnProperty('sp')) {
         that.setData({
           search_pattern: options.sp,
@@ -434,7 +433,7 @@ Page({
     var fti = wx.getStorageSync('fti') ? true : false
     if (fti != that.data.fti) {
       if (!that.search_v && that.data.page == 'main') {
-        that.getData(that)
+        that.get_home_data(that)
       } else {
         that.my_search_function(that.search_v)
         if (that.search_v) {
@@ -544,8 +543,9 @@ Page({
   onUnload: function () {
     this.purge_some_data()
   },
-  get_like_list: function (open_id) {
+  do_get_like_list: function (open_id) {
     var that = this
+    that.search_v = that.data.wx_search_data.value
     wx.request({
       url: config.gsc_url + 'mylike_by_page/' + open_id + '?page_num=' + that.data.page_num + '&page_size=' + that.data.page_size + '&search_pattern=' + that.data.search_pattern + '&t=' + util.api_version(),
       enableHttp2: true,
@@ -585,6 +585,23 @@ Page({
       }
     })
   },
+  get_like_list: function(){
+    var open_id = ''
+    try {
+      open_id = wx.getStorageSync('user_open_id')
+    } catch (e) {}
+    if (!open_id) {
+      util.user_login()
+      wx.showToast({
+        title: that.data.fti ? '請重試一次' : '请重试一次',
+        icon: 'none'
+      })
+      wx.hideNavigationBarLoading()
+      wx.stopPullDownRefresh()
+      return
+    }
+    this.do_get_like_list(open_id)
+  },
   onPullDownRefresh: function () {
     wx.showLoading({
       title: '加载中...',
@@ -595,27 +612,10 @@ Page({
     if (this != current_page) {
       that = current_page
     }
-    that.setData({
-      showhead: true,
-    })
     if (that.data.page == 'main') {
-      var open_id = ''
-      try {
-        open_id = wx.getStorageSync('user_open_id')
-      } catch (e) {}
-      if (!open_id) {
-        util.user_login()
-        wx.showToast({
-          title: that.data.fti ? '請重試一次' : '请重试一次',
-          icon: 'none'
-        })
-        wx.hideNavigationBarLoading()
-        wx.stopPullDownRefresh()
-        return
-      }
-      that.get_like_list(open_id)
+      that.get_like_list()
     } else {
-      that.getData(that)
+      that.get_home_data(that)
     }
     if (that.data.page == 'main') {
       that.setData({

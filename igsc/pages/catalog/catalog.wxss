@@ -4,7 +4,7 @@
   min-height: 2.6em;
   border-bottom-width: 0.80rpx;
   border-bottom-style: dotted;
-  border-bottom-color: rgba(187, 126, 126, 0.4);
+  border-bottom-color: rgb(97, 113, 114, 0.4);
   margin-left: 15rpx;
   margin-right: 15rpx;
   margin-bottom: 30rpx;

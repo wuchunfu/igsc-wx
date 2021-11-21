@@ -1,4 +1,4 @@
-<view class='gsc container'>
+<view class='gsc container {{playlist.length > 9 ? "no_scroll": ""}}'>
   <view id="location_id"></view>
   <view wx:if="{{!work_item.split_title || work_item.split_title.length == 0}}" class='title' data-q='{{work_item.work_title}}' data-id_='{{work_item.id}}' bindlongpress='search_' data-search_pattern='title'>{{work_item.work_title}}</view>
   <view wx:if="{{work_item.split_title && work_item.split_title.length > 0}}" class='title' data-q='{{work_item.work_title}}' data-id_='{{work_item.id}}' bindlongpress='search_' data-search_pattern='title'>
@@ -7,15 +7,15 @@
   <view wx:if="{{work_item.work_dynasty}}" class='author' data-q='{{work_item.work_author}}' data-id_='{{work_item.id}}' data-search_pattern='author' bindlongpress='search_'>
     {{work_item.work_dynasty}} · {{work_item.work_author}}
   </view>
-  <view wx:if="{{work_item.content.length>=300}}">
+  <view wx:if="{{work_item.content.length>=200}}">
     <view style='display:flex;flex-direction:row;margin-top:15rpx;' wx:if="{{work_item.audio_id > 0 && !folding}}">
       <view style='flex:40;text-align:right;'>
-        <navigator redirect url='/pages/catalog/catalog?q=音频' style='display:inline-block;'>
-          <image src='../../static/list.png' class="operate_audio"></image>
-        </navigator>
         <navigator redirect url='/pages/catalog/catalog' style='display:inline-block;'>
           <image src='../../static/home.png' class="operate_audio"></image>
         </navigator>
+        <view bindtap="show_playlist" style='display:inline-block;'>
+          <image src='../../static/list.png' class="operate_audio"></image>
+        </view>
         <image src='../../static/up_audio.png' class="operate_audio" bindtap='operate_play' data-key='up'></image>
       </view>
       <view style='flex:20;text-align:center;'>
@@ -51,15 +51,15 @@
       <text class="{{item.k? 'hl' : (item.a ? 'anno_text': '')}}" wx:for="{{work_item.split_content}}" selectable="true" decode="true" space='nbsp' bindtap="{{item.a?'show_anno':''}}" data-anno="{{item.a?item.s:''}}">{{item.s}}</text>
     </view>
   </view>
-  <view wx:if="{{work_item.content.length<300}}">
+  <view wx:if="{{work_item.content.length<200}}">
     <view style='display:flex;flex-direction:row;margin-top:15rpx;' wx:if="{{work_item.audio_id>0 && !folding}}">
       <view style='flex:40;text-align:right;'>
-        <navigator redirect url='/pages/catalog/catalog?q=音频' style='display:inline-block;'>
-          <image src='../../static/list.png' class="operate_audio"></image>
-        </navigator>
         <navigator redirect url='/pages/catalog/catalog' style='display:inline-block;'>
           <image src='../../static/home.png' class="operate_audio"></image>
         </navigator>
+        <view bindtap="show_playlist" style='display:inline-block;'>
+          <image src='../../static/list.png' class="operate_audio"></image>
+        </view>
         <image src='../../static/up_audio.png' class="operate_audio" bindtap='operate_play' data-key='up'></image>
       </view>
       <view style='flex:20;text-align:center;'>
@@ -105,4 +105,15 @@
     <image src='{{folding ? "../../static/unfold.png":"../../static/fold.png"}}' style='width:60rpx;height:60rpx;z-index: 99999;'></image>
   </view>
   <view style="display: {{annotation_detail.show ? 'inherit': 'none'}};position: absolute;left: {{annotation_detail.left}}px;top: {{annotation_detail.top}}px;background-color: #f3f3f2; color:#392f41;border-radius: 20rpx;padding: 12rpx;border: 1rpx dashed #7c4b00; margin-right: 20rpx;" bindtap="close_anno">{{annotation_detail.detail}}</view>
+ <view wx:if="{{playlist.length > 0}}" class="playlist">
+   <view class="playlist_text" bindtap="show_playlist">
+   <icon type="clear" style="float: right;margin-right: 15rpx;" color="#c0c6c9" size="30rpx"></icon>播放列表</view>
+    <view wx:for="{{playlist}}" wx:key="work_id">
+      <view id="item{{index+1}}">
+        <view bindtap='go2detail_and_play' data-id_='{{item.work_id}}'>
+          <view class='play_item' style="{{playing_audio_id ==item.work_id?'color:#7c4b00;font-weight:700;':''}}">{{index+1}}.{{item.title}} <text style="float: right;">{{item.author}}</text></view>
+        </view>
+      </view>
+    </view>
+ </view>
 </view>

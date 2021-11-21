@@ -48,6 +48,7 @@ Page({
       detail: ''
     },
     fti: false,
+    playlist: [],
   },
   set_timed: function () {
     var that = this
@@ -290,20 +291,21 @@ Page({
         var work_foreword = work.foreword
         var work_title = work.work_title
         if (words.length > 0) {
-          if (that.data.search_pattern == 'all' || that.data.search_pattern == 'content') {
-            work.split_content = util.hl_content(work_content, words, annotation_words, split_words, true)
-            if (work_foreword && work_foreword.length > 0) {
-              work.split_foreword = util.hl_content(work_foreword, words, annotation_words, split_words, true)
-            }
-          } else {
-            work.split_content = util.hl_content(work_content, words, annotation_words, split_words, false)
-            if (work_foreword && work_foreword.length > 0) {
-              work.split_foreword = util.hl_content(work_foreword, words, annotation_words, split_words, false)
-            }
+          var hl_c = false
+          var hl_f = false
+          var hl_t = false
+          if(that.data.search_pattern == 'all'){
+            hl_c = hl_f = hl_t = true
+          }else if(that.data.search_pattern == 'content'){
+            hl_c = hl_f = true
+          }else if (that.data.search_pattern == 'title'){
+            hl_t = true
           }
-          if (that.data.search_pattern == 'all' || that.data.search_pattern == 'title') {
-            work.split_title = util.hl_content(work_title, words, annotation_words, split_words, true)
+          work.split_content = util.hl_content(work_content, words, annotation_words, split_words, hl_c)
+          if (work_foreword && work_foreword.length > 0) {
+            work.split_foreword = util.hl_content(work_foreword, words, annotation_words, split_words, hl_f)
           }
+          work.split_title = util.hl_content(work_title, words, annotation_words, split_words, hl_t)
         } else {
           work.split_content = []
           work.split_foreword = []
@@ -391,10 +393,10 @@ Page({
     }
     // 有些注释有拼音，去掉
     if (tmp0.indexOf('（') != -1) {
-      tmp0 = tmp0.replaceAll(/（[a-z A-Z āáǎàōóǒòêēéěèīíǐìūúǔùǖǘǚǜüńňǹɑɡ]*(，.*)?）/g, '')
+      tmp0 = tmp0.replaceAll(/（(音)?[a-z A-Z āáǎàōóǒòêēéěèīíǐìūúǔùǖǘǚǜüńňǹɑɡ]*(，.*)?）/g, '')
     }
     if (tmp0.indexOf('(') != -1) {
-      tmp0 = tmp0.replaceAll(/\([a-z A-Z āáǎàōóǒòêēéěèīíǐìūúǔùǖǘǚǜüńňǹɑɡ]*(，.*)?\)/g, '')
+      tmp0 = tmp0.replaceAll(/\((音)?[a-z A-Z āáǎàōóǒòêēéěèīíǐìūúǔùǖǘǚǜüńňǹɑɡ]*(，.*)?\)/g, '')
     }
     return tmp0
   },
@@ -1297,7 +1299,7 @@ Page({
   },
   show_anno: function (e) {
     var w = 120
-    if(this.data.annotation_dict[e.currentTarget.dataset.anno].length > 60){
+    if(this.data.annotation_dict[e.currentTarget.dataset.anno].length > 50){
       w = 240
     }
     this.setData({
@@ -1323,5 +1325,28 @@ Page({
     })
     wx.setStorageSync('fti', fti)
     this.get_by_id(this.data.work_item.id)
+  },
+  show_playlist: function(){
+    if(this.data.playlist.length == 0){
+      var playlist = wx.getStorageSync('playlist')
+      if(playlist && playlist.length > 0){
+        this.setData({
+          playlist: playlist
+        })
+      }else{
+        wx.showToast({
+          title: '未找到播放列表',
+          icon: 'none',
+        })
+      }
+    }else{
+      this.setData({
+        playlist: [],
+      })
+    }
+  },
+  go2detail_and_play: function(e){
+    var work_id = e.currentTarget.dataset.id_
+    this.get_by_id(work_id, true)
   }
 })
