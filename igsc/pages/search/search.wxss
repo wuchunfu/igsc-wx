@@ -165,6 +165,7 @@
   font-weight: 700;
   background-color: #f3f3f2;
   border: 1px solid #7c4b00;
+  color: #7c4b00;
 }
 
 .search_radio {

@@ -26,11 +26,11 @@
         <image wx:if="{{mode}}" src='../../static/{{mode}}.png' class="operate_audio" bindtap='change_mode'></image>
         <image src='../../static/timed.png' class="operate_audio" bindtap='set_timed'>
         </image>
-        <text wx:if="{{time2close!=0}}" style='text-align:center;line-height:2em;display:inline-block;width:2em;height:2em;border-radius:1em;font-size:10rpx;color:white;background-color:#7c4b00;opacity:0.8;position:absolute;top:0px;margin-left:-28rpx;'>{{close_play_time}}</text>
+        <text wx:if="{{time2close!=0}}" style='text-align:center;line-height:2em;display:inline-block;width:2em;height:2em;border-radius:1em;font-size:10rpx;color:white;background-color:#7c4b00;opacity:0.8;position:absolute;top:0px;margin-left:-26rpx;'>{{close_play_time}}</text>
       </view>
     </view>
     <view style="margin-top:5rpx;" wx:if="{{work_item.audio_id >0 && !folding}}">
-      <slider activeColor="#7c4b00" backgroundColor="#f3f3f2" bindchanging="slider_changing" bindchange="slider2change" step="1" min="1" block-size="15" value='{{slide_value}}' block-color="#7c4b00" style="margin-top:5rpx;margin-bottom:5rpx;" />
+      <slider activeColor="#7c4b00" backgroundColor="rgb(97, 113, 114, 0.1)" bindchanging="slider_changing" bindchange="slider2change" step="1" min="1" block-size="15" value='{{slide_value}}' block-color="#7c4b00" style="margin-top:5rpx;margin-bottom:5rpx;" />
       <text style='font-size:18rpx;color:#b9adad;opacity:0.8;float:right;margin-right:18rpx;' wx:if="{{duration_show}}">{{duration_show}}</text>
       <text style='font-size:18rpx;color:#7c4b00;opacity:0.8;float:left;margin-left:18rpx;' wx:if="{{current_time_show}}">{{current_time_show}}</text>
     </view>
@@ -70,11 +70,11 @@
         <image wx:if="{{mode}}" src='../../static/{{mode}}.png' class="operate_audio" bindtap='change_mode'></image>
         <image src='../../static/timed.png' class="operate_audio" bindtap='set_timed'>
         </image>
-        <text wx:if="{{time2close!=0}}" style='text-align:center;line-height:2em;display:inline-block;width:2em;height:2em;border-radius:1em;font-size:10rpx;color:white;background-color:#7c4b00;opacity:0.8;position:absolute;top:0px;margin-left:-28rpx;'>{{close_play_time}}</text>
+        <text wx:if="{{time2close!=0}}" style='text-align:center;line-height:2em;display:inline-block;width:2em;height:2em;border-radius:1em;font-size:10rpx;color:white;background-color:#7c4b00;opacity:0.8;position:absolute;top:0px;margin-left:-26rpx;'>{{close_play_time}}</text>
       </view>
     </view>
     <view style="margin-top:5rpx;" wx:if="{{work_item.audio_id >0 && !folding}}">
-      <slider activeColor="#7c4b00" backgroundColor="#f3f3f2" bindchanging="slider_changing" bindchange="slider2change" step="1" min="1" block-size="15" value='{{slide_value}}' block-color="#7c4b00" style="margin-top:5rpx;margin-bottom:5rpx;" />
+      <slider activeColor="#7c4b00" backgroundColor="rgb(97, 113, 114, 0.1)" bindchanging="slider_changing" bindchange="slider2change" step="1" min="1" block-size="15" value='{{slide_value}}' block-color="#7c4b00" style="margin-top:5rpx;margin-bottom:5rpx;" />
       <text style='font-size:18rpx;color:#7c4b00;opacity:0.8;float:right;margin-right:18rpx;' wx:if="{{duration_show}}">{{duration_show}}</text>
       <text style='font-size:18rpx;color:#7c4b00;opacity:0.8;float:left;margin-left:18rpx;' wx:if="{{current_time_show}}">{{current_time_show}}</text>
     </view>
@@ -86,16 +86,19 @@
     <view wx:if="{{work_item.appreciation}}" bindtap='change_content' data-item='3' class='tab-item {{current_tab==3?"active":""}}'>{{fti? '賞析': '赏析'}}</view>
     <view wx:if="{{work_item.master_comment}}" bindtap='change_content' data-item='4' class='tab-item {{current_tab==4?"active":""}}'>{{fti? '輯評': '辑评'}}</view>
     <view bindtap="do_copy" class='tab-item'>
-      <image src="../../static/copy.png" style='width:28rpx;height:28rpx;'></image>
+      <image src="../../static/copy.png" style='width:26rpx;height:26rpx;'></image>
     </view>
     <view bindtap="change_fti" class='tab-item' data-fti='{{fti}}'>
-      <image src='{{fti ? "../../static/jti.png": "../../static/fti.png"}}' style='width:28rpx;height:28rpx;'></image>
+      <image src='{{fti ? "../../static/jti.png": "../../static/fti.png"}}' style='width:26rpx;height:26rpx;'></image>
     </view>
     <view bindtap="speak" class='tab-item' data-speeching='{{speeching && speeching_id == work_item.id}}'>
-      <image src='{{speeching &&  speeching_id == work_item.id ? "../../static/speak.png":"../../static/un_speak.png"}}' style='width:28rpx;height:28rpx;'></image>
+      <image src='{{speeching &&  speeching_id == work_item.id ? "../../static/speak.png":"../../static/un_speak.png"}}' style='width:26rpx;height:26rpx;'></image>
     </view>
     <view bindtap="operate_like" class='tab-item' data-like='{{work_item.like}}'>
-      <image src='{{work_item.like==1 ? "../../static/liked.png":"../../static/like.png"}}' style='width:28rpx;height:28rpx;'></image>
+      <image src='{{work_item.like==1 ? "../../static/liked.png":"../../static/like.png"}}' style='width:26rpx;height:26rpx;'></image>
+    </view>
+    <view bindtap="add_list" class='tab-item' data-id_='{{work_item.id}}' wx:if="{{work_item.audio_id > 0}}">
+      <image src='../../static/add_list.png' style='width:26rpx;height:26rpx;'></image>
     </view>
     <view class='translation'>
       <text decode='true' space='nbsp' selectable="true">{{show_content}}</text>
@@ -105,15 +108,21 @@
     <image src='{{folding ? "../../static/unfold.png":"../../static/fold.png"}}' style='width:60rpx;height:60rpx;z-index: 99999;'></image>
   </view>
   <view style="display: {{annotation_detail.show ? 'inherit': 'none'}};position: absolute;left: {{annotation_detail.left}}px;top: {{annotation_detail.top}}px;background-color: #f3f3f2; color:#392f41;border-radius: 20rpx;padding: 12rpx;border: 1rpx dashed #7c4b00; margin-right: 20rpx;" bindtap="close_anno">{{annotation_detail.detail}}</view>
- <view wx:if="{{playlist.length > 0}}" class="playlist">
-   <view class="playlist_text" bindtap="show_playlist">
-   <icon type="clear" style="float: right;margin-right: 15rpx;" color="#c0c6c9" size="30rpx"></icon>播放列表</view>
+  <view wx:if="{{playlist.length > 0}}" class="playlist">
+    <view class="playlist_text">
+      <icon type="clear" style="float: right;margin-right: 15rpx;margin-top: 10rpx;" color="#c0c6c9" size="30rpx" bindtap="show_playlist"></icon>播放列表({{playlist.length}})
+      <image src="../../static/rubbish.png" style='width:32rpx;height:32rpx;float: right;margin-top: 9rpx;margin-right: 48rpx;' bindtap="remove_all_playlist"></image>
+    </view>
     <view wx:for="{{playlist}}" wx:key="work_id">
       <view id="item{{index+1}}">
-        <view bindtap='go2detail_and_play' data-id_='{{item.work_id}}'>
-          <view class='play_item' style="{{playing_audio_id ==item.work_id?'color:#7c4b00;font-weight:700;':''}}">{{index+1}}.{{item.title}} <text style="float: right;">{{item.author}}</text></view>
+        <view style="display: flex;">
+          <view style="flex: 10;">
+            <view class='play_item' style="{{playing_audio_id ==item.work_id?'color:#7c4b00;font-weight:700;':''}}" bindtap='go2detail_and_play' data-id_='{{item.work_id}}'>{{index+1}}.{{item.title}} <text style="font-size: 20rpx;">-{{item.author}}</text>
+            </view>
+          </view>
+          <image src="../../static/clear.png" style='width:32rpx;height:32rpx;float: right;margin-top: 9rpx;margin-right: 16rpx;' data-id_='{{item.work_id}}' bindtap="remove_from_playlist"></image>
         </view>
       </view>
     </view>
- </view>
+  </view>
 </view>

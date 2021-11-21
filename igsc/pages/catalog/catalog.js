@@ -1,6 +1,8 @@
 var config = require('../../config')
 var util = require('../../utils/util.js')
 var wx_search = require('../search/search.js')
+var wechat_si = requirePlugin('WechatSI')
+var recorder = wechat_si.getRecordRecognitionManager()
 const background_audio_manager = wx.getBackgroundAudioManager()
 background_audio_manager.referrerPolicy = 'origin'
 Page({
@@ -19,6 +21,7 @@ Page({
     to_top: 'work_item1',
     show_search_box: false,
     fti: false,
+    recording: false,
   },
   getcurrent_paly_id: function () {
     var that = this
@@ -157,14 +160,19 @@ Page({
         playlist.push({
           work_id: d.id,
           title: d.work_title,
-          author: d.work_dynasty + '·' + d.work_author
+          author: d.work_author
         })
       }
     }
     wx.setStorageSync('search_result_ids', search_result_ids)
-    if (audio_ids.length > 0) {
-      wx.setStorageSync('audio_ids', audio_ids)
-      wx.setStorageSync('playlist', playlist)
+    var old_audio_ids = wx.getStorageSync('audio_ids_playlist')
+    if (!old_audio_ids || old_audio_ids['audio_ids'].length == 0) {
+      if (audio_ids.length > 0) {
+        wx.setStorageSync('audio_ids_playlist', {
+          audio_ids: audio_ids,
+          playlist: playlist,
+        })
+      }
     }
   },
   interval_get_current_play: function () {
@@ -234,6 +242,7 @@ Page({
         }
       })
     }
+    this.register_reocoder_callback()
   },
   wx_search_input: wx_search.wx_search_input,
   wx_search_key_tap: wx_search.wx_search_key_tap,
@@ -268,7 +277,7 @@ Page({
       this.my_search_function(this.data.wx_search_data.value)
     }
   },
-  process_short_content: function(content){
+  process_short_content: function (content) {
     var splits = content.split(/([。！？! ? \n ；;])/)
     if (splits.length > 0) {
       var s = ''
@@ -277,7 +286,7 @@ Page({
           continue
         }
         s += splits[i]
-        if (['。', '！', '？', '!', '?', '\n' , '；', ';'].indexOf(splits[i]) != -1) {
+        if (['。', '！', '？', '!', '?', '\n', '；', ';'].indexOf(splits[i]) != -1) {
           break
         }
       }
@@ -585,7 +594,7 @@ Page({
       }
     })
   },
-  get_like_list: function(){
+  get_like_list: function () {
     var open_id = ''
     try {
       open_id = wx.getStorageSync('user_open_id')
@@ -696,5 +705,92 @@ Page({
       historyplay: null,
     })
     this.set_scroll_height()
+  },
+  mico_recognize: function () {
+    var that = this
+    if (this.data.recording) {
+      recorder.stop()
+      this.setData({
+        recording: false,
+      })
+    } else {
+      wx.getSetting({
+        success(res) {
+          if (!res.authSetting['scope.record']) {
+            wx.authorize({
+              scope: 'scope.record',
+              success: function () {
+                recorder.start({
+                  duration: 30000,
+                  lang: 'zh_CN',
+                })
+                that.setData({
+                  recording: true,
+                })
+              },
+              fail: function (e) {
+                wx.showToast({
+                  title: that.data.fti ? '請先在設置頁面打開麥克風權限' : '请先在设置页面打开麦克风权限',
+                  icon: 'none'
+                })
+              }
+            })
+          } else {
+            recorder.start({
+              duration: 30000,
+              lang: 'zh_CN',
+            })
+            that.setData({
+              recording: true,
+            })
+          }
+        }
+      })
+    }
+  },
+  register_reocoder_callback: function () {
+    var that = this
+    recorder.onStop = function (res) {
+      wx.hideLoading()
+      var result = res.result
+      result = result.replaceAll(/[。？！，\s]/g, '')
+      if (result.length == 0) {
+        wx.showToast({
+          title: that.data.fti ? '未識別到語音' : '未识别到语音',
+          icon: 'none'
+        })
+      } else {
+        var tem_data = that.data.wx_search_data
+        if (tem_data) {
+          tem_data.value = result
+          that.setData({
+            wx_search_data: tem_data,
+          })
+          wx_search.search(result)
+        }
+      }
+      that.setData({
+        recording: false,
+      })
+    }
+    recorder.onStart = function(){
+      wx.showLoading({
+        title: '识别中点击停止'
+      })
+    }
+    recorder.onError = function (res) {
+      if (that.data.fti) {
+        var msg = util.traditionalized('语音识别错误: ' + res.msg)
+      } else {
+        var msg = '语音识别错误: ' + res.msg
+      }
+      wx.showToast({
+        title: msg,
+        icon: 'none'
+      })
+      that.setData({
+        recording: false,
+      })
+    }
   }
 })

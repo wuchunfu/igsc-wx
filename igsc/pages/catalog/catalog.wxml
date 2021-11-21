@@ -29,7 +29,7 @@
               <view wx:if="{{item.split_content && item.split_content.length > 0}}" data-id_='{{item.id}}' class="content_text" style="{{current_paly_id==item.id?'color:#7c4b00;font-weight:700;':''}}">
                 <text class="{{item.k?'hl':''}}" wx:for="{{item.split_content}}" selectable="true" decode="true" space='nbsp'>{{item.s}}</text>
               </view>
-              <text class='author' style="{{current_paly_id==item.id?'color:#7c4b00;font-weight:700;':''}}">[{{item.work_dynasty}}] {{item.work_author}}</text>
+              <text class='author' style="{{current_paly_id==item.id?'color:#7c4b00;font-weight:700;':''}}">{{item.work_dynasty}}·{{item.work_author}}</text>
             </view>
           </view>
       </view>

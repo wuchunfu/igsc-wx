@@ -2,7 +2,6 @@
   height: 42rpx;
   width: 42rpx;
   padding-right: 18rpx;
-  /* padding-top: 10rpx; */
 }
 
 .tabs {
@@ -12,11 +11,11 @@
 
 .tab-item {
   display: inline-block;
-  width: 56rpx;
+  width: 52rpx;
   margin-right: 16rpx;
-  height: 28rpx;
-  line-height: 28rpx;
-  font-size: 28rpx;
+  height: 26rpx;
+  line-height: 26rpx;
+  font-size: 26rpx;
   font-weight: 700;
 }
 
@@ -78,40 +77,40 @@
 .playlist {
   position: fixed;
   background-color: #f3f3f2;
-  width: calc(100% - 55rpx);
+  width: 640rpx;
   bottom: 0rpx;
-  height: 600rpx;
+  height: 700rpx;
   overflow-y: scroll;
-  margin-left: -35rpx;
-  padding: 25rpx;
   border-radius: 30rpx;
+  margin-bottom: 50rpx;
+  margin-left: 20rpx;
 }
 
 .play_item {
   font-size: 28rpx;
   border-bottom: 1px dotted;
-  padding-bottom: 5rpx;
-  margin-top: 10rpx;
+  padding-bottom: 6rpx;
+  margin-bottom: 16rpx;
+  padding-left: 16rpx;
   border-bottom-color: rgb(97, 113, 114, 0.4);
 }
 
 .playlist_text {
   position: fixed;
-  bottom: 600rpx;
+  bottom: 700rpx;
   left: 0;
   background-color: #617172;
-  width: 100%;
-  margin-left: 0rpx;
-  padding-top: 2rpx;
+  width: 640rpx;
+  margin-left: 54rpx;
   border-top-left-radius: 30rpx;
   border-top-right-radius: 30rpx;
   height: 50rpx;
   text-align: center;
-  color:#f3f3f2;
+  color: #f3f3f2;
 }
 
 #item1 {
-  margin-top: 35rpx;
+  margin-top: 50rpx;
 }
 
 .no_scroll {

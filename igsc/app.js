@@ -1,52 +1,15 @@
 var config = require('config')
 var util = require('utils/util')
 App({
-  get_audio_list: function () {
-    var value = '音频'
-    var key = 'search_音频' + util.format_time(new Date())
-    wx.getStorage({
-      key: key,
-      success: function (res) {
-        if (res && res.data) {
-          var data = res.data
-          var audio_ids = []
-          for (var index = 0; index < data.length; index++) {
-            audio_ids.push(data[index].id)
-          }
-          wx.setStorageSync('audio_ids', audio_ids)
-        }
-      },
-      fail: function () {
-        wx.request({
-          url: config.gsc_url + 'query/' + value + '/main/a',
-          success(result) {
-            if (!result || result.data.code != 0) {
-              return
-            }
-            var audio_ids = []
-            var data = result.data.data.data
-            for (var index = 0; index < data.length; index++) {
-              audio_ids.push(data[index].id)
-            }
-            wx.setStorageSync('audio_ids', audio_ids)
-            wx.setStorage({
-              key: key,
-              data: data,
-            })
-          }
-        })
-      }
-    })
-  },
-  onHide(){
+  onHide() {
     wx.setStorageSync('app_is_hide', true)
   },
-  onShow(){
+  onShow() {
     wx.setStorageSync('app_is_hide', false)
   },
-  onUnload: function(e){
+  onUnload: function (e) {
     console.log('app onUnload')
-},
+  },
   onLaunch() {
     try {
       var open_id = wx.getStorageSync('user_open_id')
@@ -55,19 +18,9 @@ App({
       util.user_login()
     }
     try {
-      var today = util.format_time(new Date())
       open_id = wx.getStorageSync('user_open_id')
       var play_mode = wx.getStorageSync('play_mode')
-      today = today.replace(/-/g, '')
       var historyplay = wx.getStorageSync('historyplay')
-      var today_clear = wx.getStorageSync('clear_1' + today)
-      if (!today_clear || today_clear != 1) {
-        wx.clearStorage()
-      }
-      wx.setStorage({
-        key: 'clear_1' + today,
-        data: 1,
-      })
       wx.setStorage({
         key: 'historyplay',
         data: historyplay,
@@ -80,7 +33,6 @@ App({
       }
       wx.setStorageSync('play_mode', play_mode ? play_mode : 'xunhuan')
     } catch (e) {}
-    //util.loadFont()
     wx.getSystemInfo({
       success: function (res) {
         wx.setStorageSync('platform', 'pc')
@@ -88,7 +40,7 @@ App({
     })
     wx.request({
       url: config.service.host + '/version',
-      success: function(data) {
+      success: function (data) {
         wx.setStorageSync('api_version', data.data.v + '')
       }
     })
