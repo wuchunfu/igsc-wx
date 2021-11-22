@@ -120,7 +120,7 @@
             <view class='play_item' style="{{playing_audio_id ==item.work_id?'color:#7c4b00;font-weight:700;':''}}" bindtap='go2detail_and_play' data-id_='{{item.work_id}}'>{{index+1}}.{{item.title}} <text style="font-size: 20rpx;">-{{item.author}}</text>
             </view>
           </view>
-          <image src="../../static/clear.png" style='width:32rpx;height:32rpx;float: right;margin-top: 9rpx;margin-right: 16rpx;' data-id_='{{item.work_id}}' bindtap="remove_from_playlist"></image>
+          <image src="../../static/clear.png" style='width:32rpx;height:32rpx;float: right;margin-top: 9rpx;margin-right: 16rpx;padding-left: 20rpx;padding-bottom: 20rpx;' data-id_='{{item.work_id}}' bindtap="remove_from_playlist"></image>
         </view>
       </view>
     </view>
