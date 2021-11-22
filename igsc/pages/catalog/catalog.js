@@ -319,7 +319,9 @@ Page({
         })
       }
     }
-    value = util.simplized(value)
+    if(that.data.fti){
+      value = util.simplized(value)
+    }
     var enable_cache = false
     if (!value && page == 'like') {
       var url = config.gsc_url + 'mylike_by_page/' + open_id + '?page_num=' + that.data.page_num + '&page_size=' + that.data.page_size + '&search_pattern=' + that.data.search_pattern + '&t=' + util.api_version()

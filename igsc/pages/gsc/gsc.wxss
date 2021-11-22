@@ -67,7 +67,7 @@
 }
 
 .anno_text {
-  color: #617172;
+  color:#758a99;
 }
 
 .anno_text:hover {

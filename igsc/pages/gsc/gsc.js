@@ -154,6 +154,15 @@ Page({
       fail: function (res) {}
     })
   },
+  storage_single_item: function (work_id, audio_url, title, author, audio_id) {
+    wx.setStorageSync('singleitem', {
+      'id': work_id,
+      'url': audio_url,
+      'title': title,
+      'author': author,
+      'audio_id': audio_id,
+    })
+  },
   change_mode: function () {
     //xunhuan->one->shuffle->xunhuan
     var that = this
@@ -168,21 +177,21 @@ Page({
         icon: 'none'
       })
       if (that.data.playing && that.data.playing_audio_id > 0) {
-        wx.setStorageSync('singleid', {
-          'id': that.data.playing_audio_id,
-          'url': background_audio_manager.src,
-          'title': background_audio_manager.title,
-          'author': background_audio_manager.singer,
-          'audio_id': that.data.playing_audio_id,
-        })
+        that.storage_single_item(
+          that.data.playing_audio_id,
+          background_audio_manager.src,
+          background_audio_manager.title,
+          background_audio_manager.singer,
+          that.data.playing_audio_id,
+        )
       } else {
-        wx.setStorageSync('singleid', {
-          'id': that.data.work_item.id,
-          'url': that.data.audio_url,
-          'title': that.data.work_item.work_title,
-          'author': that.data.work_item.work_author,
-          'audio_id': that.data.work_item.audio_id,
-        })
+        that.storage_single_item(
+          that.data.work_item.id,
+          that.data.audio_url,
+          that.data.work_item.work_title,
+          that.data.work_item.work_author,
+          that.data.work_item.audio_id,
+        )
       }
     } else if (this.data.mode == 'one') {
       this.setData({
@@ -296,6 +305,7 @@ Page({
         })
         var annotation_words = Object.keys(annotation_dict).filter((item, pos) => item && item.length > 0)
         var words = annotation_words.concat(split_words)
+        // 去重
         words = words.filter((item, pos) => words.indexOf(item) === pos)
         var work_content = work.content
         var work_foreword = work.foreword
@@ -410,10 +420,10 @@ Page({
     }
     // 有些注释有拼音，去掉
     if (tmp0.indexOf('（') != -1) {
-      tmp0 = tmp0.replaceAll(/（(音)?[a-z A-Z ĀÀÈŌāáǎàōóǒòêēéěèīíǐìūúǔùǖǘǚǜüńňǹɑɡ]*(，.*)?）/g, '')
+      tmp0 = tmp0.replaceAll(/（.{0,20}?）/g, '')
     }
     if (tmp0.indexOf('(') != -1) {
-      tmp0 = tmp0.replaceAll(/\((音)?[a-z A-Z ĀÀÈŌāáǎàōóǒòêēéěèīíǐìūúǔùǖǘǚǜüńňǹɑɡ]*(，.*)?\)/g, '')
+      tmp0 = tmp0.replaceAll(/\(.{0,20}?\)/g, '')
     }
     return tmp0
   },
@@ -450,7 +460,7 @@ Page({
     } else if (that.data.mode == 'one') {
       //单曲循环
       try {
-        var play_id_url = wx.getStorageSync('singleid')
+        var play_id_url = wx.getStorageSync('singleitem')
         background_audio_manager.src = play_id_url.url
         background_audio_manager.title = play_id_url.title
         background_audio_manager.singer = play_id_url.author
@@ -474,13 +484,13 @@ Page({
           that.record_play(play_id_url.id, play_id_url.title + '-' + play_id_url.author)
         }
       } catch (e) {
-        wx.setStorageSync('singleid', {
-          'id': that.data.work_item.id,
-          'url': that.data.audio_url,
-          'title': that.data.work_item.work_title,
-          'author': that.data.work_item.work_author,
-          'audio_id': that.data.work_item.audio_id,
-        })
+        that.storage_single_item(
+          that.data.work_item.id,
+          that.data.audio_url,
+          that.data.work_item.work_title,
+          that.data.work_item.work_author,
+          that.data.work_item.audio_id,
+        )
         background_audio_manager.src = that.data.audio_url
         background_audio_manager.title = that.data.work_item.work_title
         var title = 'i古诗词'
@@ -941,13 +951,13 @@ Page({
       }
       background_audio_manager.play()
       if (this.data.mode == 'one') {
-        wx.setStorageSync('singleid', {
-          'id': this.data.work_item.id,
-          'url': this.data.audio_url,
-          'title': this.data.work_item.work_title,
-          'author': this.data.work_item.work_author,
-          'audio_id': this.data.work_item.audio_id,
-        })
+        this.storage_single_item(
+          this.data.work_item.id,
+          this.data.audio_url,
+          this.data.work_item.work_title,
+          this.data.work_item.work_author,
+          this.data.work_item.audio_id,
+        )
       }
     } else {
       wx.showToast({
@@ -1470,7 +1480,7 @@ Page({
         audio_ids: audio_ids,
         playlist: playlist,
       })
-      this.set_play_list(false)
+      this.set_play_list()
     }
     wx.showToast({
       title: '成功加入播放列表',
