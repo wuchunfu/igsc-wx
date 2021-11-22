@@ -319,7 +319,7 @@ Page({
         })
       }
     }
-    if(that.data.fti){
+    if (that.data.fti) {
       value = util.simplized(value)
     }
     var enable_cache = false
@@ -762,20 +762,16 @@ Page({
           icon: 'none'
         })
       } else {
-        var tem_data = that.data.wx_search_data
-        if (tem_data) {
-          tem_data.value = result
-          that.setData({
-            wx_search_data: tem_data,
-          })
-          wx_search.search(result)
+        if (that.data.fti) {
+          result = util.traditionalized(result)
         }
+        wx_search.search(result)
       }
       that.setData({
         recording: false,
       })
     }
-    recorder.onStart = function(){
+    recorder.onStart = function () {
       wx.showLoading({
         title: '识别中点击停止'
       })

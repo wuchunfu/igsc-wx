@@ -1387,6 +1387,15 @@ Page({
             author: background_audio_manager.singer,
           })
           audio_ids.unshift(this.data.playing_audio_id)
+          for (var i = 0; i < playlist.length; i++) {
+            if (this.data.fti) {
+              playlist[i].title = util.traditionalized(playlist[i].title)
+              playlist[i].author = util.traditionalized(playlist[i].author)
+            } else {
+              playlist[i].title = util.simplized(playlist[i].title)
+              playlist[i].author = util.simplized(playlist[i].author)
+            }
+          }
           this.setData({
             playlist: playlist
           })
@@ -1397,6 +1406,15 @@ Page({
         }
       }
       if (should_set) {
+        for (var i = 0; i < playlist.length; i++) {
+          if (this.data.fti) {
+            playlist[i].title = util.traditionalized(playlist[i].title)
+            playlist[i].author = util.traditionalized(playlist[i].author)
+          } else {
+            playlist[i].title = util.simplized(playlist[i].title)
+            playlist[i].author = util.simplized(playlist[i].author)
+          }
+        }
         this.setData({
           playlist: playlist
         })
