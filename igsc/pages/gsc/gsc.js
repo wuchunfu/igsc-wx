@@ -49,6 +49,7 @@ Page({
     },
     fti: false,
     playlist: [],
+    show_playlist_flag: false,
   },
   set_timed: function () {
     var that = this
@@ -785,6 +786,12 @@ Page({
     }, 3000);
   },
   _record_play: function (id_, title) {
+    var last_record = wx.getStorageSync('last_record')
+    if (last_record) {
+      if (last_record.work_id == id_ && last_record.time > (new Date().getTime() - 15 * 1000)) {
+        return
+      }
+    }
     var historyplay = wx.getStorageSync('historyplay')
     if (!historyplay) {
       historyplay = {}
@@ -801,6 +808,10 @@ Page({
       }
     }
     wx.setStorageSync('historyplay', historyplay)
+    wx.setStorageSync('last_record', {
+      work_id: id_,
+      time: new Date().getTime(),
+    })
   },
   search_: function (e) {
     var id_ = e.currentTarget.dataset.id_
@@ -981,16 +992,19 @@ Page({
     })
     return mode
   },
-  listen_play: function (that) {
+  listen_play: function (that, event) {
     background_audio_manager.onEnded(() => {
+      console.log('onEnded', event)
       that.do_operate_play('next', that.get_play_mode())
     })
     background_audio_manager.onPause(() => {
+      console.log('onPause', event)
       that.setData({
         playing: false,
       })
     })
     background_audio_manager.onStop(() => {
+      console.log('onStop', event)
       that.setData({
         playing: false,
       })
@@ -999,22 +1013,33 @@ Page({
       }
     })
     background_audio_manager.onError((e) => {
+      console.log('onError', event, e)
       that.setData({
         playing: false,
       })
+      var last_error_time = wx.getStorageSync('last_error_time')
+      var now = new Date().getTime()
+      if (last_error_time && last_error_time > (now - 3000)) {
+        console.log('错误太频繁, last_error_time: ', last_error_time, ', now: ', now)
+        return
+      }
+      wx.setStorageSync('last_error_time', now)
       if (util.app_is_hide()) {
         that.do_operate_play('next', that.get_play_mode())
       }
     })
     background_audio_manager.onWaiting(() => {
+      console.log('onWaiting', event)
       wx.showLoading({
         title: that.data.fti ? '音頻加載中...' : '音频加载中...',
       })
     })
     background_audio_manager.onCanplay(() => {
+      console.log('onCanplay', event)
       wx.hideLoading()
     })
     background_audio_manager.onPlay(() => {
+      console.log('onPlay', event)
       if (inner_audio_context) {
         inner_audio_context.pause()
         that.setData({
@@ -1027,9 +1052,11 @@ Page({
       })
     })
     background_audio_manager.onPrev(() => {
+      console.log('onPrev', event)
       that.do_operate_play('up', that.get_play_mode())
     })
     background_audio_manager.onNext(() => {
+      console.log('onNext', event)
       that.do_operate_play('next', that.get_play_mode())
     })
     background_audio_manager.onTimeUpdate(() => {
@@ -1087,7 +1114,6 @@ Page({
   },
   onReady: function (e) {
     var that = this
-    that.listen_play(that)
     var id_ = setInterval(() => {
       if (that.data.work_item) {
         that.set_current_playing()
@@ -1100,6 +1126,7 @@ Page({
     inner_audio_context.playbackRate = 0.8
     inner_audio_context.referrerPolicy = 'origin'
     that.listen_speeching(that)
+    that.listen_play(that, 'onReady')
   },
   set_current_playing: function () {
     if (background_audio_manager && !background_audio_manager.paused) {
@@ -1127,11 +1154,11 @@ Page({
   },
   onHide: function () {
     inner_audio_context.stop()
-    this.listen_play(this)
+    this.listen_play(this, 'onHide')
   },
   onUnload: function () {
     inner_audio_context.stop()
-    this.listen_play(this)
+    this.listen_play(this, 'onUnload')
   },
   long_press: function () {
     var that = this
@@ -1356,10 +1383,7 @@ Page({
     wx.setStorageSync('fti', fti)
     this.get_by_id(this.data.work_item.id)
   },
-  set_play_list: function (check = true) {
-    if (check && this.data.playlist.length <= 0) {
-      return
-    }
+  set_play_list: function (toast = false) {
     var data = wx.getStorageSync('audio_ids_playlist')
     if (!data) {
       var playlist = []
@@ -1397,8 +1421,13 @@ Page({
             }
           }
           this.setData({
-            playlist: playlist
+            playlist: playlist,
           })
+          if (playlist.length == 0) {
+            this.setData({
+              show_playlist_flag: false,
+            })
+          }
           wx.setStorageSync('audio_ids_playlist', {
             audio_ids: audio_ids,
             playlist: playlist,
@@ -1416,10 +1445,15 @@ Page({
           }
         }
         this.setData({
-          playlist: playlist
+          playlist: playlist,
         })
+        if (playlist.length == 0) {
+          this.setData({
+            show_playlist_flag: false,
+          })
+        }
       }
-      if (playlist.length == 0 && !check) {
+      if (playlist.length == 0 && toast) {
         wx.showToast({
           title: '播放列表为空',
           icon: 'none'
@@ -1428,11 +1462,14 @@ Page({
     }
   },
   show_playlist: function () {
-    if (this.data.playlist.length == 0) {
-      this.set_play_list(false)
+    if (!this.data.show_playlist_flag) {
+      this.setData({
+        show_playlist_flag: true
+      })
+      this.set_play_list(true)
     } else {
       this.setData({
-        playlist: [],
+        show_playlist_flag: false
       })
     }
   },
@@ -1463,7 +1500,7 @@ Page({
       audio_ids: audio_ids,
       playlist: playlist,
     })
-    this.set_play_list(false)
+    this.set_play_list(true)
   },
   add_list: function (e) {
     var work_id = e.currentTarget.dataset.id_

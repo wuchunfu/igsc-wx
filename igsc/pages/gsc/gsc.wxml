@@ -108,7 +108,7 @@
     <image src='{{folding ? "../../static/unfold.png":"../../static/fold.png"}}' style='width:60rpx;height:60rpx;z-index: 99999;'></image>
   </view>
   <view style="display: {{annotation_detail.show ? 'inherit': 'none'}};position: absolute;left: {{annotation_detail.left}}px;top: {{annotation_detail.top}}px;background-color: #f3f3f2; color:#392f41;border-radius: 20rpx;padding: 12rpx;border: 1rpx dashed #7c4b00; margin-right: 20rpx;" bindtap="close_anno">{{annotation_detail.detail}}</view>
-  <view wx:if="{{playlist.length > 0}}" class="playlist">
+  <view wx:if="{{playlist.length > 0 && show_playlist_flag}}" class="playlist">
     <view class="playlist_text">
       <icon type="clear" style="float: right;margin-right: 15rpx;margin-top: 10rpx;" color="#c0c6c9" size="30rpx" bindtap="show_playlist"></icon>播放列表({{playlist.length}})
       <image src="../../static/rubbish.png" style='width:32rpx;height:32rpx;float: right;margin-top: 9rpx;margin-right: 48rpx;' bindtap="remove_all_playlist"></image>
