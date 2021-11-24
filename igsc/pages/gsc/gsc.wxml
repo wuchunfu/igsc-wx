@@ -1,4 +1,4 @@
-<view class='gsc container {{playlist.length > 9 ? "no_scroll": ""}}'>
+<view class='gsc container {{playlist.length > 9 && show_playlist_flag ? "no_scroll": ""}}'>
   <view id="location_id"></view>
   <view wx:if="{{!work_item.split_title || work_item.split_title.length == 0}}" class='title' data-q='{{work_item.work_title}}' data-id_='{{work_item.id}}' bindlongpress='search_' data-search_pattern='title'>{{work_item.work_title}}</view>
   <view wx:if="{{work_item.split_title && work_item.split_title.length > 0}}" class='title' data-q='{{work_item.work_title}}' data-id_='{{work_item.id}}' bindlongpress='search_' data-search_pattern='title'>

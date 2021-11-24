@@ -17,6 +17,8 @@ function init(that, hot_keys, tip_keys, search_function, go_back_function) {
   var tem_data = {}
   if (that.search_v) {
     tem_data.value = that.search_v
+  }else{
+    tem_data.value  = ''
   }
   var bar_height = 30
   var view = {
@@ -39,7 +41,6 @@ function init(that, hot_keys, tip_keys, search_function, go_back_function) {
 
 function wx_search_input(e) {
   var input_value = e.detail.value
-
   var tem_data = __that.data.wx_search_data
 
   var tip_keys = []

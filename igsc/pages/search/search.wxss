@@ -13,7 +13,6 @@
 .wx_search_mind_key_item {
   padding: 10rpx 5rpx 10rpx 15rpx;
   margin-left: 10rpx;
-  /* border-bottom: 1px solid #eee; */
   display: flex;
   font-size: 20rpx;
 }
@@ -22,7 +21,7 @@
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  border-bottom: 1rpx solid #eee;
+  border-bottom: 1rpx solid #f3f3f2;
 }
 
 .wx_search_key_item {
@@ -56,7 +55,7 @@
   text-align: center;
   padding-top: 2rpx;
   padding-bottom: 2rpx;
-  border: 1rpx solid #eee;
+  border: 1rpx solid #f3f3f2;
   border-radius: 2rpx;
 }
 
@@ -96,17 +95,18 @@
   flex: auto;
   background: #fff;
   border-radius: 10rpx;
-  border: 1px dashed #7c4b00;
+  border: 1rpx dashed #617172;
+  height: 60rpx;
 }
 
 .weui-search-bar__form:hover {
-  background: #f3f3f2;
-  border: 1px solid #7c4b00;
+  border: 1rpx dashed #7c4b00;
+  background-color: #fff;
 }
 
 .weui-search-bar__form:focus {
-  background: #f3f3f2;
-  border: 1px solid #7c4b00;
+  border: 1rpx dashed #7c4b00;
+  background-color: #fff;
 }
 
 .weui-search-bar__box {
@@ -122,7 +122,8 @@
   height: 60rpx;
   line-height: 60rpx;
   padding-right: 60rpx;
-  caret-color: #7c4b00;
+  caret-color: #617172;
+  font-size: 28rpx;
 }
 
 .weui-icon-clear {
@@ -144,8 +145,7 @@
   z-index: 2;
   border-radius: 3rpx;
   text-align: center;
-  color: #fff;
-  background: #f3f3f2;
+  background: #fff;
   line-height: 28rpx;
 }
 
@@ -153,23 +153,28 @@
   margin-left: 10rpx;
   line-height: 60rpx;
   white-space: nowrap;
-  font-size: 30rpx;
+  font-size: 28rpx;
   height: 60rpx;
   border-radius: 10rpx;
-  border: 1px dashed #7c4b00;
-  background-color: #fff;
+  border: 1rpx dashed #617172;
   padding: 0px 5rpx 0rpx 5rpx;
+  color: #617172;
+  background-color: #fff;
 }
 
 .weui-search-bar__cancel-btn:hover {
-  font-weight: 700;
-  background-color: #f3f3f2;
-  border: 1px solid #7c4b00;
+  border: 1rpx dashed #7c4b00;
   color: #7c4b00;
+  background-color: #fff;
 }
 
 .search_radio {
-  color: #7c4b00;
+  color: #617172;
   margin-right: 10rpx;
   transform: scale(0.8);
+}
+
+.placeholder {
+  color: #617172;
+  font-size: 28rpx;
 }

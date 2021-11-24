@@ -117,15 +117,19 @@ Page({
           datas = []
         }
         var dd = []
-        if (that.data.fti) {
-          for (var i = 0; i < datas.length; i++) {
-            that.trans_fti(datas[i])
-          }
-        }
         for (var data of datas) {
           data.short_content = that.process_short_content(data.content)
           data.split_words = ''
           dd.push(data)
+        }
+        wx.setStorage({
+          key: 'gsc_items' + util.format_time(new Date()),
+          data: dd
+        })
+        if (that.data.fti) {
+          for (var i = 0; i < dd.length; i++) {
+            that.trans_fti(dd[i])
+          }
         }
         that.setData({
           gscitems: dd,
@@ -134,10 +138,6 @@ Page({
           show_bottom_button: false,
         })
         that.storage_result(dd)
-        wx.setStorage({
-          key: 'gsc_items' + util.format_time(new Date()),
-          data: dd
-        })
         wx.hideLoading()
       },
       fail: function () {
@@ -442,7 +442,11 @@ Page({
       that = current_page
     }
     var fti = wx.getStorageSync('fti') ? true : false
-    if (fti != that.data.fti) {
+    var not_equal = (fti != that.data.fti)
+    that.setData({
+      fti: fti,
+    })
+    if (not_equal) {
       if (!that.search_v && that.data.page == 'main') {
         that.get_home_data(that)
       } else {
@@ -456,9 +460,6 @@ Page({
         }
       }
     }
-    that.setData({
-      fti: fti,
-    })
     var hot = ['杜甫', '白居易', '苏轼', '姜夔', '水调歌头', '少年游', '永遇乐', '蝶恋花', '与陈伯之书', '滕王阁序', '洛神赋', '纤手破新橙']
     var mind = ['宋祁', '朱淑真', '吴文英', '晏几道', '秦观', '贺铸', '王安石', '李之仪', '周邦彦', '姜夔', '晏殊', '张先', '范仲淹', '晁补之', '赵佶', '宋徽宗', '张元干', '岳飞', '史达祖', '刘克庄', '蒋捷', '钱惟演', '张炎', '张孝祥', '张镃', '张抡', '青玉案', '元宵', '中秋', '蝶恋花', '满庭芳', '卜算子', '菩萨蛮', '忆江南', '浣溪沙', '诉衷情', '清平乐', '雨霖铃', '定风波', '八声甘州', '青门引', '念奴娇', '水调歌头', '洞仙歌', '渔家傲', '横塘路', '瑞龙吟', '六丑', '欧阳修', '声声慢', '永遇乐', '贺新郎', '水龙吟', '程垓', '齐天乐', '苏轼', '辛弃疾', '白居易', '李白', '杜甫', '李清照', '杜审言']
     if (fti) {
