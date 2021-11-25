@@ -103,7 +103,7 @@
     <view bindtap="operate_like" class='tab-item' data-like='{{work_item.like}}'>
       <image src='{{work_item.like==1 ? "../../static/liked.png":"../../static/like.png"}}' class='bottom_icons'></image>
     </view>
-    <view class='translation'>
+    <view class='translation' bindtouchstart="touch_start" bindtouchend="touch_end" data-currentab="{{current_tab}}">
       <text decode='true' space='nbsp' selectable="true">{{show_content}}</text>
     </view>
   </view>

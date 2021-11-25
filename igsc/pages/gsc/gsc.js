@@ -58,6 +58,7 @@ Page({
       captcha: ''
     },
     captcha_data: '',
+    move_start_x: 0,
   },
   set_timed: function () {
     var that = this
@@ -834,23 +835,51 @@ Page({
       })
     }
   },
-  change_content: function (e) {
-    var target_id = e.currentTarget.dataset.item
+  _change_content: function (target_id, direction = '') {
     var gsc = this.data.work_item
     var show_content = ''
-    switch ('' + target_id) {
-      case '0':
+    target_id = parseInt(target_id)
+    switch (target_id) {
+      case 0:
         show_content = gsc.intro
-        break
-      case '1':
-        show_content = gsc.annotation
-        break
-      case '2':
-        show_content = gsc.translation
-        break
-      case '3':
-        show_content = gsc.appreciation
-        break
+        if (show_content && show_content.length > 0) {
+          break
+        }
+        if (direction == 'left') {
+          return this._change_content(1, direction)
+        } else if (direction == 'right') {
+          return this._change_content(3, direction)
+        }
+        case 1:
+          show_content = gsc.annotation
+          if (show_content && show_content.length > 0) {
+            break
+          }
+          if (direction == 'left') {
+            return this._change_content(2, direction)
+          } else if (direction == 'right') {
+            return this._change_content(0, direction)
+          }
+          case 2:
+            show_content = gsc.translation
+            if (show_content && show_content.length > 0) {
+              break
+            }
+            if (direction == 'left') {
+              return this._change_content(3, direction)
+            } else if (direction == 'right') {
+              return this._change_content(1, direction)
+            }
+            case 3:
+              show_content = gsc.appreciation
+              if (show_content && show_content.length > 0) {
+                break
+              }
+              if (direction == 'left') {
+                return this._change_content(0, direction)
+              } else if (direction == 'right') {
+                return this._change_content(2, direction)
+              }
     }
     show_content = show_content.replace(/　　/g, '')
     show_content = show_content.replace(/\n/g, '\n　　')
@@ -864,6 +893,33 @@ Page({
       current_tab: target_id,
       show_content: show_content,
     })
+  },
+  change_content: function (e) {
+    this._change_content(e.currentTarget.dataset.item)
+  },
+  touch_start: function (e) {
+    this.setData({
+      move_start_x: e.changedTouches[0].pageX
+    })
+  },
+  touch_end: function (e) {
+    var current_tab = parseInt(e.currentTarget.dataset.currentab)
+    if (e.changedTouches[0].pageX - this.data.move_start_x > 50) {
+      if (current_tab == 0) {
+        current_tab = 3
+      } else {
+        current_tab -= 1
+      }
+      this._change_content(current_tab, 'right')
+    }
+    if (this.data.move_start_x - e.changedTouches[0].pageX > 50) {
+      if (current_tab == 3) {
+        current_tab = 0
+      } else {
+        current_tab += 1
+      }
+      this._change_content(current_tab, 'left')
+    }
   },
   onPullDownRefresh: function () {
     wx.showNavigationBarLoading()
@@ -1158,8 +1214,10 @@ Page({
     }, 200)
   },
   onHide: function () {
+    wx.setStorageSync('app_is_hide', true)
     inner_audio_context.stop()
     this.listen_play(this, 'onHide')
+
   },
   onUnload: function () {
     inner_audio_context.stop()

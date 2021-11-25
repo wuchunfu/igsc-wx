@@ -494,12 +494,12 @@ Page({
           })
           historylist = historylist.slice(0, 10)
           for (var x in historylist) {
+            if (that.data.fti) {
+              historylist[x].title = util.traditionalized(historylist[x].title)
+            } else {
+              historylist[x].title = util.simplized(historylist[x].title)
+            }
             if (historylist[x].times > 99) {
-              if (that.data.fti) {
-                historylist[x].title = util.traditionalized(historylist[x].title)
-              } else {
-                historylist[x].title = util.simplized(historylist[x].title)
-              }
               historylist[x].times = '99+'
             }
           }
