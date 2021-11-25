@@ -263,6 +263,19 @@ function simplized(cc) {
   return str
 }
 
+
+function get_open_id() {
+  var open_id = wx.getStorageSync('user_open_id')
+  if (!open_id || open_id.length == 0) {
+    util.user_login()
+    wx.showToast({
+      title: '未获取用户标识',
+      icon: 'none'
+    })
+    return
+  }
+  return open_id
+}
 module.exports = {
   format_time,
   show_success,
@@ -274,4 +287,5 @@ module.exports = {
   app_is_hide,
   simplized,
   traditionalized,
+  get_open_id,
 }

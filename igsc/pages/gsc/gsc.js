@@ -50,6 +50,14 @@ Page({
     fti: false,
     playlist: [],
     show_playlist_flag: false,
+    show_feedback: false,
+    feedback_remark: '',
+    feedback_checked_value: [],
+    captcha: {
+      token: '',
+      captcha: ''
+    },
+    captcha_data: '',
   },
   set_timed: function () {
     var that = this
@@ -260,9 +268,6 @@ Page({
         } else if (work.appreciation) {
           target_id = 3
           show_content = work.appreciation
-        } else if (work.master_comment) {
-          target_id = 4
-          show_content = work.master_comment
         }
         show_content = show_content.replace(/　　/g, '')
         show_content = show_content.replace(/\n/g, '\n　　')
@@ -846,9 +851,6 @@ Page({
       case '3':
         show_content = gsc.appreciation
         break
-      case '4':
-        show_content = gsc.master_comment
-        break
     }
     show_content = show_content.replace(/　　/g, '')
     show_content = show_content.replace(/\n/g, '\n　　')
@@ -1017,13 +1019,16 @@ Page({
       that.setData({
         playing: false,
       })
-      var last_error_time = wx.getStorageSync('last_error_time')
+      var last_error_times = wx.getStorageSync('last_error_times')
       var now = new Date().getTime()
-      if (last_error_time && last_error_time > (now - 3000)) {
-        console.log('错误太频繁, last_error_time: ', last_error_time, ', now: ', now)
+      if (last_error_times && last_error_times > (now - 3000) && last_error_time.times % 3 == 0) {
+        console.log('错误太频繁, last_error_times: ', last_error_times, ', now: ', now)
         return
       }
-      wx.setStorageSync('last_error_time', now)
+      wx.setStorageSync('last_error_times', {
+        time: now,
+        times: last_error_times ? last_error_times.times + 1 : 1,
+      })
       if (util.app_is_hide()) {
         that.do_operate_play('next', that.get_play_mode())
       }
@@ -1554,6 +1559,172 @@ Page({
           wx.removeStorageSync('audio_ids_playlist')
           that.set_play_list()
         }
+      }
+    })
+  },
+  feedback: function (e) {
+    this.refresh()
+    this.setData({
+      show_feedback: true,
+    })
+  },
+  close_feedback: function () {
+    this.setData({
+      show_feedback: false,
+      feedback_checked_value: [],
+      feedback_remark: '',
+      captcha: {
+        token: '',
+        captcha: ''
+      },
+      captcha_data: '',
+    })
+  },
+  feedback_checked: function (e) {
+    this.setData({
+      feedback_checked_value: e.detail.value
+    })
+  },
+  feedback_remark_input: function (e) {
+    this.setData({
+      feedback_remark: e.detail.value
+    })
+  },
+  captcha_input: function (e) {
+    this.setData({
+      captcha_data: e.detail.value
+    })
+  },
+  feedback_submit: function () {
+    var that = this
+    if (this.data.feedback_checked_value.length == 0 && this.data.feedback_remark.replaceAll(/\s/g, '').length == 0) {
+      wx.showToast({
+        title: '反馈内容为空',
+        icon: 'none'
+      })
+      return
+    }
+    if (this.data.feedback_checked_value.length > 0) {
+      var l = this.data.feedback_remark.replaceAll(/\s/g, '').length
+      if (l == 0) {
+        wx.showToast({
+          title: '详细信息为空',
+          icon: 'none'
+        })
+        return
+      }
+      if (l <= 6) {
+        wx.showToast({
+          title: '详细信息太少',
+          icon: 'none'
+        })
+        return
+      }
+    }
+    if (this.data.captcha_data.length != 6) {
+      wx.showToast({
+        title: '验证码不正确',
+        icon: 'none'
+      })
+      return
+    }
+    var submit_cache_key = 'submit_cache_key' + util.format_time(new Date())
+    var submit_cache = wx.getStorageSync(submit_cache_key)
+    if (!submit_cache) {
+      submit_cache = 0
+    }
+    if (submit_cache >= 10) {
+      wx.showToast({
+        title: '今天反馈太多啦',
+        icon: 'none'
+      })
+      return
+    }
+    wx.showLoading({
+      title: '反馈中...',
+      mask: true,
+    })
+    var feedback_value = 0
+    var feedback_checked_value = this.data.feedback_checked_value
+    for (var i = 0; i < feedback_checked_value.length; i++) {
+      feedback_value += parseInt(feedback_checked_value[i])
+    }
+    var gsc_id = this.data.work_item.id
+    if (!gsc_id) {
+      wx.showToast({
+        title: '获取内容异常',
+        icon: 'none'
+      })
+      return
+    }
+    var open_id = util.get_open_id()
+    if (!open_id || open_id.length == 0) {
+      return
+    }
+    wx.request({
+      url: config.service.host + '/gsc/feedback/' + open_id + '/' + gsc_id,
+      enableHttp2: true,
+      data: {
+        feedback_type: feedback_value,
+        remark: this.data.feedback_remark,
+        token: this.data.captcha.token,
+        captcha: this.data.captcha_data,
+      },
+      header: {
+        'content-type': 'application/json'
+      },
+      method: 'POST',
+      success: function (res) {
+        if (res.data.code == 0) {
+          wx.showToast({
+            title: '感谢你的反馈❤️',
+          })
+          wx.setStorageSync(submit_cache_key, submit_cache + 1)
+          that.close_feedback()
+        } else {
+          wx.showToast({
+            title: res.data.msg,
+            icon: 'none'
+          })
+        }
+      },
+      fail: function (res) {
+        wx.showToast({
+          title: '网络异常~~',
+          icon: 'none'
+        })
+      }
+    })
+  },
+  refresh: function () {
+    var that = this
+    var open_id = util.get_open_id()
+    if (!open_id || open_id.length == 0) {
+      return
+    }
+    wx.request({
+      url: config.service.host + '/user/' + open_id + '/captcha',
+      enableHttp2: true,
+      success: function (res) {
+        if (res.data.code == 0) {
+          that.setData({
+            captcha: {
+              captcha: res.data.captcha,
+              token: res.data.token,
+            }
+          })
+        } else {
+          wx.showToast({
+            title: res.data.msg,
+            icon: 'none'
+          })
+        }
+      },
+      fail: function () {
+        wx.showToast({
+          title: '网络异常~~',
+          icon: 'none'
+        })
       }
     })
   }
